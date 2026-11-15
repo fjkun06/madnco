@@ -4,21 +4,16 @@ import { en } from "@/locales/en";
 import { siteConfig } from "@/utils/app.constants";
 import { BUTTON_GHOST, BUTTON_PRIMARY, DISPLAY_TRACKING, WRAP } from "@/utils/ui.classes";
 import { ExternalLink } from "@/components/ui/ExternalLink";
-import { RANGE, ScrollProgress } from "@/components/ui/scroll/ScrollProgress";
 
 /**
  * Above the fold. The entrance is CSS only (globals.css: `.hero-title`,
  * `.mascot-*`, `.animate-rise-in`), so it paints at once without waiting
- * for JavaScript. Scrolling away is scroll-linked (`--p`, 0 → 1 while the
- * hero leaves the screen): the title lifts and fades, the skull and ghost
- * fly apart, the game screen sinks back.
+ * for JavaScript. Nothing here is linked to the scroll.
  */
 export function Hero() {
   const t = en.hero;
   return (
-    <ScrollProgress
-      as="section"
-      range={RANGE.leaving}
+    <section
       aria-labelledby="hero-title"
       className={`${WRAP} grid grid-cols-1 items-center gap-[clamp(2.25rem,1rem+4vw,3.5rem)] pt-[clamp(1.75rem,0.9rem+3.5vw,3.5rem)] pb-[clamp(3.5rem,2rem+5vw,6rem)] lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]`}
     >
@@ -27,18 +22,16 @@ export function Hero() {
           <span aria-hidden="true" className="h-[3px] w-7 bg-tq" />
           {t.kicker}
         </p>
-        <div className="translate-y-[calc(var(--p)*-160px)] opacity-[calc(1-var(--p)*0.65)]">
-          <h1
-            id="hero-title"
-            className={`hero-title mt-[22px] mb-0 font-display text-hero leading-[0.8] text-paper ${DISPLAY_TRACKING}`}
-          >
-            {t.titleTop}
-            <span className="mt-[0.12em] mb-[0.02em] block text-[0.42em] leading-[1.05] text-tq [text-shadow:none]">
-              {t.titleMid}
-            </span>
-            {t.titleBottom}
-          </h1>
-        </div>
+        <h1
+          id="hero-title"
+          className={`hero-title mt-[22px] mb-0 font-display text-hero leading-[0.8] text-paper ${DISPLAY_TRACKING}`}
+        >
+          {t.titleTop}
+          <span className="mt-[0.12em] mb-[0.02em] block text-[0.42em] leading-[1.05] text-tq [text-shadow:none]">
+            {t.titleMid}
+          </span>
+          {t.titleBottom}
+        </h1>
         <p className="animate-rise-in mt-[clamp(1.5rem,1.1rem+1.2vw,2.125rem)] mb-0 max-w-[35rem] text-lead leading-tight font-bold [animation-delay:0.45s]">
           {t.sloganLead} <em className="text-bordeaux-hi not-italic">{t.sloganAccent}</em>{" "}
           {t.sloganRest}
@@ -64,7 +57,7 @@ export function Hero() {
       <div
         role="img"
         aria-label={t.artLabel}
-        className="hud-scan relative aspect-square w-full origin-top scale-[calc(1-var(--p)*0.1)] bg-ink-2 cut sm:aspect-[16/10] lg:aspect-[1/1.05]"
+        className="hud-scan relative aspect-square w-full bg-ink-2 cut sm:aspect-[16/10] lg:aspect-[1/1.05]"
       >
         <Brackets />
         <div className="absolute inset-x-[26px] top-[22px] flex items-center justify-between label-mono text-xs text-muted">
@@ -74,18 +67,14 @@ export function Hero() {
           </span>
         </div>
         <div className="absolute inset-x-6 top-[70px] bottom-[92px] flex items-center justify-center gap-[4%]">
-          <span className="flex h-full max-h-[260px] w-[40%] max-w-[210px] translate-x-[calc(var(--p)*-110%)] translate-y-[calc(var(--p)*-50px)] rotate-[calc(var(--p)*-30deg)]">
-            <Skull className="mascot-skull h-full w-full" />
-          </span>
+          <Skull className="mascot-skull h-full max-h-[260px] w-[40%] max-w-[210px]" />
           <span
             aria-hidden="true"
             className={`mascot-amp font-display text-amp ${DISPLAY_TRACKING}`}
           >
             &amp;
           </span>
-          <span className="flex h-full max-h-[260px] w-[40%] max-w-[210px] translate-x-[calc(var(--p)*110%)] translate-y-[calc(var(--p)*-50px)] rotate-[calc(var(--p)*30deg)]">
-            <Ghost className="mascot-ghost h-full w-full" />
-          </span>
+          <Ghost className="mascot-ghost h-full max-h-[260px] w-[40%] max-w-[210px]" />
         </div>
         <div className="absolute inset-x-[26px] bottom-[22px] flex items-end justify-between gap-4 label-mono">
           <p className="m-0 text-xs leading-[1.8] text-muted">
@@ -94,7 +83,7 @@ export function Hero() {
           </p>
         </div>
       </div>
-    </ScrollProgress>
+    </section>
   );
 }
 

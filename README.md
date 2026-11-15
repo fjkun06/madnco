@@ -42,9 +42,7 @@ npm run build && npm start
   when scrolled into view.
 - Scroll-linked motion (`components/ui/scroll/ScrollProgress`, framer-motion
   `useScroll`): an element's scroll progress becomes the CSS variable `--p`
-  (0 → 1) and children move with it — page progress bar, hero title lifting
-  and mascots flying apart, tapes tilting and sliding, section accent words
-  sliding home, crew cards drifting at different speeds, activity lines
+  (0 → 1) and children move with it — page progress bar, tapes tilting and sliding, crew cards drifting at different speeds, activity lines
   filling, Discord stripes drifting and "madness." growing, the XP bar
   filling, the footer sign painting in.
 - Reduced motion: short fades, no movement; `[data-reveal]` CSS override keeps
