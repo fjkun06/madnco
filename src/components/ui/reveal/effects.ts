@@ -72,6 +72,16 @@ export const DEFAULT_STAGGER = 0.09;
  */
 export const viewport = { once: true, amount: 0.15, margin: "0px 0px -8% 0px" } as const;
 
+/**
+ * Effects whose start state has no visible area (a full clip-path or
+ * scaleX 0). Browsers report an intersection ratio of 0 for them however far
+ * they are scrolled in, so a 15 % threshold never fires and they stay hidden
+ * for good; they trigger on any intersection instead.
+ */
+const ZERO_AREA_EFFECTS: readonly RevealEffect[] = ["wipe", "draw"];
+
+export const zeroAreaViewport = { ...viewport, amount: "some" } as const;
+
 function transitionFor(effect: RevealEffect): Transition {
   if (effect === "stamp") return STAMP_SPRING;
   if (effect === "pop") return SPRING;
@@ -115,8 +125,12 @@ export function groupVariants(stagger: number, delay: number, reduce: boolean): 
 }
 
 /** motion props that start the animation on scroll or on mount. */
-export function triggerProps(trigger: RevealTrigger) {
-  return trigger === "mount"
-    ? { initial: "hidden", animate: "visible" }
-    : { initial: "hidden", whileInView: "visible", viewport };
+export function triggerProps(trigger: RevealTrigger, effect?: RevealEffect) {
+  if (trigger === "mount") return { initial: "hidden", animate: "visible" };
+  const zeroArea = effect !== undefined && ZERO_AREA_EFFECTS.includes(effect);
+  return {
+    initial: "hidden",
+    whileInView: "visible",
+    viewport: zeroArea ? zeroAreaViewport : viewport,
+  };
 }

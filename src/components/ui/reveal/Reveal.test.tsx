@@ -99,4 +99,18 @@ describe("triggerProps", () => {
       viewport: { once: true },
     });
   });
+
+  // A fully clipped or scaleX(0) element reports an intersection ratio of 0
+  // however far it is scrolled in, so a ratio threshold left every section
+  // heading (wipe) and the XP bar (draw) hidden for good.
+  it.each(["wipe", "draw"] as const)("starts %s on any intersection", (effect) => {
+    expect(triggerProps("view", effect).viewport).toMatchObject({ amount: "some" });
+  });
+
+  it.each(effects.filter((e) => e !== "wipe" && e !== "draw"))(
+    "waits for 15 %% of %s to be visible",
+    (effect) => {
+      expect(triggerProps("view", effect).viewport).toMatchObject({ amount: 0.15 });
+    },
+  );
 });

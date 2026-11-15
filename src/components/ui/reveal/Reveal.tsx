@@ -58,7 +58,7 @@ export function Reveal({
     <Tag
       {...rest}
       data-reveal=""
-      {...triggerProps(trigger)}
+      {...triggerProps(trigger, effect)}
       variants={itemVariants(effect, useReduceMotion(), delay)}
     />
   );
