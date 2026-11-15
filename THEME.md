@@ -94,8 +94,11 @@ Layouts change at Tailwind's breakpoints, where the content needs it:
   section notes beside their headings.
 - `xl` (1280): four-column activity rows (title, text and tag side by side).
 
+The footer's ENDLESS MADNESS sign is SVG text with `textLength`, so it always
+spans the full content width (one line from `md`, one word per line on phones).
+
 Don't name a font-size token after an existing utility class: `--text-outline`
-once generated `text-outline` and clashed with the stroke style of that name.
+once generated `text-outline` and clashed with a style of that name.
 
 ## Shape and utilities
 
