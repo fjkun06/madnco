@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MadnCo. hub
 
-## Getting Started
+Link-in-bio hub for **MadnCo.** — _the duo of endless madness_.
+Live at **https://www.madnco.frankjordan.dev**.
 
-First, run the development server:
+Same stack and conventions as Herzog and the portfolio: Next.js 16 (App Router,
+Turbopack), React 19, TypeScript strict, Tailwind v4 theme tokens, framer-motion
+(LazyMotion + `m.*`), Jest + Testing Library, ESLint + Prettier. English only.
+
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3008
+npm run lint
+npm test
+npm run build && npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Where things live
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| What                               | Where                                     |
+| ---------------------------------- | ----------------------------------------- |
+| Handles, links, follower count     | `src/utils/app.constants.ts` (siteConfig) |
+| Every word on the site             | `src/locales/en.ts`                       |
+| Crew order/colours, activity order | `src/components/home/*.content.ts`        |
+| Colour tokens and their jobs       | `src/app/globals.css`, `THEME.md`         |
+| Reveal kit (scroll animations)     | `src/components/ui/reveal/`               |
+| Pause animations                   | `src/lib/motion/pause.ts`, footer toggle  |
+| Impressum / privacy facts          | `src/content/legal/provider.ts`           |
+| Metadata, sitemap, robots          | `src/lib/seo/metadata.ts`, `src/app/`     |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Updating facts
 
-## Learn More
+- `siteConfig.madncoFollowers` in `src/utils/app.constants.ts` — set by hand
+  until @madnco8 reaches 50 (TikTok's LIVE minimum). Redeploy to update.
 
-To learn more about Next.js, take a look at the following resources:
+## Motion
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Hero: CSS only (`.hero-title`, `.mascot-*`, `.animate-rise-in`), paints at once.
+- Sections: `Reveal` / `RevealGroup` / `RevealItem`, each element animates once
+  when scrolled into view.
+- Scroll-linked motion (`components/ui/scroll/ScrollProgress`, framer-motion
+  `useScroll`): an element's scroll progress becomes the CSS variable `--p`
+  (0 → 1) and children move with it — page progress bar, tapes tilting and sliding, crew cards drifting at different speeds, activity lines
+  filling, Discord stripes drifting, the XP bar filling.
+- Reduced motion: short fades, no movement; `[data-reveal]` CSS override keeps
+  content visible. Footer "Pause animations" stops the loops (WCAG 2.2.2).
+- Never `overflow: hidden` on a wrapper around animated content — use `clip`.

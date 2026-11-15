@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MadnCo. Hub · Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&amp;family=Rubik:wght@400;500;700;900&amp;family=JetBrains+Mono:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#110A0C}
+a{color:#30D5C8}a:hover{color:#F4EFE6}
+.mc{--ink:#110A0C;--ink2:#1B1014;--ink3:#26161C;--bdx:#800020;--bdxhi:#E8557A;--tq:#30D5C8;--paper:#F4EFE6;--mute:#BBAAB1;--red:#FF4D4D;background:var(--ink);color:var(--paper);font-family:Rubik,system-ui,sans-serif;overflow:clip}
+.mc *{box-sizing:border-box}
+.wrap{max-width:1280px;margin:0 auto;padding:0 48px}
+.disp{font-family:'Lilita One',Rubik,sans-serif;font-weight:400;letter-spacing:.01em}
+.mono{font-family:'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase}
+.cut{clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
+.cut-s{clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:12px;min-height:56px;padding:0 28px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:15px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;border:0;cursor:pointer;transition:transform .15s ease,background .15s ease}
+.btn:hover{transform:translate(-3px,-3px)}
+.btn:focus-visible{outline:none;box-shadow:inset 0 0 0 3px var(--paper)}
+.btn-tq{background:var(--tq);color:var(--ink)}.btn-tq:hover{background:var(--paper);color:var(--ink)}
+.btn-ghost{background:var(--ink3);color:var(--paper)}.btn-ghost:hover{background:var(--bdx);color:var(--paper)}
+.btn-ink{background:var(--ink);color:var(--paper)}.btn-ink:hover{background:var(--tq);color:var(--ink)}
+.shadowbox{position:relative;display:inline-block}
+.shadowbox::before{content:"";position:absolute;inset:0;transform:translate(6px,6px);background:var(--bdx);clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
+.shadowbox .btn{position:relative}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:24px;height:84px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--paper);font-size:30px}
+.logo:hover{color:var(--paper)}
+.logo .dot{color:var(--tq)}
+.nav{display:flex;gap:32px;align-items:center}
+.nav a{color:var(--mute);text-decoration:none;font-size:13px}
+.nav a:hover{color:var(--tq)}
+.menu-btn{display:none;width:48px;height:48px;background:var(--ink3);border:0;color:var(--paper);align-items:center;justify-content:center;cursor:pointer}
+
+/* live pill */
+.pill{display:inline-flex;align-items:center;gap:10px;height:36px;padding:0 14px;font-size:12px;font-weight:800;background:var(--ink3);color:var(--mute)}
+.pill .ld{width:10px;height:10px;border-radius:50%;background:#6E5A62}
+.is-live .pill{background:var(--red);color:var(--ink)}
+.is-live .pill .ld{background:var(--ink);animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.4}}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:56px;align-items:center;padding:56px 0 96px}
+.kicker{display:inline-flex;align-items:center;gap:10px;color:var(--tq);font-size:13px;font-weight:700}
+.kicker .bar{width:28px;height:3px;background:var(--tq)}
+.big{margin:22px 0 0;font-size:clamp(96px,13.5vw,200px);line-height:.8;color:var(--paper);text-shadow:-7px 0 0 var(--bdx),7px 0 0 var(--tq);animation:glitch 5s steps(1) infinite}
+.big .sm{display:block;font-size:.42em;line-height:1.05;color:var(--tq);text-shadow:none;margin:.12em 0 .02em}
+@keyframes glitch{0%,90%,100%{text-shadow:-7px 0 0 var(--bdx),7px 0 0 var(--tq);transform:none}
+92%{text-shadow:10px 0 0 var(--bdx),-10px 0 0 var(--tq);transform:translate(4px,-2px) skewX(-6deg)}
+94%{text-shadow:-14px 0 0 var(--bdx),14px 0 0 var(--tq);transform:translate(-5px,2px)}
+96%{text-shadow:-7px 0 0 var(--bdx),7px 0 0 var(--tq);transform:none}}
+.slogan{margin:34px 0 0;font-size:28px;font-weight:700;line-height:1.25;max-width:560px}
+.slogan em{font-style:normal;color:var(--bdxhi)}
+.cta-row{display:flex;flex-wrap:wrap;gap:22px;margin-top:40px}
+.redot{width:10px;height:10px;border-radius:50%;background:var(--red)}
+
+/* HUD screen */
+.hud{position:relative;aspect-ratio:1/1.05;background:var(--ink2);background-image:repeating-linear-gradient(0deg,rgba(244,239,230,.035) 0 2px,transparent 2px 5px)}
+.hud .br{position:absolute;width:44px;height:44px;border-color:var(--tq);border-style:solid;border-width:0}
+.br.tl{top:-2px;left:-2px;border-top-width:5px;border-left-width:5px}
+.br.tr{top:-2px;right:-2px;border-top-width:5px;border-right-width:5px}
+.br.bl{bottom:-2px;left:-2px;border-bottom-width:5px;border-left-width:5px}
+.br.bbr{bottom:-2px;right:-2px;border-bottom-width:5px;border-right-width:5px}
+.hud-top{position:absolute;top:22px;left:26px;right:26px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--mute)}
+.hud-top b{color:var(--tq)}
+.mascots{position:absolute;inset:70px 24px 92px;display:flex;align-items:center;justify-content:center;gap:4%}
+.mascot{width:40%;max-width:210px}
+.skull{animation:bob 2.6s ease-in-out infinite}
+.ghost{animation:float 3.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-16px) rotate(3deg)}}
+@keyframes float{0%,100%{transform:translateY(-10px) rotate(4deg)}50%{transform:translateY(12px) rotate(-3deg)}}
+.amp{font-size:64px;color:var(--paper);opacity:.9}
+.hud-bot{position:absolute;left:26px;right:26px;bottom:22px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
+.np{font-size:12px;color:var(--mute);line-height:1.8}
+.np b{display:block;color:var(--paper);font-size:15px}
+.status{font-size:13px;font-weight:800;padding:8px 12px;background:var(--ink3);color:var(--mute)}
+.is-live .status{background:var(--red);color:var(--ink)}
+
+/* tapes */
+.tapes{position:relative;height:190px;margin:10px 0 40px}
+.tape{position:absolute;left:-40px;right:-40px;height:64px;display:flex;align-items:center;overflow:hidden;white-space:nowrap}
+.tape-a{top:30px;background:var(--tq);color:var(--ink);transform:rotate(-2.4deg);z-index:2}
+.tape-b{top:96px;background:var(--bdx);color:var(--paper);transform:rotate(1.8deg)}
+.track{display:inline-flex;gap:0;animation:tick 34s linear infinite}
+.tape-b .track{animation-direction:reverse;animation-duration:42s}
+.track span{font-family:'Lilita One',sans-serif;font-size:34px;padding:0 22px}
+.track i{font-style:normal;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;opacity:.55}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* section heads */
+.sec{padding:96px 0}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:48px}
+.sec-head h2{margin:10px 0 0;font-size:clamp(52px,6.4vw,96px);line-height:.9}
+.sec-head h2 .tq{color:var(--tq)}
+.lbl{font-size:13px;font-weight:700;color:var(--bdxhi)}
+.aside{max-width:360px;color:var(--mute);font-size:17px;line-height:1.55;margin:0}
+
+/* crew select */
+.select{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:40px;align-items:stretch}
+.slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.slot{position:relative;display:flex;flex-direction:column;justify-content:space-between;min-height:400px;padding:22px;border:0;text-align:left;cursor:pointer;color:var(--paper);background:var(--ink2);font:inherit;transition:transform .2s ease,background .2s ease}
+.slot:hover{transform:translateY(-8px)}
+.slot:focus-visible{outline:none;box-shadow:inset 0 0 0 3px var(--paper)}
+.slot .ptag{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px;letter-spacing:.1em}
+.slot .art{display:flex;justify-content:center;align-items:center;flex:1;padding:18px 0}
+.slot .art svg{width:76%;max-width:150px}
+.slot .nm{font-family:'Lilita One',sans-serif;font-size:44px;line-height:1}
+.slot .rl{font-size:14px;color:var(--mute);margin-top:6px}
+.slot-mad .ptag{color:var(--bdxhi)}
+.slot-co .ptag{color:var(--tq)}
+.slot-guest .ptag{color:var(--mute)}
+.slot-guest{background:transparent;outline:2px dashed #5A464E;outline-offset:-2px}
+.slot.on.slot-mad{background:var(--bdx)}
+.slot.on.slot-mad .ptag,.slot.on.slot-mad .rl{color:var(--paper)}
+.slot.on.slot-co{background:var(--tq);color:var(--ink)}
+.slot.on.slot-co .ptag,.slot.on.slot-co .rl{color:var(--ink)}
+.slot.on.slot-guest{background:var(--paper);color:var(--ink);outline-color:transparent}
+.slot.on.slot-guest .ptag,.slot.on.slot-guest .rl{color:var(--ink)}
+.slot .sel{position:absolute;top:18px;right:18px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:11px;letter-spacing:.1em;padding:5px 8px;background:var(--ink);color:var(--paper);opacity:0}
+.slot.on .sel{opacity:1}
+.bio{background:var(--ink2);padding:36px;display:flex;flex-direction:column;gap:22px}
+.bio .who{display:flex;align-items:baseline;gap:16px}
+.bio .who .disp{font-size:72px;line-height:.9}
+.bio .who .mono{font-size:13px;color:var(--mute)}
+.bio p{margin:0;font-size:19px;line-height:1.55;color:var(--paper)}
+.stat .mono{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);margin-bottom:10px}
+.meter{height:18px;background:var(--ink3);display:flex;gap:3px;padding:3px}
+.meter span{display:block;height:100%}
+.f-mad{background:var(--bdxhi)}.f-co{background:var(--tq)}.f-guest{background:var(--paper)}
+.w90{width:90%}.w10{width:10%}.wq{width:0%}
+.plays{display:flex;flex-wrap:wrap;gap:10px}
+.chip{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:9px 12px;background:var(--ink3);color:var(--paper)}
+
+/* what we do */
+.rows{border-top:2px solid var(--ink3)}
+.row{display:grid;grid-template-columns:120px minmax(0,1fr) minmax(0,.9fr) 140px;gap:32px;align-items:center;padding:30px 20px;border-bottom:2px solid var(--ink3);transition:background .2s ease,padding .2s ease}
+.row:hover{background:var(--bdx);padding-left:36px}
+.row .n{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:22px;color:var(--tq)}
+.row:hover .n{color:var(--paper)}
+.row h3{margin:0;font-family:'Lilita One',sans-serif;font-weight:400;font-size:clamp(40px,4.6vw,68px);line-height:.95}
+.row p{margin:0;color:var(--mute);font-size:17px;line-height:1.5}
+.row:hover p{color:var(--paper)}
+.row .where{justify-self:end;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:12px;letter-spacing:.1em;padding:8px 10px;background:var(--ink3);color:var(--tq)}
+
+/* discord band */
+.band{position:relative;background:#4A0818;padding:110px 0;border-top:4px solid var(--tq)}
+.band::before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,rgba(17,10,12,.10) 0 2px,transparent 2px 22px);pointer-events:none}
+.band-in{position:relative;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:48px;align-items:center}
+.band h2{margin:0;font-size:clamp(64px,8vw,128px);line-height:.85;color:var(--paper)}
+.band h2 span{color:var(--tq)}
+.band p{margin:24px 0 36px;font-size:20px;line-height:1.5;max-width:520px}
+.chan{background:var(--ink);padding:24px}
+.chan .mono{font-size:12px;color:var(--mute);margin-bottom:14px;display:block}
+.chan ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.chan li{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--ink2);font-size:17px;font-weight:500}
+.chan li .h{font-family:'JetBrains Mono',monospace;color:var(--tq);font-weight:800}
+.chan li.new{background:var(--ink3)}
+.chan li .badge{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:800;letter-spacing:.08em;padding:4px 7px;background:var(--red);color:var(--ink)}
+
+/* links */
+.links{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:40px}
+.ll{display:flex;flex-direction:column;border-top:2px solid var(--ink3)}
+.ll a{display:grid;grid-template-columns:150px minmax(0,1fr) 40px;align-items:center;gap:20px;padding:26px 8px;border-bottom:2px solid var(--ink3);text-decoration:none;color:var(--paper);transition:background .15s ease,padding .15s ease}
+.ll a:hover{background:var(--tq);color:var(--ink);padding-left:24px}
+.ll a:focus-visible{outline:none;box-shadow:inset 0 0 0 3px var(--tq)}
+.ll .pf{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px;letter-spacing:.1em;color:var(--mute)}
+.ll a:hover .pf{color:var(--ink)}
+.ll .hd{font-family:'Lilita One',sans-serif;font-size:40px;line-height:1}
+.lvl{background:var(--ink2);padding:32px;display:flex;flex-direction:column;gap:20px;align-self:start}
+.lvl .disp{font-size:44px;line-height:.95}
+.lvl p{margin:0;color:var(--mute);font-size:16px;line-height:1.55}
+.lvl p b{color:var(--paper)}
+.xp{height:26px;background:var(--ink3);padding:4px;display:flex}
+.xp span{display:block;height:100%;background:repeating-linear-gradient(90deg,var(--tq) 0 14px,#23A99E 14px 18px)}
+.l0{width:2%}.l1{width:10%}.l2{width:20%}.l3{width:30%}.l4{width:40%}.l5{width:50%}.l6{width:60%}.l7{width:70%}.l8{width:80%}.l9{width:90%}.l10{width:100%}
+.xp-l{display:flex;justify-content:space-between;font-size:12px;color:var(--mute)}
+.xp-l b{color:var(--tq)}
+
+/* case file */
+.case{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:0;background:var(--paper);color:var(--ink)}
+.case-l{padding:44px;background:#E7DFD1;position:relative}
+.stamp{display:inline-block;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px;letter-spacing:.14em;padding:8px 12px;border:3px solid var(--bdx);color:var(--bdx);transform:rotate(-6deg)}
+.case-l h3{margin:34px 0 0;font-family:'Lilita One',sans-serif;font-weight:400;font-size:54px;line-height:.92}
+.case-r{padding:44px;display:flex;flex-direction:column;justify-content:space-between;gap:28px}
+.case-r p{margin:0;font-size:19px;line-height:1.55;color:#3A2A30}
+.case-r .row2{display:flex;flex-wrap:wrap;gap:14px}
+.case a.btn{background:var(--ink);color:var(--paper)}
+.case a.btn:hover{background:var(--bdx);color:var(--paper)}
+
+/* footer */
+.foot{padding:110px 0 56px}
+.out{font-family:'Lilita One',sans-serif;font-size:clamp(70px,11vw,170px);line-height:.85;color:transparent;-webkit-text-stroke:2px #4A3940;margin:0;white-space:nowrap}
+.out span{color:var(--tq);-webkit-text-stroke:0}
+.foot-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-top:48px;font-size:12px;color:var(--mute)}
+.foot-row a{color:var(--mute)}.foot-row a:hover{color:var(--tq)}
+
+/* reveal on scroll */
+@supports (animation-timeline: view()){
+.rv{animation:rv linear both;animation-timeline:view();animation-range:entry 10% cover 30%}
+}
+@keyframes rv{from{opacity:0;transform:translateY(48px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.mc *,.mc{animation:none !important;transition:none !important}}
+
+
+/* ===== v5 motion: load + in-view reveals (framer-style) + scroll scrub ===== */
+@keyframes popIn{0%{scale:0;opacity:0}70%{scale:1.12;opacity:1}100%{scale:1;opacity:1}}
+@keyframes dropIn{0%{scale:1.4;opacity:0}60%{scale:.96;opacity:1}100%{scale:1;opacity:1}}
+@keyframes kick{from{opacity:0;translate:-30px 0}to{opacity:1;translate:0 0}}
+.kicker{animation:kick .6s .1s ease-out both}
+.big{animation:glitch 5s steps(1) infinite,dropIn .7s .15s cubic-bezier(.2,1.3,.4,1) both}
+.skull{animation:bob 2.6s ease-in-out infinite,popIn .6s .5s cubic-bezier(.2,1.4,.4,1) both}
+.ghost{animation:float 3.4s ease-in-out infinite,popIn .6s .7s cubic-bezier(.2,1.4,.4,1) both}
+.amp{animation:popIn .5s .9s ease-out both}
+.slogan{animation:kick .6s .45s ease-out both}
+.cta-row{animation:kick .6s .6s ease-out both}
+
+/* reveal system: hidden until in view, then animate once */
+.mc [data-rv]{--e:cubic-bezier(.22,1,.36,1);--sp:cubic-bezier(.34,1.56,.64,1);transition:opacity .7s var(--e) var(--d,0s),translate .8s var(--e) var(--d,0s),scale .7s var(--sp) var(--d,0s),rotate .7s var(--sp) var(--d,0s),clip-path .9s var(--e) var(--d,0s),background-size .9s var(--e) calc(var(--d,0s) + .3s),background-position 1.4s var(--e) var(--d,0s),transform .2s ease,background-color .2s ease,padding .2s ease}
+.mc [data-rv="up"]{opacity:0;translate:0 60px}
+.mc [data-rv="left"]{opacity:0;translate:-110px 0}
+.mc [data-rv="right"]{opacity:0;translate:110px 0}
+.mc [data-rv="pop"]{opacity:0;scale:.6;translate:0 50px}
+.mc [data-rv="wipe"]{clip-path:inset(0 100% 0 0);translate:-40px 0}
+.mc [data-rv="slam"]{opacity:0;scale:3;rotate:-24deg}
+.mc [data-rv="bar"]{scale:0 1;transform-origin:left}
+.mc [data-rv="fill"]{background:linear-gradient(90deg,var(--paper) 0 50%,transparent 50%);background-size:200% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text}
+.mc [data-rv][data-in]{opacity:1;translate:0 0;scale:1;rotate:0deg;clip-path:inset(0 0 0 0)}
+.mc [data-rv="fill"][data-in]{background-position:0 0}
+.mc [data-rv="bar"][data-in]{scale:1 1}
+.row[data-rv]{background-image:linear-gradient(var(--tq),var(--tq));background-repeat:no-repeat;background-position:left bottom;background-size:0% 3px}
+.row[data-rv][data-in]{background-size:100% 3px}
+.row:hover{background-color:var(--bdx)}
+.rows .row:nth-child(2){--d:.08s}.rows .row:nth-child(3){--d:.16s}.rows .row:nth-child(4){--d:.24s}.rows .row:nth-child(5){--d:.32s}.rows .row:nth-child(6){--d:.4s}
+.slots .slot:nth-of-type(2){--d:.12s}.slots .slot:nth-of-type(3){--d:.24s}
+.chan li:nth-child(1){--d:.2s}.chan li:nth-child(2){--d:.28s}.chan li:nth-child(3){--d:.36s}.chan li:nth-child(4){--d:.44s}.chan li:nth-child(5){--d:.52s}.chan li:nth-child(6){--d:.6s}
+.ll a:nth-child(2){--d:.08s}.ll a:nth-child(3){--d:.16s}.ll a:nth-child(4){--d:.24s}.ll a:nth-child(5){--d:.32s}
+.ll .arr{transition:rotate .6s cubic-bezier(.34,1.56,.64,1) .2s;rotate:-135deg}
+.ll a[data-in] .arr{rotate:0deg}
+
+/* scroll-scrubbed extras */
+.prog{position:fixed;top:0;left:0;right:0;height:5px;z-index:60;pointer-events:none;display:none}
+.prog span{display:block;height:100%;background:var(--tq);transform-origin:left}
+@supports (animation-timeline: scroll()){
+.prog{display:block}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.prog span{animation:grow linear both;animation-timeline:scroll(root)}
+@keyframes heroOut{to{translate:0 -140px}}
+@keyframes splitL{to{translate:-70% -40px}}
+@keyframes splitR{to{translate:70% -40px}}
+.big{animation:glitch 5s steps(1) infinite,dropIn .7s .15s cubic-bezier(.2,1.3,.4,1) both,heroOut linear both;animation-timeline:auto,auto,view();animation-range:normal,normal,exit 0% exit 100%}
+.skull{animation:bob 2.6s ease-in-out infinite,popIn .6s .5s cubic-bezier(.2,1.4,.4,1) both,splitL linear both;animation-timeline:auto,auto,view();animation-range:normal,normal,exit 0% exit 100%}
+.ghost{animation:float 3.4s ease-in-out infinite,popIn .6s .7s cubic-bezier(.2,1.4,.4,1) both,splitR linear both;animation-timeline:auto,auto,view();animation-range:normal,normal,exit 0% exit 100%}
+@keyframes tilt{from{rotate:-3deg;scale:1.06}to{rotate:3deg;scale:1.06}}
+.tapes{animation:tilt linear both;animation-timeline:view()}
+}
+
+/* phone */
+@media (max-width:760px){
+.wrap{padding:0 20px}
+.top{height:68px}
+.logo{font-size:24px}
+.nav{display:none}
+.top .join-top{display:none}
+.menu-btn{display:inline-flex}
+.hero{grid-template-columns:minmax(0,1fr);gap:36px;padding:28px 0 56px}
+.big{font-size:104px;text-shadow:-4px 0 0 var(--bdx),4px 0 0 var(--tq)}
+.slogan{font-size:22px;margin-top:24px}
+.cta-row{flex-direction:column;align-items:stretch;gap:16px;margin-top:30px}
+.cta-row .shadowbox,.cta-row .btn{width:100%;justify-content:center}
+.hud{aspect-ratio:1/1}
+.amp{font-size:44px}
+.tapes{height:150px;margin:0 0 10px}
+.tape{height:50px}.tape-a{top:24px}.tape-b{top:78px}
+.track span{font-size:24px;padding:0 14px}.track i{font-size:16px}
+.sec{padding:64px 0}
+.sec-head{margin-bottom:32px}
+.sec-head h2{font-size:56px}
+.select{grid-template-columns:minmax(0,1fr);gap:16px}
+.slots{gap:10px}
+.slot{min-height:200px;padding:12px}
+.slot .nm{font-size:26px}
+.slot .rl{font-size:12px}
+.slot .sel{display:none}
+.slot .art{padding:8px 0}
+.bio{padding:24px}
+.bio .who .disp{font-size:52px}
+.bio p{font-size:17px}
+.row{grid-template-columns:52px minmax(0,1fr);gap:10px 16px;padding:24px 4px}
+.row:hover{padding-left:12px}
+.row p{grid-column:2}
+.row .where{grid-column:2;justify-self:start}
+.row h3{font-size:40px}
+.row .n{font-size:16px}
+.band{padding:72px 0}
+.band-in{grid-template-columns:minmax(0,1fr);gap:36px}
+.band h2{font-size:68px}
+.band p{font-size:18px}
+.band .shadowbox,.band .btn{width:100%;justify-content:center}
+.links{grid-template-columns:minmax(0,1fr)}
+.ll a{grid-template-columns:minmax(0,1fr) 32px;gap:4px 12px;padding:20px 4px}
+.ll .pf{grid-column:1}
+.ll .hd{grid-column:1;font-size:32px}
+.ll .arr{grid-column:2;grid-row:1 / span 2}
+.case{grid-template-columns:minmax(0,1fr)}
+.case-l,.case-r{padding:28px}
+.case-l h3{font-size:44px}
+.foot{padding:72px 0 40px}
+.out{font-size:64px;white-space:normal}
+}
+@media (prefers-reduced-motion: reduce){.mc *,.mc{animation:none !important;transition:none !important}.mc [data-rv]{opacity:1 !important;translate:none !important;scale:none !important;rotate:none !important;clip-path:none !important}.mc [data-rv="fill"]{background:none !important}.ll .arr{rotate:0deg !important}}
+</style>
+<style>
+.mnav{position:absolute;left:20px;right:20px;top:68px;z-index:70;background:var(--ink2);padding:8px;display:flex;flex-direction:column}
+.mnav[hidden]{display:none}
+.mnav a{font-family:'Lilita One',sans-serif;font-size:30px;color:var(--paper);text-decoration:none;padding:12px 16px}
+.mnav a:hover{background:var(--bdx)}
+.mc{position:relative}
+.proto-bar{position:fixed;right:16px;bottom:16px;z-index:80;display:flex;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.proto-bar button{border:0;cursor:pointer;padding:10px 12px;background:#26161C;color:#F4EFE6;font:inherit}
+.proto-bar button[aria-pressed="true"]{background:#FF4D4D;color:#110A0C}
+</style>
+</head>
+<body>
+<div class="mc" id="mc">
+  <div class="prog" aria-hidden="true"><span></span></div>
+
+  <header class="wrap top">
+    <a class="logo disp" href="#top" aria-label="MadnCo. home">
+      <svg width="34" height="36" viewBox="0 0 120 130" aria-hidden="true"><path d="M60 6C28 6 8 28 8 58c0 18 10 30 22 36v18c0 6 4 10 10 10h40c6 0 10-4 10-10V94c12-6 22-18 22-36C112 28 92 6 60 6z" fill="#E8557A"></path><ellipse cx="40" cy="60" rx="14" ry="16" fill="#110A0C"></ellipse><ellipse cx="80" cy="60" rx="14" ry="16" fill="#110A0C"></ellipse><path d="M60 76l-7 14h14z" fill="#110A0C"></path></svg>
+      <span>MADNCO<span class="dot">.</span></span>
+    </a>
+    <nav class="nav mono" aria-label="Main">
+      <a href="#crew">The crew</a>
+      <a href="#what">What we do</a>
+      <a href="#discord">Discord</a>
+      <a href="#links">Find us</a>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 14px">
+      <span class="pill mono"><span class="ld"></span><span id="pill-label">Offline</span></span>
+      <a class="btn btn-tq cut-s join-top" href="#discord" style="min-height: 44px; padding: 0 18px; font-size: 13px">Join Discord</a>
+      <button class="menu-btn cut-s" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mnav" id="menu-btn">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h12"></path></svg>
+      </button>
+    </div>
+  </header>
+  <nav id="mnav" class="mnav" aria-label="Menu" hidden>
+    <a href="#crew">The crew</a><a href="#what">What we do</a><a href="#discord">Discord</a><a href="#links">Find us</a>
+  </nav>
+
+  <main id="top">
+    <section class="wrap hero" aria-labelledby="hero-title">
+      <div>
+        <span class="kicker mono"><span class="bar"></span>Player 1 has entered the chat</span>
+        <h1 id="hero-title" class="big disp">MAD<span class="sm">n</span>CO.</h1>
+        <p class="slogan">The duo of <em>endless madness.</em> FIFA nights, RP chaos, story mode roasts, OmeTV and the funniest stuff on the internet.</p>
+        <div class="cta-row">
+          <span class="shadowbox"><a class="btn btn-tq cut" href="#discord">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg>
+            Join the Discord</a></span>
+          <a class="btn btn-ghost cut" href="https://www.tiktok.com/@clipzhub06"><span class="redot"></span>Watch the lives</a>
+        </div>
+      </div>
+
+      <div class="hud cut" role="img" aria-label="Skull and ghost mascots of Mad and Co on a game screen">
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br bbr"></span>
+        <div class="hud-top mono"><span>MADNCO.EXE</span><span><b>P1</b> + <b>P2</b></span></div>
+        <div class="mascots">
+          <svg class="mascot skull" viewBox="0 0 120 130" aria-hidden="true"><path d="M60 6C28 6 8 28 8 58c0 18 10 30 22 36v18c0 6 4 10 10 10h40c6 0 10-4 10-10V94c12-6 22-18 22-36C112 28 92 6 60 6z" fill="#E8557A"></path><ellipse cx="40" cy="60" rx="14" ry="16" fill="#110A0C"></ellipse><ellipse cx="80" cy="60" rx="14" ry="16" fill="#110A0C"></ellipse><path d="M60 76l-7 14h14z" fill="#110A0C"></path><path d="M48 104v18M60 104v18M72 104v18" stroke="#110A0C" stroke-width="4"></path></svg>
+          <span class="amp disp" aria-hidden="true">&amp;</span>
+          <svg class="mascot ghost" viewBox="0 0 120 140" aria-hidden="true"><path d="M60 6C30 6 12 30 12 60v68l16-12 16 14 16-14 16 14 16-14 16 12V60C108 30 90 6 60 6z" fill="#30D5C8"></path><ellipse cx="44" cy="58" rx="9" ry="13" fill="#110A0C"></ellipse><ellipse cx="76" cy="58" rx="9" ry="13" fill="#110A0C"></ellipse><ellipse cx="60" cy="86" rx="8" ry="10" fill="#110A0C"></ellipse></svg>
+        </div>
+        <div class="hud-bot mono">
+          <div class="np">Now playing<b>FIFA · RP · Story mode</b></div>
+          <span class="status"><span id="status-label">Offline</span></span>
+        </div>
+      </div>
+    </section>
+
+    <div class="tapes" aria-hidden="true">
+      <div class="tape tape-a"><div class="track">
+        <span>FIFA NIGHTS</span><i>//</i><span>RP CHAOS</span><i>//</i><span>STORY MODE ROASTS</span><i>//</i><span>OMETV CHAOS</span><i>//</i><span>RAGE QUITS</span><i>//</i>
+        <span>FIFA NIGHTS</span><i>//</i><span>RP CHAOS</span><i>//</i><span>STORY MODE ROASTS</span><i>//</i><span>OMETV CHAOS</span><i>//</i><span>RAGE QUITS</span><i>//</i>
+      </div></div>
+      <div class="tape tape-b"><div class="track">
+        <span>THE DUO OF ENDLESS MADNESS</span><i>//</i><span>JOIN THE FAM</span><i>//</i><span>THE DUO OF ENDLESS MADNESS</span><i>//</i><span>JOIN THE FAM</span><i>//</i>
+        <span>THE DUO OF ENDLESS MADNESS</span><i>//</i><span>JOIN THE FAM</span><i>//</i><span>THE DUO OF ENDLESS MADNESS</span><i>//</i><span>JOIN THE FAM</span><i>//</i>
+      </div></div>
+    </div>
+
+    <section id="crew" class="wrap sec" aria-labelledby="crew-title">
+      <div class="sec-head">
+        <div>
+          <span class="lbl mono" data-rv="up">01 / The crew</span>
+          <h2 id="crew-title" class="disp" data-rv="wipe" style="--d: .1s">Choose your <span class="tq">fighter</span></h2>
+        </div>
+        <p class="aside" data-rv="up" style="--d: .25s">Mad runs the show. Co jumps in when school and work let him. And there is always a free slot for whoever drops in to game.</p>
+      </div>
+      <div class="select">
+        <div class="slots" role="group" aria-label="Crew members">
+          
+            <button type="button" class="slot cut slot-mad on" data-rv="pop" data-id="mad" aria-pressed="true">
+              <span class="ptag">P1</span>
+              <span class="sel">Selected</span>
+              <span class="art"><svg viewBox="0 0 120 130" aria-hidden="true"><path d="M60 6C28 6 8 28 8 58c0 18 10 30 22 36v18c0 6 4 10 10 10h40c6 0 10-4 10-10V94c12-6 22-18 22-36C112 28 92 6 60 6z" fill="#F4EFE6"></path><ellipse cx="40" cy="60" rx="14" ry="16" fill="#110A0C"></ellipse><ellipse cx="80" cy="60" rx="14" ry="16" fill="#110A0C"></ellipse><path d="M60 76l-7 14h14z" fill="#110A0C"></path><path d="M48 104v18M60 104v18M72 104v18" stroke="#110A0C" stroke-width="4"></path></svg></span>
+              <span>
+                <span class="nm" style="display: block">MAD</span>
+                <span class="rl" style="display: block">Host</span>
+              </span>
+            </button>
+            <button type="button" class="slot cut slot-co" data-rv="pop" data-id="co" aria-pressed="false">
+              <span class="ptag">P2</span>
+              <span class="sel">Selected</span>
+              <span class="art"><svg viewBox="0 0 120 140" aria-hidden="true"><path d="M60 6C30 6 12 30 12 60v68l16-12 16 14 16-14 16 14 16-14 16 12V60C108 30 90 6 60 6z" fill="#F4EFE6"></path><ellipse cx="44" cy="58" rx="9" ry="13" fill="#110A0C"></ellipse><ellipse cx="76" cy="58" rx="9" ry="13" fill="#110A0C"></ellipse><ellipse cx="60" cy="86" rx="8" ry="10" fill="#110A0C"></ellipse></svg></span>
+              <span>
+                <span class="nm" style="display: block">CO</span>
+                <span class="rl" style="display: block">Co-host</span>
+              </span>
+            </button>
+            <button type="button" class="slot cut slot-guest" data-rv="pop" data-id="guest" aria-pressed="false">
+              <span class="ptag">P?</span>
+              <span class="sel">Selected</span>
+              <span class="art"><svg viewBox="0 0 120 130" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="square"><path d="M36 42c0-16 11-26 26-26s26 10 26 24c0 20-26 20-26 42"></path><path d="M62 108v8"></path></svg></span>
+              <span>
+                <span class="nm" style="display: block">???</span>
+                <span class="rl" style="display: block">Guest slot</span>
+              </span>
+            </button>
+        </div>
+
+        <div class="bio cut" aria-live="polite" data-rv="right" style="--d: .35s">
+          <div class="who"><span class="disp" id="bio-name">MAD</span><span class="mono" id="bio-meta">P1 · Host</span></div>
+          <p id="bio-blurb"></p>
+          <div class="stat">
+            <div class="mono"><span>Screen time</span><span id="bio-time">90%</span></div>
+            <div class="meter"><span id="bio-meter" class="f-mad w90"></span></div>
+          </div>
+          <div class="plays" id="bio-plays">
+            
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="what" class="wrap sec" aria-labelledby="what-title">
+      <div class="sec-head">
+        <div>
+          <span class="lbl mono" data-rv="up">02 / What we do</span>
+          <h2 id="what-title" class="disp" data-rv="wipe" style="--d: .1s">Pick your <span class="tq">madness</span></h2>
+        </div>
+        <p class="aside" data-rv="up" style="--d: .25s">No fixed schedule: school and work come first. Turn on Live Ping in the Discord and you will know the second we go live.</p>
+      </div>
+      <div class="rows">
+        <div class="row" data-rv="left"><span class="n">01</span><h3>FIFA nights</h3><p>FC and eFootball with Co and the crew. Last-minute goals, rage moments, zero chill.</p><span class="where cut-s">LIVE</span></div>
+        <div class="row" data-rv="left"><span class="n">02</span><h3>RP chaos</h3><p>In character on roleplay servers: gangs, heists, police chases, and a lot of talking our way out of trouble.</p><span class="where cut-s">LIVE</span></div>
+        <div class="row" data-rv="left"><span class="n">03</span><h3>Story mode, roasted</h3><p>Cyberpunk, Red Dead, Wukong and more, with dark humour, sarcasm and plenty of dying.</p><span class="where cut-s">LIVE</span></div>
+        <div class="row" data-rv="left"><span class="n">04</span><h3>OmeTV chaos</h3><p>Random strangers, live reactions. You never know who is next.</p><span class="where cut-s">LIVE</span></div>
+        <div class="row" data-rv="left"><span class="n">05</span><h3>Chill streams</h3><p>Just hanging out with the chat. Questions, stories, whatever comes up.</p><span class="where cut-s">LIVE</span></div>
+        <div class="row" data-rv="left"><span class="n">06</span><h3>Funny finds</h3><p>The funniest stuff we find online, and the best of what you drop in the Discord.</p><span class="where cut-s">TIKTOK</span></div>
+      </div>
+    </section>
+
+    <section id="discord" class="band" aria-labelledby="dc-title">
+      <div class="wrap band-in">
+        <div>
+          <span class="lbl mono" style="color: #F4EFE6" data-rv="up">03 / Home base</span>
+          <h2 id="dc-title" class="disp" style="margin-top: 14px; --d: .1s" data-rv="wipe">Join the <span>madness.</span></h2>
+          <p data-rv="up" style="--d: .25s">The Discord is where the fam hangs out between streams: memes, clips, FIFA talk, voice chats, and a ping the moment we go live.</p>
+          <span class="shadowbox" data-rv="pop" style="--d: .4s"><a class="btn btn-ink cut" href="#discord">Open the Discord
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg></a></span>
+        </div>
+        <div class="chan cut" aria-label="Some of the Discord channels" data-rv="right" style="--d: .15s">
+          <span class="mono">MadnCo. · channels</span>
+          <ul>
+            <li class="new" data-rv="right"><span class="h">#</span>live-now<span class="badge">PING</span></li>
+            <li data-rv="right"><span class="h">#</span>memes-and-funny</li>
+            <li data-rv="right"><span class="h">#</span>clips</li>
+            <li data-rv="right"><span class="h">#</span>fifa</li>
+            <li data-rv="right"><span class="h">#</span>suggestions</li>
+            <li data-rv="right"><span class="h">&gt;</span>Gaming · voice</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="links" class="wrap sec" aria-labelledby="links-title">
+      <div class="sec-head">
+        <div>
+          <span class="lbl mono" data-rv="up">04 / Find us</span>
+          <h2 id="links-title" class="disp" data-rv="wipe" style="--d: .1s">Every <span class="tq">channel</span></h2>
+        </div>
+      </div>
+      <div class="links">
+        <div class="ll">
+          <a data-rv="up" href="https://www.tiktok.com/@madnco8"><span class="pf">TikTok</span><span class="hd">@madnco8</span><svg class="arr" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg></a>
+          <a data-rv="up" href="https://www.tiktok.com/@clipzhub06"><span class="pf">TikTok Live</span><span class="hd">@clipzhub06</span><svg class="arr" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg></a>
+          <a data-rv="up" href="#links"><span class="pf">Twitch</span><span class="hd">[TWITCH HANDLE]</span><svg class="arr" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg></a>
+          <a data-rv="up" href="#links"><span class="pf">YouTube</span><span class="hd">[YOUTUBE HANDLE]</span><svg class="arr" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg></a>
+          <a data-rv="up" href="#discord"><span class="pf">Discord</span><span class="hd">MadnCo. server</span><svg class="arr" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg></a>
+        </div>
+        <div class="lvl cut" data-rv="pop" style="--d: .3s">
+          <span class="lbl mono">Side quest</span>
+          <span class="disp">Unlock MadnCo. LIVE</span>
+          <p>TikTok lets <b>@madnco8</b> go live at 50 followers. Until then we stream on <b>@clipzhub06</b>. Every follow gets us closer.</p>
+          <div class="xp"><span class="l0" data-rv="bar" style="--d: .6s"></span></div>
+          <div class="xp-l mono"><span>Followers</span><span><b>[...]</b> / 50</span></div>
+          <a class="btn btn-tq cut-s" href="https://www.tiktok.com/@madnco8" style="justify-content: center">Follow @madnco8</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" aria-labelledby="case-title" style="padding-bottom: 24px">
+      <span class="lbl mono" style="display: block; margin-bottom: 18px" data-rv="up">05 / Also by Mad</span>
+      <div class="case cut" data-rv="up" style="--d: .1s">
+        <div class="case-l">
+          <span class="stamp" data-rv="slam" style="--d: .55s">CASE FILE</span>
+          <h3 id="case-title">The Anime Case Files</h3>
+        </div>
+        <div class="case-r">
+          <p>Mad's anime channel. [ONE LINE ABOUT WHAT THE CHANNEL DOES]</p>
+          <div class="row2">
+            <a class="btn cut-s" href="https://www.tiktok.com/@theanimecasefiles">TikTok</a>
+            <a class="btn cut-s" href="#">YouTube</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <p class="out" aria-label="Endless madness" data-rv="fill">ENDLESS <span>MADNESS</span></p>
+    <div class="foot-row mono">
+      <span>MadnCo. · Mad &amp; Co</span>
+      <a href="https://frankjordan.dev">Built by Mad · frankjordan.dev</a>
+    </div>
+  </footer>
+</div>
+<div class="proto-bar" role="group" aria-label="Prototype controls"><button type="button" id="proto-live" aria-pressed="false">Preview live</button></div>
+
+<script>
+(function(){
+  var crew={
+    mad:{name:"MAD",tag:"P1",role:"Host",time:"90%",fill:"f-mad",w:"w90",blurb:"Runs the show. Every stream, every rage moment, every OmeTV stranger. If MadnCo. is live, Mad is there.",plays:["FIFA","RP","Story mode","OmeTV","Funny finds"]},
+    co:{name:"CO",tag:"P2",role:"Co-host",time:"10%",fill:"f-co",w:"w10",blurb:"Joins when school and work let him. When Co is in, FIFA nights and OmeTV lives get twice as loud.",plays:["FIFA","OmeTV"]},
+    guest:{name:"???",tag:"P?",role:"Guest slot",time:"Open",fill:"f-guest",w:"wq",blurb:"Pals drop in to game with Mad all the time. The next one could be you: hop in the Discord and say hi.",plays:["Gaming","Voice chat"]}
+  };
+  function $(id){return document.getElementById(id)}
+  function pick(id){
+    var m=crew[id];
+    document.querySelectorAll('.slot').forEach(function(b){var on=b.getAttribute('data-id')===id;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false')});
+    $('bio-name').textContent=m.name;$('bio-meta').textContent=m.tag+' \u00b7 '+m.role;$('bio-blurb').textContent=m.blurb;$('bio-time').textContent=m.time;
+    $('bio-meter').className=m.fill+' '+m.w;
+    var plays=$('bio-plays');plays.textContent='';
+    m.plays.forEach(function(p){var c=document.createElement('span');c.className='chip cut-s';c.textContent=p;plays.appendChild(c)});
+  }
+  document.querySelectorAll('.slot').forEach(function(b){b.addEventListener('click',function(){pick(b.getAttribute('data-id'))})});
+  pick('mad');
+  // mobile menu
+  var mb=$('menu-btn'),nav=$('mnav');
+  function setMenu(open){nav.hidden=!open;mb.setAttribute('aria-expanded',open?'true':'false');mb.setAttribute('aria-label',open?'Close menu':'Open menu')}
+  mb.addEventListener('click',function(){setMenu(nav.hidden)});
+  nav.addEventListener('click',function(e){if(e.target.tagName==='A')setMenu(false)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!nav.hidden){setMenu(false);mb.focus()}});
+  // live preview toggle (prototype only)
+  var lb=$('proto-live');
+  lb.addEventListener('click',function(){var live=lb.getAttribute('aria-pressed')!=='true';lb.setAttribute('aria-pressed',live?'true':'false');$('mc').classList.toggle('is-live',live);$('pill-label').textContent=live?'Live now':'Offline';$('status-label').textContent=live?'Live now':'Offline'});
+  // reveal once in view
+  var els=[].slice.call(document.querySelectorAll('.mc [data-rv]'));
+  if(!('IntersectionObserver' in window)){els.forEach(function(el){el.setAttribute('data-in','')});return}
+  var io=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.setAttribute('data-in','');io.unobserve(e.target)}})},{threshold:0.15,rootMargin:'0px 0px -8% 0px'});
+  els.forEach(function(el){io.observe(el)});
+})();
+</script>
+</body>
+</html>
