@@ -1,15 +1,24 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { LazyMotion } from "framer-motion";
-
-const loadFeatures = () => import("./motion-features").then((mod) => mod.default);
+import { LazyMotion, domAnimation } from "framer-motion";
 
 /**
  * Lets all `m.*` components on the page share framer-motion's animation
- * features, loaded asynchronously. Until they arrive, elements simply show
- * their initial state; nothing on the page depends on them to be usable.
+ * features (variants, in-view, hover/tap).
+ *
+ * The features are passed in synchronously, not loaded with a dynamic
+ * import: every reveal is server-rendered hidden and only these features
+ * animate it in, so if a separate chunk is late or fails (it did in
+ * `next dev`) whole sections stay invisible with no error.
  */
 export function MotionProvider({ children }: { children: ReactNode }) {
-  return <LazyMotion features={loadFeatures}>{children}</LazyMotion>;
+  return <LazyMotion features={domAnimation}>{children}</LazyMotion>;
 }
+
+/**
+ * Without scripts nothing ever animates the reveals in, so this shows them
+ * as they are. Rendered inside `<noscript>` in the root layout.
+ */
+export const REVEAL_NOSCRIPT_CSS =
+  "[data-reveal]{opacity:1!important;transform:none!important;clip-path:none!important}";

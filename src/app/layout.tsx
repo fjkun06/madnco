@@ -5,7 +5,7 @@ import "./globals.css";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { InlineScript } from "@/components/layout/InlineScript";
-import { MotionProvider } from "@/components/ui/reveal";
+import { MotionProvider, REVEAL_NOSCRIPT_CSS } from "@/components/ui/reveal";
 import { PAUSE_KEY } from "@/lib/motion/pause";
 import { en } from "@/locales/en";
 import { siteConfig } from "@/utils/app.constants";
@@ -57,6 +57,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       {/* App Router document: a plain <head> is right here. */}
       <head>
         <InlineScript html={BOOT} />
+        <noscript>
+          <style>{REVEAL_NOSCRIPT_CSS}</style>
+        </noscript>
       </head>
       <body id="top">
         <a
