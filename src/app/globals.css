@@ -73,6 +73,10 @@
 html {
   scroll-padding-top: 1rem;
   background: var(--color-ink);
+  /* While html is overflow: visible, body's overflow is handed to the viewport
+     and body clips nothing: the tapes, mascot split and footer sign then widen
+     the page and phones zoom out. A value here keeps body's clip on body. */
+  overflow-x: clip;
 }
 
 body {
