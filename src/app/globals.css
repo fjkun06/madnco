@@ -41,8 +41,8 @@
   --text-body-lg: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem); /* 17 → 19 px */
 
   /* Fluid spacing */
-  /* Motion: one curve for every hover and CSS entrance (expo out). */
-  --ease-heavy: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Motion: one smooth deceleration curve for every hover and CSS entrance. */
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
 
   --spacing-gutter: clamp(1.25rem, 4vw, 3rem); /* page side padding, 20 → 48 px */
   --spacing-section: clamp(4rem, 2.6rem + 4.5vw, 6rem); /* section padding */
@@ -243,7 +243,7 @@
 
 /* Hero text paints from the server HTML with CSS, not JS (coding guide). */
 .animate-rise-in {
-  animation: rise-in 1s var(--ease-heavy) both;
+  animation: rise-in 0.8s var(--ease-smooth) both;
 }
 
 .hero-title {
@@ -252,7 +252,7 @@
     7px 0 0 var(--color-tq);
   animation:
     glitch 5s steps(1) infinite,
-    slam-in 1.2s 0.15s cubic-bezier(0.22, 1.12, 0.36, 1) both;
+    slam-in 0.9s 0.15s cubic-bezier(0.22, 1.08, 0.36, 1) both;
 }
 
 @media (max-width: 767px) {
@@ -265,18 +265,18 @@
 
 .mascot-skull {
   animation:
-    bob 3.6s ease-in-out infinite,
-    pop-in 1s 0.5s cubic-bezier(0.22, 1.18, 0.36, 1) both;
+    bob 3s ease-in-out infinite,
+    pop-in 0.8s 0.5s cubic-bezier(0.22, 1.15, 0.36, 1) both;
 }
 
 .mascot-ghost {
   animation:
-    float 4.4s ease-in-out infinite,
-    pop-in 1s 0.7s cubic-bezier(0.22, 1.18, 0.36, 1) both;
+    float 3.8s ease-in-out infinite,
+    pop-in 0.8s 0.7s cubic-bezier(0.22, 1.15, 0.36, 1) both;
 }
 
 .mascot-amp {
-  animation: pop-in 0.9s 0.95s var(--ease-heavy) both;
+  animation: pop-in 0.7s 0.9s var(--ease-smooth) both;
 }
 
 .hud-scan {
@@ -290,11 +290,11 @@
 /* ---------- tapes ---------- */
 
 .tape-track {
-  animation: tick 48s linear infinite;
+  animation: tick 40s linear infinite;
 }
 
 .tape-track-reverse {
-  animation: tick 60s linear infinite reverse;
+  animation: tick 50s linear infinite reverse;
 }
 
 /* ---------- discord band ---------- */
@@ -317,104 +317,12 @@
   );
 }
 
-/* ---------- footer ---------- */
-
-/* ---------- scroll-scrubbed extras (progressive: browsers without
-   scroll timelines simply show the static page) ---------- */
-
-@keyframes grow-x {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes hero-lift {
-  to {
-    translate: 0 -140px;
-  }
-}
-
-@keyframes split-left {
-  to {
-    translate: -70% -40px;
-  }
-}
-
-@keyframes split-right {
-  to {
-    translate: 70% -40px;
-  }
-}
-
-@keyframes tilt {
-  from {
-    rotate: -3deg;
-    scale: 1.06;
-  }
-  to {
-    rotate: 3deg;
-    scale: 1.06;
-  }
-}
-
-.scroll-progress {
-  display: none;
-}
-
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .scroll-progress {
-      display: block;
-      transform-origin: left;
-      animation: grow-x linear both;
-      animation-timeline: scroll(root);
-    }
-
-    .hero-title {
-      animation:
-        glitch 5s steps(1) infinite,
-        slam-in 1.2s 0.15s cubic-bezier(0.22, 1.12, 0.36, 1) both,
-        hero-lift linear both;
-      animation-timeline: auto, auto, view();
-      animation-range:
-        normal,
-        normal,
-        exit 0% exit 100%;
-    }
-
-    .mascot-skull {
-      animation:
-        bob 3.6s ease-in-out infinite,
-        pop-in 1s 0.5s cubic-bezier(0.22, 1.18, 0.36, 1) both,
-        split-left linear both;
-      animation-timeline: auto, auto, view();
-      animation-range:
-        normal,
-        normal,
-        exit 0% exit 100%;
-    }
-
-    .mascot-ghost {
-      animation:
-        float 4.4s ease-in-out infinite,
-        pop-in 1s 0.7s cubic-bezier(0.22, 1.18, 0.36, 1) both,
-        split-right linear both;
-      animation-timeline: auto, auto, view();
-      animation-range:
-        normal,
-        normal,
-        exit 0% exit 100%;
-    }
-
-    .tapes-tilt {
-      animation: tilt linear both;
-      animation-timeline: view();
-    }
-  }
-}
+/* ---------- scroll-linked motion ----------
+   ScrollProgress (components/ui/scroll) puts the scroll progress of an
+   element on it as --p (0 → 1). Children read it in transforms, e.g.
+   translate-y-[calc(var(--p)*-160px)]. Without --p (reduced motion, no JS)
+   those values are invalid and the browser simply shows the element at
+   rest, fully visible. */
 
 /* ---------- "Pause animations" (lib/motion/pause.ts, WCAG 2.2.2) ---------- */
 

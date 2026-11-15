@@ -4,6 +4,7 @@ import { en } from "@/locales/en";
 import { confirmedHref, siteConfig } from "@/utils/app.constants";
 import { BUTTON_INK, DISPLAY_TRACKING, WRAP } from "@/utils/ui.classes";
 import { ExternalLink } from "@/components/ui/ExternalLink";
+import { ScrollProgress } from "@/components/ui/scroll/ScrollProgress";
 
 /**
  * Channels shown in the server preview: text channels (#) and a voice
@@ -19,7 +20,9 @@ const channels = [
 ] as const;
 
 /**
- * 03 / Home base — the wine band that sends people to the Discord. Without a
+ * 03 / Home base — the wine band that sends people to the Discord. Linked to
+ * the scroll, its stripes drift and "madness." grows to full size by the
+ * time the band is mid-screen. Without a
  * confirmed invite link the button shows a visible placeholder instead of
  * a dead link.
  */
@@ -27,11 +30,17 @@ export function DiscordBand() {
   const t = en.discord;
   const href = confirmedHref(siteConfig.links.discord);
   return (
-    <section
+    <ScrollProgress
+      as="section"
       id="discord"
       aria-labelledby="discord-title"
-      className="band-stripes relative border-t-4 border-tq bg-wine py-band"
+      className="relative overflow-clip border-t-4 border-tq bg-wine py-band"
     >
+      {/* Stripes drift against the scroll for depth. */}
+      <span
+        aria-hidden="true"
+        className="band-stripes pointer-events-none absolute inset-0 [background-position:0_calc(var(--p)*-260px)]"
+      />
       <div
         className={`${WRAP} grid grid-cols-1 items-center gap-[clamp(2.25rem,1.5rem+2.4vw,3rem)] lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]`}
       >
@@ -46,7 +55,10 @@ export function DiscordBand() {
             id="discord-title"
             className={`mt-3.5 mb-0 font-display text-band leading-[0.85] text-paper ${DISPLAY_TRACKING}`}
           >
-            {t.titleLead} <span className="text-tq">{t.titleAccent}</span>
+            {t.titleLead}{" "}
+            <span className="inline-block origin-left scale-[calc(0.7+min(var(--p)*2,1)*0.3)] text-tq">
+              {t.titleAccent}
+            </span>
           </Reveal>
           <Reveal
             as="p"
@@ -108,6 +120,6 @@ export function DiscordBand() {
           </RevealGroup>
         </Reveal>
       </div>
-    </section>
+    </ScrollProgress>
   );
 }

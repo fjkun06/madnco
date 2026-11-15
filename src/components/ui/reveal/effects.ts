@@ -60,19 +60,18 @@ function shownFor(effect: RevealEffect) {
 }
 
 /*
- * Heavy, smooth feel: long expo-out curves (fast start, very long soft
- * landing) and springs with extra mass and damping, so things arrive with
- * weight instead of snapping or bouncing.
+ * Smooth feel: a long, soft deceleration and springs damped just enough to
+ * glide into place without bouncing, but quick enough not to feel slow.
  */
-const EASE_OUT: Transition["ease"] = [0.16, 1, 0.3, 1];
-const DURATION = 1.1;
-const WIPE_DURATION = 1.3;
+const EASE_OUT: Transition["ease"] = [0.22, 1, 0.36, 1];
+const DURATION = 0.9;
+const WIPE_DURATION = 1;
 const REDUCED_DURATION = 0.2;
-const SPRING = { type: "spring", stiffness: 140, damping: 24, mass: 1.3 } as const;
-const STAMP_SPRING = { type: "spring", stiffness: 260, damping: 22, mass: 1.8 } as const;
+const SPRING = { type: "spring", stiffness: 170, damping: 26, mass: 1 } as const;
+const STAMP_SPRING = { type: "spring", stiffness: 300, damping: 24, mass: 1.2 } as const;
 
 /** Default seconds between two items of a group. */
-export const DEFAULT_STAGGER = 0.14;
+export const DEFAULT_STAGGER = 0.1;
 
 /**
  * Starts once ~15 % of the element is visible, slightly before it reaches

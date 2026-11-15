@@ -40,8 +40,13 @@ npm run build && npm start
 - Hero: CSS only (`.hero-title`, `.mascot-*`, `.animate-rise-in`), paints at once.
 - Sections: `Reveal` / `RevealGroup` / `RevealItem`, each element animates once
   when scrolled into view.
-- Scroll-scrubbed extras (progress bar, hero lift, mascots splitting, tape
-  tilt): CSS scroll timelines, only where supported and without reduced motion.
+- Scroll-linked motion (`components/ui/scroll/ScrollProgress`, framer-motion
+  `useScroll`): an element's scroll progress becomes the CSS variable `--p`
+  (0 → 1) and children move with it — page progress bar, hero title lifting
+  and mascots flying apart, tapes tilting and sliding, section accent words
+  sliding home, crew cards drifting at different speeds, activity lines
+  filling, Discord stripes drifting and "madness." growing, the XP bar
+  filling, the footer sign painting in.
 - Reduced motion: short fades, no movement; `[data-reveal]` CSS override keeps
   content visible. Footer "Pause animations" stops the loops (WCAG 2.2.2).
 - Never `overflow: hidden` on a wrapper around animated content — use `clip`.

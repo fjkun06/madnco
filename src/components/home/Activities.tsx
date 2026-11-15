@@ -3,10 +3,11 @@ import { en } from "@/locales/en";
 import { WRAP } from "@/utils/ui.classes";
 import { activities } from "./activities.content";
 import { SectionHead } from "./SectionHead";
+import { ScrollProgress } from "@/components/ui/scroll/ScrollProgress";
 
 /**
  * 02 / What we do — numbered rows, not a card grid. Rows slide in one after
- * another and draw a turquoise line under themselves; hover floods a row
+ * another; a turquoise line under each fills as you scroll; hover floods a row
  * with bordeaux.
  */
 export function Activities() {
@@ -26,14 +27,16 @@ export function Activities() {
             as="li"
             key={id}
             effect="slide-left"
-            className="group relative grid grid-cols-[clamp(3.25rem,2rem+4vw,4.5rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2.5 border-b-2 border-ink-3 px-1 py-[clamp(1.5rem,1.2rem+0.8vw,1.875rem)] transition-[background-color,padding] duration-500 ease-heavy hover:bg-bordeaux hover:pl-3 sm:px-3 xl:grid-cols-[120px_minmax(0,1fr)_minmax(0,0.9fr)_140px] xl:gap-8 xl:px-5 xl:hover:pl-9"
+            className="group relative grid grid-cols-[clamp(3.25rem,2rem+4vw,4.5rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2.5 border-b-2 border-ink-3 px-1 py-[clamp(1.5rem,1.2rem+0.8vw,1.875rem)] transition-[background-color,padding] duration-300 ease-smooth hover:bg-bordeaux hover:pl-3 sm:px-3 xl:grid-cols-[120px_minmax(0,1fr)_minmax(0,0.9fr)_140px] xl:gap-8 xl:px-5 xl:hover:pl-9"
           >
-            <RevealItem
-              as="span"
-              effect="draw"
+            {/* Fills from left to right as this row scrolls up the screen. */}
+            <ScrollProgress
               aria-hidden
-              className="absolute inset-x-0 bottom-0 h-[3px] origin-left bg-tq"
-            />
+              range={["start 92%", "start 45%"]}
+              className="pointer-events-none absolute inset-0"
+            >
+              <span className="absolute inset-x-0 bottom-0 h-[3px] origin-left scale-x-[var(--p)] bg-tq" />
+            </ScrollProgress>
             <span className="font-mono text-[clamp(1rem,0.85rem+0.6vw,1.375rem)] font-extrabold text-tq group-hover:text-paper">
               {String(i + 1).padStart(2, "0")}
             </span>

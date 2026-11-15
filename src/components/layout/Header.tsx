@@ -58,7 +58,7 @@ export function Header() {
         </ExternalLink>
         <a
           href="#discord"
-          className="hidden min-h-11 items-center bg-tq px-[18px] label-mono text-[13px] font-extrabold text-ink no-underline focus-inset transition-colors duration-500 ease-heavy whitespace-nowrap cut hover:bg-paper md:inline-flex"
+          className="hidden min-h-11 items-center bg-tq px-[18px] label-mono text-[13px] font-extrabold text-ink no-underline focus-inset transition-colors duration-300 ease-smooth whitespace-nowrap cut hover:bg-paper md:inline-flex"
         >
           {t.joinDiscord}
         </a>

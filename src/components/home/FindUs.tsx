@@ -11,6 +11,7 @@ import {
 } from "@/utils/ui.classes";
 import { SectionHead } from "./SectionHead";
 import { ExternalLink } from "@/components/ui/ExternalLink";
+import { ScrollProgress } from "@/components/ui/scroll/ScrollProgress";
 
 type Row = { key: keyof typeof en.links.platforms; handle: string; href: string };
 
@@ -52,7 +53,7 @@ export function FindUs() {
                 {url ? (
                   <ExternalLink
                     href={url}
-                    className={`${ROW} group text-paper transition-[background-color,color,padding] duration-500 ease-heavy hover:bg-tq hover:pl-6 hover:text-ink focus-visible:outline-offset-[-3px]`}
+                    className={`${ROW} group text-paper transition-[background-color,color,padding] duration-300 ease-smooth hover:bg-tq hover:pl-6 hover:text-ink focus-visible:outline-offset-[-3px]`}
                   >
                     <span className={`${PLATFORM} text-muted group-hover:text-ink`}>
                       {t.platforms[key]}
@@ -71,7 +72,7 @@ export function FindUs() {
                         aria-hidden="true"
                         size={28}
                         strokeWidth={2.5}
-                        className="transition-transform duration-700 ease-heavy group-hover:rotate-45"
+                        className="transition-transform duration-500 ease-smooth group-hover:rotate-45"
                       />
                     </RevealItem>
                   </ExternalLink>
@@ -148,13 +149,19 @@ function SideQuest() {
         aria-valuenow={followers ?? undefined}
         className="flex h-[26px] bg-ink-3 p-1"
       >
-        <Reveal
-          as="span"
-          effect="draw"
-          delay={0.6}
-          className="xp-fill block h-full origin-left"
+        {/* Fills up to the real count as the card scrolls into view. */}
+        <span
+          className="block h-full"
           style={{ width: `${Math.max(progress, MIN_XP) * 100}%` }}
-        />
+        >
+          <ScrollProgress
+            as="span"
+            range={["start end", "center 55%"]}
+            className="block h-full"
+          >
+            <span className="xp-fill block h-full origin-left scale-x-[var(--p)]" />
+          </ScrollProgress>
+        </span>
       </div>
       <div className="flex justify-between label-mono text-xs text-muted">
         <span>{t.followers}</span>

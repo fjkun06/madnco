@@ -1,9 +1,11 @@
 import { Reveal } from "@/components/ui/reveal";
 import { SECTION_LABEL, SECTION_TITLE } from "@/utils/ui.classes";
+import { RANGE, ScrollProgress } from "@/components/ui/scroll/ScrollProgress";
 
 /**
  * Number + name label, a display heading with one turquoise word, and an
- * optional note on the right. The heading wipes in like a lower-third.
+ * optional note on the right. The heading wipes in like a lower-third; the
+ * turquoise word then slides home as you scroll the section up.
  */
 export function SectionHead({
   id,
@@ -20,13 +22,19 @@ export function SectionHead({
   aside?: string;
 }) {
   return (
-    <div className="mb-[clamp(2rem,1.5rem+1.6vw,3rem)] grid grid-cols-1 items-end gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22.5rem)] lg:gap-10">
+    <ScrollProgress
+      range={RANGE.arriving}
+      className="mb-[clamp(2rem,1.5rem+1.6vw,3rem)] grid grid-cols-1 items-end gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22.5rem)] lg:gap-10"
+    >
       <div>
         <Reveal as="span" className={`${SECTION_LABEL} block`}>
           {label}
         </Reveal>
         <Reveal as="h2" effect="wipe" delay={0.1} className={SECTION_TITLE} id={id}>
-          {titleLead} <span className="text-tq">{titleAccent}</span>
+          {titleLead}{" "}
+          <span className="inline-block translate-x-[calc((1-var(--p))*1.2em)] text-tq opacity-[calc(0.25+var(--p)*0.75)]">
+            {titleAccent}
+          </span>
         </Reveal>
       </div>
       {aside && (
@@ -38,6 +46,6 @@ export function SectionHead({
           {aside}
         </Reveal>
       )}
-    </div>
+    </ScrollProgress>
   );
 }

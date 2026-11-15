@@ -9,6 +9,7 @@ import { MotionProvider, REVEAL_NOSCRIPT_CSS } from "@/components/ui/reveal";
 import { PAUSE_KEY } from "@/lib/motion/pause";
 import { en } from "@/locales/en";
 import { siteConfig } from "@/utils/app.constants";
+import { ScrollProgress } from "@/components/ui/scroll/ScrollProgress";
 
 const display = Lilita_One({
   variable: "--font-display-face",
@@ -68,12 +69,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           {en.nav.skip}
         </a>
-        {/* Scroll progress, scrubbed by CSS where scroll timelines exist. */}
-        <div
-          aria-hidden="true"
-          className="scroll-progress pointer-events-none fixed inset-x-0 top-0 z-[60] h-[5px] bg-tq"
-        />
         <MotionProvider>
+          {/* Page scroll progress: a turquoise bar filling across the top. */}
+          <ScrollProgress
+            page
+            aria-hidden
+            className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[5px] [--p:0] motion-reduce:hidden"
+          >
+            <span className="block h-full origin-left scale-x-[var(--p)] bg-tq" />
+          </ScrollProgress>
           <Header />
           <main id="main">{children}</main>
           <Footer />

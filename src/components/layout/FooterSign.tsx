@@ -1,20 +1,30 @@
 import type { ReactNode } from "react";
-import { Reveal } from "@/components/ui/reveal";
+import { RANGE, ScrollProgress } from "@/components/ui/scroll/ScrollProgress";
 
 /**
  * The ENDLESS MADNESS sign. Drawn as SVG text with `textLength`, so it spans
  * exactly the content width at any screen size, whatever the font's metrics:
  * one line from `md`, one word per line on phones. An outlined copy sits
- * underneath; the solid copy wipes in over it (reduced motion: shown at once).
+ * underneath; the solid copy paints over it as you scroll down to the
+ * footer (reduced motion: shown at once).
  */
 export function FooterSign({ first, second }: { first: string; second: string }) {
   return (
-    <div className="relative" role="img" aria-label={`${first} ${second}`}>
+    <ScrollProgress
+      range={RANGE.entering}
+      className="relative"
+      role="img"
+      aria-label={`${first} ${second}`}
+    >
       <SignArt first={first} second={second} solid={false} />
-      <Reveal effect="wipe" aria-hidden className="absolute inset-0">
+      {/* Painted in from left to right in step with the scroll. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 [clip-path:inset(0_calc((1-var(--p))*100%)_0_0)]"
+      >
         <SignArt first={first} second={second} solid />
-      </Reveal>
-    </div>
+      </div>
+    </ScrollProgress>
   );
 }
 

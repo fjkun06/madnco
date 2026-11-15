@@ -6,6 +6,7 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import type { Dictionary } from "@/locales/en";
 import { DISPLAY_TRACKING } from "@/utils/ui.classes";
 import { crewOrder, crewScheme, type CrewId } from "./crew.content";
+import { ScrollProgress } from "@/components/ui/scroll/ScrollProgress";
 
 type CrewText = Dictionary["crew"];
 
@@ -14,6 +15,16 @@ type CrewText = Dictionary["crew"];
  * one shows its bio, screen-time meter and games. Cards are real toggle
  * buttons (`aria-pressed`); the bio is a polite live region.
  */
+/**
+ * Scroll parallax: while the section passes, the three cards drift at
+ * different speeds (Mad up, the guest slot down), like layers in a game menu.
+ */
+const PARALLAX: Record<CrewId, string> = {
+  mad: "translate-y-[calc((var(--p)-0.5)*-70px)]",
+  co: "translate-y-[calc((var(--p)-0.5)*10px)]",
+  guest: "translate-y-[calc((var(--p)-0.5)*90px)]",
+};
+
 export function CrewSelect({ text }: { text: CrewText }) {
   const [selected, setSelected] = useState<CrewId>("mad");
   const member = text.members[selected];
@@ -21,51 +32,55 @@ export function CrewSelect({ text }: { text: CrewText }) {
 
   return (
     <div className="grid grid-cols-1 gap-[clamp(1rem,0.4rem+2vw,2.5rem)] lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-      <RevealGroup
-        className="grid grid-cols-3 gap-[clamp(0.625rem,0.4rem+0.7vw,1.125rem)]"
-        role="group"
-        aria-label={text.groupLabel}
-        stagger={0.12}
-      >
-        {crewOrder.map((id) => {
-          const isOn = id === selected;
-          const s = crewScheme[id];
-          return (
-            <RevealItem key={id} effect="pop">
-              <button
-                type="button"
-                aria-pressed={isOn}
-                onClick={() => setSelected(id)}
-                className={`relative flex h-full min-h-[clamp(12.5rem,6.5rem+22vw,25rem)] w-full flex-col justify-between border-0 p-[clamp(0.75rem,0.45rem+1.2vw,1.375rem)] text-left focus-inset transition-[transform,background-color] duration-500 ease-heavy cut hover:-translate-y-2 motion-reduce:hover:translate-y-0 ${isOn ? s.active : s.idle}`}
-              >
-                <span
-                  className={`font-mono text-[13px] font-extrabold tracking-[0.1em] ${isOn ? "" : s.tagIdle}`}
-                >
-                  {s.tag}
-                </span>
-                {isOn && (
-                  <span className="absolute top-[18px] right-[18px] hidden bg-ink px-2 py-[5px] font-mono text-[11px] font-extrabold tracking-[0.1em] text-paper md:block">
-                    {text.selected}
-                  </span>
-                )}
-                <span className="flex flex-1 items-center justify-center py-2 md:py-[18px]">
-                  <CrewArt id={id} />
-                </span>
-                <span>
-                  <span className="block font-display text-card leading-none">
-                    {text.members[id].name}
-                  </span>
-                  <span
-                    className={`mt-1.5 block text-[clamp(0.75rem,0.68rem+0.3vw,0.875rem)] ${isOn ? "" : "text-muted"}`}
+      <ScrollProgress>
+        <RevealGroup
+          className="grid grid-cols-3 gap-[clamp(0.625rem,0.4rem+0.7vw,1.125rem)]"
+          role="group"
+          aria-label={text.groupLabel}
+          stagger={0.12}
+        >
+          {crewOrder.map((id) => {
+            const isOn = id === selected;
+            const s = crewScheme[id];
+            return (
+              <RevealItem key={id} effect="pop" className="h-full">
+                <div className={`h-full ${PARALLAX[id]}`}>
+                  <button
+                    type="button"
+                    aria-pressed={isOn}
+                    onClick={() => setSelected(id)}
+                    className={`relative flex h-full min-h-[clamp(12.5rem,6.5rem+22vw,25rem)] w-full flex-col justify-between border-0 p-[clamp(0.75rem,0.45rem+1.2vw,1.375rem)] text-left focus-inset transition-[transform,background-color] duration-300 ease-smooth cut hover:-translate-y-2 motion-reduce:hover:translate-y-0 ${isOn ? s.active : s.idle}`}
                   >
-                    {text.members[id].role}
-                  </span>
-                </span>
-              </button>
-            </RevealItem>
-          );
-        })}
-      </RevealGroup>
+                    <span
+                      className={`font-mono text-[13px] font-extrabold tracking-[0.1em] ${isOn ? "" : s.tagIdle}`}
+                    >
+                      {s.tag}
+                    </span>
+                    {isOn && (
+                      <span className="absolute top-[18px] right-[18px] hidden bg-ink px-2 py-[5px] font-mono text-[11px] font-extrabold tracking-[0.1em] text-paper md:block">
+                        {text.selected}
+                      </span>
+                    )}
+                    <span className="flex flex-1 items-center justify-center py-2 md:py-[18px]">
+                      <CrewArt id={id} />
+                    </span>
+                    <span>
+                      <span className="block font-display text-card leading-none">
+                        {text.members[id].name}
+                      </span>
+                      <span
+                        className={`mt-1.5 block text-[clamp(0.75rem,0.68rem+0.3vw,0.875rem)] ${isOn ? "" : "text-muted"}`}
+                      >
+                        {text.members[id].role}
+                      </span>
+                    </span>
+                  </button>
+                </div>
+              </RevealItem>
+            );
+          })}
+        </RevealGroup>
+      </ScrollProgress>
 
       <Reveal
         effect="slide-right"
@@ -90,7 +105,7 @@ export function CrewSelect({ text }: { text: CrewText }) {
           </div>
           <div className="flex h-[18px] bg-ink-3 p-[3px]" aria-hidden="true">
             <span
-              className={`block h-full transition-[width] duration-700 ease-heavy ${scheme.fill}`}
+              className={`block h-full transition-[width] duration-500 ease-smooth ${scheme.fill}`}
               style={{ width: `${scheme.share * 100}%` }}
             />
           </div>
