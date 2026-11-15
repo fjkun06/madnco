@@ -81,13 +81,16 @@ export const viewport = { once: true, amount: 0.15, margin: "0px 0px -8% 0px" } 
 
 /**
  * Effects whose start state has no visible area (a full clip-path or
- * scaleX 0). Browsers report an intersection ratio of 0 for them however far
- * they are scrolled in, so a 15 % threshold never fires and they stay hidden
- * for good; they trigger on any intersection instead.
+ * scaleX 0). Chrome clips an IntersectionObserver target by its own
+ * clip-path, so such an element never counts as "in view" (not even with
+ * `amount: "some"`) and would stay hidden for good. `Reveal` therefore
+ * observes an unclipped wrapper and animates an inner element instead.
  */
 const ZERO_AREA_EFFECTS: readonly RevealEffect[] = ["wipe", "draw"];
 
-export const zeroAreaViewport = { ...viewport, amount: "some" } as const;
+export function hasZeroArea(effect: RevealEffect): boolean {
+  return ZERO_AREA_EFFECTS.includes(effect);
+}
 
 function transitionFor(effect: RevealEffect): Transition {
   if (effect === "stamp") return STAMP_SPRING;
@@ -132,12 +135,10 @@ export function groupVariants(stagger: number, delay: number, reduce: boolean): 
 }
 
 /** motion props that start the animation on scroll or on mount. */
-export function triggerProps(trigger: RevealTrigger, effect?: RevealEffect) {
+export function triggerProps(trigger: RevealTrigger) {
   if (trigger === "mount") return { initial: "hidden", animate: "visible" };
-  const zeroArea = effect !== undefined && ZERO_AREA_EFFECTS.includes(effect);
-  return {
-    initial: "hidden",
-    whileInView: "visible",
-    viewport: zeroArea ? zeroAreaViewport : viewport,
-  };
+  return { initial: "hidden", whileInView: "visible", viewport };
 }
+
+/** Variants for a wrapper that only passes "hidden"/"visible" down to its child. */
+export const passThrough: Variants = { hidden: {}, visible: {} };

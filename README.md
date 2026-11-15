@@ -43,8 +43,7 @@ npm run build && npm start
 - Scroll-linked motion (`components/ui/scroll/ScrollProgress`, framer-motion
   `useScroll`): an element's scroll progress becomes the CSS variable `--p`
   (0 → 1) and children move with it — page progress bar, tapes tilting and sliding, crew cards drifting at different speeds, activity lines
-  filling, Discord stripes drifting and "madness." growing, the XP bar
-  filling, the footer sign painting in.
+  filling, Discord stripes drifting, the XP bar filling.
 - Reduced motion: short fades, no movement; `[data-reveal]` CSS override keeps
   content visible. Footer "Pause animations" stops the loops (WCAG 2.2.2).
 - Never `overflow: hidden` on a wrapper around animated content — use `clip`.

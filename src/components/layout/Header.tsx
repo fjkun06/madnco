@@ -22,14 +22,14 @@ export function Header() {
   ];
   return (
     <header
-      className={`${WRAP} relative flex h-[68px] items-center justify-between gap-6 md:h-[84px]`}
+      className={`${WRAP} relative flex h-16 items-center justify-between gap-4 sm:h-[72px] sm:gap-6 md:h-[84px]`}
     >
       <a
         href="#top"
         aria-label={t.home}
-        className={`flex items-center gap-2.5 font-display text-2xl text-paper no-underline ${DISPLAY_TRACKING} md:text-[30px]`}
+        className={`flex items-center gap-2 font-display text-[21px] text-paper no-underline sm:gap-2.5 sm:text-2xl ${DISPLAY_TRACKING} md:text-[30px]`}
       >
-        <Skull className="h-9 w-[34px]" teeth={false} />
+        <Skull className="h-[26px] w-6 sm:h-9 sm:w-[34px]" teeth={false} />
         <span aria-hidden="true">
           MADNCO<span className="text-tq">.</span>
         </span>
@@ -48,17 +48,17 @@ export function Header() {
           </a>
         ))}
       </nav>
-      <div className="flex items-center gap-3.5">
+      <div className="flex items-center gap-3 sm:gap-3.5">
         <ExternalLink
           href={siteConfig.links.tiktokLive}
-          className="hidden h-9 items-center gap-2.5 bg-ink-3 px-3.5 label-mono text-xs font-extrabold text-muted no-underline whitespace-nowrap cut-s hover:text-paper sm:inline-flex"
+          className="hidden h-9 items-center gap-2.5 bg-ink-3 px-3.5 label-mono text-xs font-extrabold text-muted no-underline whitespace-nowrap cut-s hover:text-paper md:inline-flex"
         >
           <Radio aria-hidden="true" size={16} strokeWidth={2.5} className="text-live" />
           {interpolate(en.live.pill, { handle: siteConfig.handles.tiktokLive })}
         </ExternalLink>
         <a
           href="#discord"
-          className="hidden min-h-11 items-center bg-tq px-[18px] label-mono text-[13px] font-extrabold text-ink no-underline focus-inset transition-colors duration-300 ease-smooth whitespace-nowrap cut hover:bg-paper md:inline-flex"
+          className="inline-flex min-h-10 items-center bg-tq px-3.5 label-mono text-[11px] font-extrabold sm:min-h-11 sm:px-[18px] sm:text-[13px] text-ink no-underline focus-inset transition-colors duration-300 ease-smooth whitespace-nowrap cut hover:bg-paper"
         >
           {t.joinDiscord}
         </a>

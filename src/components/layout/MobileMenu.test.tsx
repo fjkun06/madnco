@@ -19,7 +19,30 @@ describe("MobileMenu", () => {
     fireEvent.click(button);
     expect(button).toHaveAttribute("aria-expanded", "true");
     expect(button).toHaveAccessibleName("Close menu");
-    expect(screen.getByRole("link", { name: "Discord" })).toBeVisible();
+    // Mounted on open; it animates in from opacity 0, so not toBeVisible().
+    expect(screen.getByRole("link", { name: "Discord" })).toBeInTheDocument();
+  });
+
+  it("keeps the panel out of the page while closed", () => {
+    setup();
+    expect(screen.queryByRole("link", { name: "Discord" })).toBeNull();
+  });
+
+  it("stops the page from scrolling while open", () => {
+    const button = setup();
+    fireEvent.click(button);
+    expect(document.documentElement.style.overflow).toBe("hidden");
+    fireEvent.click(button);
+    expect(document.documentElement.style.overflow).toBe("");
+  });
+
+  it("closes when tapping outside the panel", () => {
+    const button = setup();
+    fireEvent.click(button);
+    const backdrop = document.querySelector("div.fixed.inset-0");
+    expect(backdrop).not.toBeNull();
+    fireEvent.click(backdrop as Element);
+    expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
   it("closes on Escape and gives focus back to the button", () => {

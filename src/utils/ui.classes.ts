@@ -5,7 +5,7 @@
 
 /**
  * Page width: content up to 1184 px inside a 1280 px frame, with a fluid
- * gutter (20 px on phones → 48 px on desktop) so nothing ever touches the
+ * gutter (16 px on phones → 48 px on desktop) so nothing ever touches the
  * screen edge, at any width.
  */
 export const WRAP = "mx-auto w-full max-w-[1280px] px-gutter";
@@ -15,7 +15,7 @@ export const DISPLAY_TRACKING = "tracking-[0.01em]";
 
 /** Button without its corner shape; the exports add `cut` or `cut-s`. */
 const BUTTON_CORE =
-  "focus-inset label-mono inline-flex min-h-14 items-center justify-center gap-3 px-7 text-[15px] font-extrabold no-underline transition-[transform,background-color,color] duration-300 ease-smooth hover:-translate-x-[3px] hover:-translate-y-[3px] motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0";
+  "focus-inset label-mono inline-flex min-h-12 items-center justify-center gap-1.5 px-2.5 text-[11px] font-extrabold whitespace-nowrap sm:min-h-14 sm:gap-3 sm:px-7 sm:text-[15px] no-underline transition-[transform,background-color,color] duration-300 ease-smooth hover:-translate-x-[3px] hover:-translate-y-[3px] motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0";
 const BUTTON_BASE = `cut ${BUTTON_CORE}`;
 
 /** Primary action: turquoise, dark text. */
@@ -31,7 +31,8 @@ export const BUTTON_PRIMARY_S = `cut-s ${BUTTON_CORE} bg-tq text-ink hover:bg-pa
 export const BUTTON_INK_S = `cut-s ${BUTTON_CORE} bg-ink text-paper hover:bg-bordeaux hover:text-paper`;
 
 /** Section number and name above a heading, e.g. "01 / The crew". */
-export const SECTION_LABEL = "label-mono text-[13px] font-bold text-bordeaux-hi";
+export const SECTION_LABEL =
+  "label-mono text-[11px] font-bold text-bordeaux-hi sm:text-[13px]";
 
 /** Big display heading of a section. */
-export const SECTION_TITLE = `font-display mt-2.5 text-section leading-[0.9] ${DISPLAY_TRACKING}`;
+export const SECTION_TITLE = `font-display mt-1.5 sm:mt-2.5 text-section leading-[0.9] ${DISPLAY_TRACKING}`;

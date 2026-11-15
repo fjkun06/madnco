@@ -101,17 +101,32 @@ describe("triggerProps", () => {
     });
   });
 
-  // A fully clipped or scaleX(0) element reports an intersection ratio of 0
-  // however far it is scrolled in, so a ratio threshold left every section
-  // heading (wipe) and the XP bar (draw) hidden for good.
-  it.each(["wipe", "draw"] as const)("starts %s on any intersection", (effect) => {
-    expect(triggerProps("view", effect).viewport).toMatchObject({ amount: "some" });
+  it("uses the same viewport for every effect", () => {
+    expect(triggerProps("view").viewport).toMatchObject({ amount: 0.15 });
   });
+});
 
-  it.each(effects.filter((e) => e !== "wipe" && e !== "draw"))(
-    "waits for 15 %% of %s to be visible",
+describe("zero-area effects", () => {
+  // Chrome clips an IntersectionObserver target by its own clip-path, so a
+  // fully wiped-out element never fired and section headings stayed hidden.
+  it.each(["wipe", "draw"] as const)(
+    "%s animates an inner element inside an unclipped wrapper",
     (effect) => {
-      expect(triggerProps("view", effect).viewport).toMatchObject({ amount: 0.15 });
+      const { container } = render(
+        <Reveal as="h2" effect={effect} className="title" id="t">
+          Heading
+        </Reveal>,
+      );
+      const outer = container.querySelector("h2#t.title");
+      expect(outer).not.toBeNull();
+      expect(outer).not.toHaveAttribute("data-reveal");
+      expect(outer?.querySelector("span[data-reveal]")?.textContent).toBe("Heading");
     },
   );
+
+  it("keeps a single element for other effects", () => {
+    const { container } = render(<Reveal as="p">text</Reveal>);
+    expect(container.querySelector("p")).toHaveAttribute("data-reveal");
+    expect(container.querySelector("p span")).toBeNull();
+  });
 });

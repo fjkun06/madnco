@@ -28,10 +28,10 @@ const rows: Row[] = [
 ];
 
 /** Platform name: mono, wide tracking, kept in its own case (TikTok). */
-const PLATFORM = "font-mono text-[13px] font-extrabold tracking-[0.1em]";
+const PLATFORM = "font-mono text-[10px] font-extrabold tracking-[0.1em] sm:text-[13px]";
 
 const ROW =
-  "grid grid-cols-[minmax(0,1fr)_32px] items-center gap-x-3 gap-y-1 border-b-2 border-ink-3 px-1 py-5 no-underline md:grid-cols-[150px_minmax(0,1fr)_40px] md:gap-5 md:px-2 md:py-[26px]";
+  "grid grid-cols-[minmax(0,1fr)_22px] items-center gap-x-2.5 gap-y-0.5 border-b-2 border-ink-3 px-0.5 py-3 no-underline sm:grid-cols-[minmax(0,1fr)_32px] sm:gap-x-3 sm:gap-y-1 sm:px-1 sm:py-5 md:grid-cols-[150px_minmax(0,1fr)_40px] md:gap-5 md:px-2 md:py-[26px]";
 
 /** 04 / Find us — every channel as a big row, plus the side quest card. */
 export function FindUs() {
@@ -44,7 +44,7 @@ export function FindUs() {
         titleLead={t.titleLead}
         titleAccent={t.titleAccent}
       />
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-5 sm:gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <RevealGroup as="ul" className="m-0 list-none border-t-2 border-ink-3 p-0">
           {rows.map(({ key, handle, href }) => {
             const url = confirmedHref(href);
@@ -53,7 +53,7 @@ export function FindUs() {
                 {url ? (
                   <ExternalLink
                     href={url}
-                    className={`${ROW} group text-paper transition-[background-color,color,padding] duration-300 ease-smooth hover:bg-tq hover:pl-6 hover:text-ink focus-visible:outline-offset-[-3px]`}
+                    className={`${ROW} group text-paper transition-[background-color,color,padding] duration-300 ease-smooth hover:bg-tq hover:pl-2.5 hover:text-ink sm:hover:pl-6 focus-visible:outline-offset-[-3px]`}
                   >
                     <span className={`${PLATFORM} text-muted group-hover:text-ink`}>
                       {t.platforms[key]}
@@ -70,9 +70,8 @@ export function FindUs() {
                     >
                       <ArrowUpRight
                         aria-hidden="true"
-                        size={28}
                         strokeWidth={2.5}
-                        className="transition-transform duration-500 ease-smooth group-hover:rotate-45"
+                        className="size-5 transition-transform duration-500 ease-smooth group-hover:rotate-45 sm:size-7"
                       />
                     </RevealItem>
                   </ExternalLink>
@@ -87,9 +86,8 @@ export function FindUs() {
                     </span>
                     <ArrowUpRight
                       aria-hidden="true"
-                      size={28}
                       strokeWidth={2.5}
-                      className="col-start-2 row-span-2 row-start-1 text-line md:col-start-auto md:row-span-1 md:row-start-auto"
+                      className="col-start-2 row-span-2 row-start-1 size-5 text-line sm:size-7 md:col-start-auto md:row-span-1 md:row-start-auto"
                     />
                   </div>
                 )}
@@ -117,7 +115,7 @@ function SideQuest() {
       effect="pop"
       delay={0.3}
       aria-labelledby="quest-title"
-      className="flex flex-col gap-5 self-start bg-ink-2 p-[clamp(1.5rem,1.2rem+1vw,2rem)] cut md:max-w-[34rem] lg:max-w-none"
+      className="flex flex-col gap-3 self-start bg-ink-2 p-[clamp(1.125rem,0.8rem+1.3vw,2rem)] cut sm:gap-5 md:max-w-[34rem] lg:max-w-none"
     >
       <span className={SECTION_LABEL}>{t.label}</span>
       <h3
@@ -126,7 +124,7 @@ function SideQuest() {
       >
         {t.title}
       </h3>
-      <p className="m-0 text-base leading-[1.55] text-muted">
+      <p className="m-0 text-sm leading-[1.5] text-muted sm:text-base sm:leading-[1.55]">
         {interpolateParts(t.text, {
           handle: handles.tiktok,
           goal,
@@ -147,7 +145,7 @@ function SideQuest() {
         aria-valuemin={0}
         aria-valuemax={goal}
         aria-valuenow={followers ?? undefined}
-        className="flex h-[26px] bg-ink-3 p-1"
+        className="flex h-[18px] bg-ink-3 p-[3px] sm:h-[26px] sm:p-1"
       >
         {/* Fills up to the real count as the card scrolls into view. */}
         <span
@@ -163,7 +161,7 @@ function SideQuest() {
           </ScrollProgress>
         </span>
       </div>
-      <div className="flex justify-between label-mono text-xs text-muted">
+      <div className="flex justify-between label-mono text-[10px] text-muted sm:text-xs">
         <span>{t.followers}</span>
         <span>
           <b className="text-tq" data-nosnippet={followers === null ? "" : undefined}>

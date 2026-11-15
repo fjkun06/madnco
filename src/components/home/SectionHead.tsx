@@ -20,7 +20,7 @@ export function SectionHead({
   aside?: string;
 }) {
   return (
-    <div className="mb-[clamp(2rem,1.5rem+1.6vw,3rem)] grid grid-cols-1 items-end gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22.5rem)] lg:gap-10">
+    <div className="mb-[clamp(1rem,0.5rem+1.6vw,2rem)] grid grid-cols-1 items-end gap-2.5 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22.5rem)] lg:gap-10">
       <div>
         <Reveal as="span" className={`${SECTION_LABEL} block`}>
           {label}
@@ -33,7 +33,7 @@ export function SectionHead({
         <Reveal
           as="p"
           delay={0.25}
-          className="m-0 max-w-[22.5rem] text-[17px] leading-[1.55] text-muted"
+          className="m-0 max-w-[22.5rem] text-sm leading-[1.5] text-muted sm:text-[17px] sm:leading-[1.55]"
         >
           {aside}
         </Reveal>

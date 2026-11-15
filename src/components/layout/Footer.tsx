@@ -13,11 +13,13 @@ import { ExternalLink } from "@/components/ui/ExternalLink";
 export function Footer() {
   const t = en.footer;
   return (
-    <footer className={`${WRAP} pt-band pb-[clamp(2.5rem,2rem+1.5vw,3.5rem)]`}>
+    <footer
+      className={`${WRAP} pt-[clamp(3rem,1.6rem+5.6vw,6.875rem)] pb-[clamp(1.75rem,1rem+3vw,3.5rem)]`}
+    >
       <FooterSign first={t.outlineA} second={t.outlineB} />
-      <div className="mt-12 flex flex-wrap justify-between gap-5 label-mono text-xs text-muted">
+      <div className="mt-[22px] flex flex-wrap justify-between gap-2.5 label-mono text-[10px] text-muted sm:mt-12 sm:gap-5 sm:text-xs">
         <span>{t.credit}</span>
-        <nav aria-label="Legal" className="flex flex-wrap gap-5">
+        <nav aria-label="Legal" className="flex flex-wrap gap-2.5 sm:gap-5">
           <Link href="/impressum" className="underline-offset-2 hover:text-tq">
             {t.impressum}
           </Link>

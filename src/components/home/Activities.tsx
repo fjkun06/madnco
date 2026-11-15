@@ -27,7 +27,7 @@ export function Activities() {
             as="li"
             key={id}
             effect="slide-left"
-            className="group relative grid grid-cols-[clamp(3.25rem,2rem+4vw,4.5rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2.5 border-b-2 border-ink-3 px-1 py-[clamp(1.5rem,1.2rem+0.8vw,1.875rem)] transition-[background-color,padding] duration-300 ease-smooth hover:bg-bordeaux hover:pl-3 sm:px-3 xl:grid-cols-[120px_minmax(0,1fr)_minmax(0,0.9fr)_140px] xl:gap-8 xl:px-5 xl:hover:pl-9"
+            className="group relative grid grid-cols-[30px_minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-1 border-b-2 border-ink-3 px-0.5 py-[clamp(1rem,0.6rem+1.3vw,1.875rem)] transition-[background-color,padding] duration-300 ease-smooth hover:bg-bordeaux hover:pl-2 sm:grid-cols-[clamp(3.25rem,2rem+4vw,4.5rem)_minmax(0,1fr)_auto] sm:gap-x-4 sm:gap-y-2.5 sm:px-3 sm:hover:pl-3 xl:grid-cols-[120px_minmax(0,1fr)_minmax(0,0.9fr)_140px] xl:gap-8 xl:px-5 xl:hover:pl-9"
           >
             {/* Fills from left to right as this row scrolls up the screen. */}
             <ScrollProgress
@@ -37,16 +37,16 @@ export function Activities() {
             >
               <span className="absolute inset-x-0 bottom-0 h-[3px] origin-left scale-x-[var(--p)] bg-tq" />
             </ScrollProgress>
-            <span className="font-mono text-[clamp(1rem,0.85rem+0.6vw,1.375rem)] font-extrabold text-tq group-hover:text-paper">
+            <span className="font-mono text-[clamp(0.75rem,0.5rem+1vw,1.375rem)] font-extrabold text-tq group-hover:text-paper">
               {String(i + 1).padStart(2, "0")}
             </span>
             <h3 className="m-0 font-display text-row leading-[0.95] font-normal">
               {t.items[id].title}
             </h3>
-            <p className="col-start-2 m-0 max-w-[36rem] text-[17px] leading-normal text-muted group-hover:text-paper xl:col-start-auto">
+            <p className="col-start-2 col-end-4 m-0 max-w-[36rem] text-sm leading-[1.45] text-muted group-hover:text-paper sm:text-[17px] sm:leading-normal xl:col-auto">
               {t.items[id].text}
             </p>
-            <span className="col-start-2 justify-self-start bg-ink-3 px-2.5 py-2 font-mono text-xs font-extrabold tracking-[0.1em] text-tq uppercase cut-s xl:col-start-auto xl:justify-self-end">
+            <span className="col-start-3 row-start-1 justify-self-end bg-ink-3 px-[7px] py-[5px] font-mono text-[10px] font-extrabold tracking-[0.1em] text-tq uppercase cut-s sm:px-2.5 sm:py-2 sm:text-xs xl:col-auto xl:row-auto">
               {t.where[where]}
             </span>
           </RevealItem>

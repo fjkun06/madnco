@@ -1,10 +1,13 @@
 "use client";
 
 import type { CSSProperties, ElementType, ReactNode } from "react";
+import { m } from "framer-motion";
 import { motionTags, useReduceMotion, type MotionTag } from "./motion";
 import {
   DEFAULT_STAGGER,
   groupVariants,
+  hasZeroArea,
+  passThrough,
   itemVariants,
   triggerProps,
   type RevealEffect,
@@ -45,22 +48,38 @@ type TriggerProps = {
   delay?: number;
 };
 
+const PHRASING_TAGS: readonly MotionTag[] = ["p", "span", "h2", "h3"];
+
 /** A single element with its own entrance. */
 export function Reveal({
   as = "div",
   effect = "fade-up",
   delay = 0,
   trigger = "view",
+  children,
   ...rest
 }: ElementProps & TriggerProps & { effect?: RevealEffect }) {
   const Tag = motionTags[as] as ElementType;
+  const variants = itemVariants(effect, useReduceMotion(), delay);
+
+  // A fully clipped element never registers as in view, so the outer
+  // element (unclipped) is observed and the inner one does the wipe.
+  if (hasZeroArea(effect)) {
+    // Headings and paragraphs only take phrasing content, so a span there.
+    const Inner = PHRASING_TAGS.includes(as) ? m.span : m.div;
+    return (
+      <Tag {...rest} {...triggerProps(trigger)} variants={passThrough}>
+        <Inner data-reveal="" className="block size-full" variants={variants}>
+          {children}
+        </Inner>
+      </Tag>
+    );
+  }
+
   return (
-    <Tag
-      {...rest}
-      data-reveal=""
-      {...triggerProps(trigger, effect)}
-      variants={itemVariants(effect, useReduceMotion(), delay)}
-    />
+    <Tag {...rest} data-reveal="" {...triggerProps(trigger)} variants={variants}>
+      {children}
+    </Tag>
   );
 }
 
