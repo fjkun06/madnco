@@ -16,20 +16,20 @@ export function CaseFile() {
       </Reveal>
       <Reveal
         delay={0.1}
-        className="cut grid grid-cols-1 bg-paper text-ink md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]"
+        className="grid grid-cols-1 bg-paper text-ink cut md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]"
       >
         <div className="relative bg-paper-2 p-7 md:p-11">
           <Reveal
             as="span"
             effect="stamp"
             delay={0.55}
-            className="label-mono inline-block -rotate-6 border-[3px] border-bordeaux px-3 py-2 text-[13px] font-extrabold tracking-[0.14em] text-bordeaux"
+            className="inline-block -rotate-6 border-[3px] border-bordeaux px-3 py-2 label-mono text-[13px] font-extrabold tracking-[0.14em] text-bordeaux"
           >
             {t.stamp}
           </Reveal>
           <h3
             id="case-title"
-            className="font-display mt-8 mb-0 text-[44px] leading-[0.92] font-normal md:text-[54px]"
+            className="mt-8 mb-0 font-display text-[44px] leading-[0.92] font-normal md:text-[54px]"
           >
             {show.name}
           </h3>

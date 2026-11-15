@@ -52,7 +52,7 @@ export function FindUs() {
                     <span className="label-mono text-[13px] font-extrabold text-muted group-hover:text-ink">
                       {t.platforms[key]}
                     </span>
-                    <span className="font-display col-start-1 text-[32px] leading-none md:col-start-auto md:text-[40px]">
+                    <span className="col-start-1 font-display text-[32px] leading-none md:col-start-auto md:text-[40px]">
                       {handle}
                     </span>
                     <ArrowUpRight
@@ -67,10 +67,10 @@ export function FindUs() {
                     <span className="label-mono text-[13px] font-extrabold">
                       {t.platforms[key]}
                     </span>
-                    <span className="font-display col-start-1 text-[32px] leading-none md:col-start-auto md:text-[40px]">
+                    <span className="col-start-1 font-display text-[32px] leading-none md:col-start-auto md:text-[40px]">
                       {handle}
                     </span>
-                    <span className="label-mono col-start-1 text-[11px] md:col-span-1 md:col-start-auto">
+                    <span className="col-start-1 label-mono text-[11px] md:col-span-1 md:col-start-auto">
                       {t.notLinked}
                     </span>
                   </div>
@@ -96,12 +96,12 @@ function SideQuest() {
       effect="pop"
       delay={0.3}
       aria-labelledby="quest-title"
-      className="cut flex flex-col gap-5 self-start bg-ink-2 p-8"
+      className="flex flex-col gap-5 self-start bg-ink-2 p-8 cut"
     >
       <span className={SECTION_LABEL}>{t.label}</span>
       <h3
         id="quest-title"
-        className="font-display m-0 text-[44px] leading-[0.95] font-normal"
+        className="m-0 font-display text-[44px] leading-[0.95] font-normal"
       >
         {t.title}
       </h3>
@@ -128,7 +128,7 @@ function SideQuest() {
           style={{ width: `${progress * 100}%` }}
         />
       </div>
-      <div className="label-mono flex justify-between text-xs text-muted">
+      <div className="flex justify-between label-mono text-xs text-muted">
         <span>{t.followers}</span>
         <span>
           <b className="text-tq" data-nosnippet={followers === null ? "" : undefined}>

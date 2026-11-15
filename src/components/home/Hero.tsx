@@ -18,13 +18,13 @@ export function Hero() {
       className={`${WRAP} grid grid-cols-1 items-center gap-9 pt-7 pb-14 md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] md:gap-14 md:pt-14 md:pb-24`}
     >
       <div>
-        <p className="animate-rise-in label-mono m-0 inline-flex items-center gap-2.5 text-[13px] font-bold text-tq [animation-delay:0.1s]">
+        <p className="animate-rise-in m-0 inline-flex items-center gap-2.5 label-mono text-[13px] font-bold text-tq [animation-delay:0.1s]">
           <span aria-hidden="true" className="h-[3px] w-7 bg-tq" />
           {t.kicker}
         </p>
         <h1
           id="hero-title"
-          className="hero-title font-display mt-5 mb-0 text-[104px] leading-[0.8] text-paper md:text-[clamp(96px,13.5vw,200px)]"
+          className="hero-title mt-5 mb-0 font-display text-[104px] leading-[0.8] text-paper md:text-[clamp(96px,13.5vw,200px)]"
         >
           {t.titleTop}
           <span className="block text-[0.42em] leading-[1.05] text-tq [text-shadow:none]">
@@ -40,7 +40,7 @@ export function Hero() {
           <span className="relative inline-flex">
             <span
               aria-hidden="true"
-              className="cut absolute inset-0 translate-x-1.5 translate-y-1.5 bg-bordeaux"
+              className="absolute inset-0 translate-x-1.5 translate-y-1.5 bg-bordeaux cut"
             />
             <a href="#discord" className={`${BUTTON_PRIMARY} relative w-full`}>
               <MessageSquare aria-hidden="true" size={20} strokeWidth={2.5} />
@@ -60,7 +60,7 @@ export function Hero() {
         className="hud-scan relative aspect-square bg-ink-2 md:aspect-[1/1.05]"
       >
         <Brackets />
-        <div className="label-mono absolute inset-x-6 top-5 flex items-center justify-between text-xs text-muted">
+        <div className="absolute inset-x-6 top-5 flex items-center justify-between label-mono text-xs text-muted">
           <span>{t.screenName}</span>
           <span>
             <b className="text-tq">P1</b> + <b className="text-tq">P2</b>
@@ -76,7 +76,7 @@ export function Hero() {
           </span>
           <Ghost className="mascot-ghost w-[40%] max-w-[210px]" />
         </div>
-        <div className="label-mono absolute inset-x-6 bottom-5 flex items-end justify-between gap-4">
+        <div className="absolute inset-x-6 bottom-5 flex items-end justify-between gap-4 label-mono">
           <p className="m-0 text-xs leading-loose text-muted">
             {t.nowPlayingLabel}
             <b className="block text-[15px] text-paper">{t.nowPlaying}</b>

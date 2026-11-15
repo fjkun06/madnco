@@ -37,13 +37,13 @@ export function Activities() {
             <span className="font-mono text-base font-extrabold text-tq group-hover:text-paper md:text-[22px]">
               {String(i + 1).padStart(2, "0")}
             </span>
-            <h3 className="font-display m-0 text-[40px] leading-[0.95] font-normal md:text-[clamp(40px,4.6vw,68px)]">
+            <h3 className="m-0 font-display text-[40px] leading-[0.95] font-normal md:text-[clamp(40px,4.6vw,68px)]">
               {t.items[id].title}
             </h3>
             <p className="col-start-2 m-0 text-[17px] leading-normal text-muted group-hover:text-paper md:col-start-auto">
               {t.items[id].text}
             </p>
-            <span className="cut-s label-mono col-start-2 justify-self-start bg-ink-3 px-2.5 py-2 text-xs font-extrabold text-tq md:col-start-auto md:justify-self-end">
+            <span className="col-start-2 justify-self-start bg-ink-3 px-2.5 py-2 label-mono text-xs font-extrabold text-tq cut-s md:col-start-auto md:justify-self-end">
               {t.where[where]}
             </span>
           </RevealItem>

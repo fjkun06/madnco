@@ -20,7 +20,7 @@ export function LegalPage({
         ← {en.legal.back}
       </Link>
       <h1 className={`${SECTION_TITLE} mb-10`}>{title}</h1>
-      <div className="flex flex-col gap-6 text-[17px] leading-relaxed text-muted [&_h2]:font-display [&_h2]:mt-6 [&_h2]:mb-0 [&_h2]:text-3xl [&_h2]:font-normal [&_h2]:text-paper [&_p]:m-0">
+      <div className="flex flex-col gap-6 text-[17px] leading-relaxed text-muted [&_h2]:mt-6 [&_h2]:mb-0 [&_h2]:font-display [&_h2]:text-3xl [&_h2]:font-normal [&_h2]:text-paper [&_p]:m-0">
         {children}
       </div>
     </article>

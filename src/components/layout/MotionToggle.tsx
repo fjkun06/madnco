@@ -15,7 +15,7 @@ export function MotionToggle({ pause, play }: { pause: string; play: string }) {
       type="button"
       aria-pressed={paused}
       onClick={() => setPaused(!paused)}
-      className="label-mono cursor-pointer border-0 bg-transparent p-0 text-left text-xs text-muted underline-offset-4 hover:text-tq hover:underline"
+      className="cursor-pointer border-0 bg-transparent p-0 text-left label-mono text-xs text-muted underline-offset-4 hover:text-tq hover:underline"
     >
       {paused ? play : pause}
     </button>

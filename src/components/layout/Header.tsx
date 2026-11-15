@@ -26,7 +26,7 @@ export function Header() {
       <a
         href="#top"
         aria-label={t.home}
-        className="font-display flex items-center gap-2.5 text-2xl text-paper no-underline md:text-[30px]"
+        className="flex items-center gap-2.5 font-display text-2xl text-paper no-underline md:text-[30px]"
       >
         <Skull className="h-9 w-[34px]" teeth={false} />
         <span aria-hidden="true">
@@ -47,14 +47,14 @@ export function Header() {
       <div className="flex items-center gap-3.5">
         <a
           href={siteConfig.links.tiktokLive}
-          className="cut-s label-mono hidden h-9 items-center gap-2.5 bg-ink-3 px-3.5 text-xs font-extrabold text-muted no-underline hover:text-paper sm:inline-flex"
+          className="hidden h-9 items-center gap-2.5 bg-ink-3 px-3.5 label-mono text-xs font-extrabold text-muted no-underline cut-s hover:text-paper sm:inline-flex"
         >
           <Radio aria-hidden="true" size={16} strokeWidth={2.5} className="text-live" />
           {interpolate(en.live.pill, { handle: siteConfig.handles.tiktokLive })}
         </a>
         <a
           href="#discord"
-          className="cut focus-inset label-mono hidden min-h-11 items-center bg-tq px-[18px] text-[13px] font-extrabold text-ink no-underline transition-colors hover:bg-paper md:inline-flex"
+          className="hidden min-h-11 items-center bg-tq px-[18px] label-mono text-[13px] font-extrabold text-ink no-underline focus-inset transition-colors cut hover:bg-paper md:inline-flex"
         >
           {t.joinDiscord}
         </a>

@@ -29,7 +29,7 @@ export function Footer() {
           {t.outlineA} <span className="text-tq">{t.outlineB}</span>
         </Reveal>
       </div>
-      <div className="label-mono mt-12 flex flex-wrap justify-between gap-5 text-xs text-muted">
+      <div className="mt-12 flex flex-wrap justify-between gap-5 label-mono text-xs text-muted">
         <span>{t.credit}</span>
         <nav aria-label="Legal" className="flex flex-wrap gap-5">
           <Link href="/impressum" className="no-underline hover:text-tq">

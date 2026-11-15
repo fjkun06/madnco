@@ -43,7 +43,7 @@ export function MobileMenu({
         aria-controls={panelId}
         aria-label={open ? closeLabel : openLabel}
         onClick={() => setOpen((v) => !v)}
-        className="cut-s focus-inset inline-flex size-12 items-center justify-center border-0 bg-ink-3 text-paper"
+        className="inline-flex size-12 items-center justify-center border-0 bg-ink-3 text-paper focus-inset cut-s"
       >
         {open ? (
           <X aria-hidden="true" size={22} strokeWidth={2.5} />
@@ -63,7 +63,7 @@ export function MobileMenu({
               <a
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="font-display block px-4 py-3.5 text-3xl text-paper no-underline hover:bg-bordeaux"
+                className="block px-4 py-3.5 font-display text-3xl text-paper no-underline hover:bg-bordeaux"
               >
                 {link.label}
               </a>

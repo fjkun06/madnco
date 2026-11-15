@@ -25,7 +25,7 @@ export function DiscordBand() {
         className={`${WRAP} grid grid-cols-1 items-center gap-9 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-12`}
       >
         <div>
-          <Reveal as="span" className="label-mono block text-[13px] font-bold text-paper">
+          <Reveal as="span" className="block label-mono text-[13px] font-bold text-paper">
             {t.label}
           </Reveal>
           <Reveal
@@ -33,7 +33,7 @@ export function DiscordBand() {
             effect="wipe"
             delay={0.1}
             id="discord-title"
-            className="font-display mt-3.5 mb-0 text-[68px] leading-[0.85] text-paper md:text-[clamp(64px,8vw,128px)]"
+            className="mt-3.5 mb-0 font-display text-[68px] leading-[0.85] text-paper md:text-[clamp(64px,8vw,128px)]"
           >
             {t.titleLead} <span className="text-tq">{t.titleAccent}</span>
           </Reveal>
@@ -51,7 +51,7 @@ export function DiscordBand() {
           >
             <span
               aria-hidden="true"
-              className="cut absolute inset-0 translate-x-1.5 translate-y-1.5 bg-ink-3"
+              className="absolute inset-0 translate-x-1.5 translate-y-1.5 bg-ink-3 cut"
             />
             {href ? (
               <a href={href} className={`${BUTTON_INK} relative w-full`}>
@@ -66,8 +66,8 @@ export function DiscordBand() {
           </Reveal>
         </div>
 
-        <Reveal effect="slide-right" delay={0.15} className="cut bg-ink p-6">
-          <span className="label-mono mb-3.5 block text-xs text-muted">
+        <Reveal effect="slide-right" delay={0.15} className="bg-ink p-6 cut">
+          <span className="mb-3.5 block label-mono text-xs text-muted">
             {t.channelsLabel}
           </span>
           <RevealGroup
@@ -88,7 +88,7 @@ export function DiscordBand() {
                 </span>
                 {name}
                 {i === 0 && (
-                  <span className="label-mono ml-auto bg-live px-1.5 py-1 text-[11px] font-extrabold text-ink">
+                  <span className="ml-auto bg-live px-1.5 py-1 label-mono text-[11px] font-extrabold text-ink">
                     {t.ping}
                   </span>
                 )}

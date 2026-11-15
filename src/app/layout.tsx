@@ -55,14 +55,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       {/* App Router document: a plain <head> is right here. */}
-      {/* eslint-disable-next-line @next/next/no-head-element */}
       <head>
         <InlineScript html={BOOT} />
       </head>
       <body id="top">
         <a
           href="#main"
-          className="label-mono sr-only z-[70] bg-tq px-4 py-2 text-sm font-bold text-ink focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+          className="sr-only z-[70] bg-tq px-4 py-2 label-mono text-sm font-bold text-ink focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
         >
           {en.nav.skip}
         </a>

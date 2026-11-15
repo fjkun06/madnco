@@ -35,7 +35,7 @@ export function CrewSelect({ text }: { text: CrewText }) {
                 type="button"
                 aria-pressed={isOn}
                 onClick={() => setSelected(id)}
-                className={`cut focus-inset relative flex h-full min-h-[200px] w-full flex-col justify-between border-0 p-3 text-left transition-[transform,background-color] duration-200 hover:-translate-y-2 motion-reduce:hover:translate-y-0 md:min-h-[400px] md:p-[22px] ${isOn ? s.active : s.idle}`}
+                className={`relative flex h-full min-h-[200px] w-full flex-col justify-between border-0 p-3 text-left focus-inset transition-[transform,background-color] duration-200 cut hover:-translate-y-2 motion-reduce:hover:translate-y-0 md:min-h-[400px] md:p-[22px] ${isOn ? s.active : s.idle}`}
               >
                 <span
                   className={`label-mono text-[13px] font-extrabold ${isOn ? "" : s.tagIdle}`}
@@ -43,7 +43,7 @@ export function CrewSelect({ text }: { text: CrewText }) {
                   {s.tag}
                 </span>
                 {isOn && (
-                  <span className="label-mono absolute top-[18px] right-[18px] hidden bg-ink px-2 py-1 text-[11px] font-extrabold text-paper md:block">
+                  <span className="absolute top-[18px] right-[18px] hidden bg-ink px-2 py-1 label-mono text-[11px] font-extrabold text-paper md:block">
                     {text.selected}
                   </span>
                 )}
@@ -51,7 +51,7 @@ export function CrewSelect({ text }: { text: CrewText }) {
                   <CrewArt id={id} />
                 </span>
                 <span>
-                  <span className="font-display block text-[26px] leading-none md:text-[44px]">
+                  <span className="block font-display text-[26px] leading-none md:text-[44px]">
                     {text.members[id].name}
                   </span>
                   <span
@@ -69,7 +69,7 @@ export function CrewSelect({ text }: { text: CrewText }) {
       <Reveal
         effect="slide-right"
         delay={0.35}
-        className="cut flex flex-col gap-[22px] bg-ink-2 p-6 md:p-9"
+        className="flex flex-col gap-[22px] bg-ink-2 p-6 cut md:p-9"
       >
         <div aria-live="polite" className="flex flex-col gap-[22px]">
           <div className="flex items-baseline gap-4">
@@ -83,7 +83,7 @@ export function CrewSelect({ text }: { text: CrewText }) {
           <p className="m-0 text-[17px] leading-relaxed md:text-[19px]">{member.blurb}</p>
         </div>
         <div>
-          <div className="label-mono mb-2.5 flex justify-between text-xs text-muted">
+          <div className="mb-2.5 flex justify-between label-mono text-xs text-muted">
             <span>{text.screenTime}</span>
             <span>{member.time}</span>
           </div>
@@ -98,7 +98,7 @@ export function CrewSelect({ text }: { text: CrewText }) {
           {member.plays.map((game) => (
             <li
               key={game}
-              className="cut-s label-mono bg-ink-3 px-3 py-2 text-xs font-bold text-paper"
+              className="bg-ink-3 px-3 py-2 label-mono text-xs font-bold text-paper cut-s"
             >
               {game}
             </li>

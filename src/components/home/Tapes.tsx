@@ -46,7 +46,7 @@ function Tape({
           <Fragment key={half}>
             {loop.map((word, i) => (
               <Fragment key={`${half}-${i}`}>
-                <span className="font-display px-3.5 text-2xl md:px-[22px] md:text-[34px]">
+                <span className="px-3.5 font-display text-2xl md:px-[22px] md:text-[34px]">
                   {word}
                 </span>
                 <span className="font-mono text-base font-extrabold opacity-55 md:text-[22px]">
