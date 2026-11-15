@@ -1,4 +1,4 @@
-import { LegalPage, Placeholder } from "@/components/legal/LegalPage";
+import { LegalPage } from "@/components/legal/LegalPage";
 import { provider } from "@/content/legal/provider";
 import { pageMetadata, routes } from "@/lib/seo/metadata";
 import { en } from "@/locales/en";
@@ -14,14 +14,13 @@ export default function PrivacyPage() {
     <LegalPage title={en.legal.privacyTitle}>
       <h2>Who is responsible</h2>
       <p>
-        <Placeholder>{provider.name}</Placeholder>, contact:{" "}
-        <Placeholder>{provider.email}</Placeholder>.
+        {provider.name}, {provider.street}, {provider.city}. Contact:{" "}
+        <a href={`mailto:${provider.email}`}>{provider.email}</a>.
       </p>
       <h2>Hosting</h2>
       <p>
         The site is hosted by Vercel Inc. When you open a page, Vercel processes technical
-        data such as your IP address and browser type to deliver it and keep it secure.{" "}
-        <Placeholder>[Retention period and Vercel data processing agreement]</Placeholder>
+        data such as your IP address and browser type to deliver it and keep it secure.
       </p>
       <h2>No tracking, no cookies</h2>
       <p>
@@ -37,13 +36,7 @@ export default function PrivacyPage() {
       <h2>Your rights</h2>
       <p>
         You can ask for access to, correction or deletion of your data, and complain to a
-        data protection authority.{" "}
-        <Placeholder>[Responsible authority for the operator&rsquo;s state]</Placeholder>
-      </p>
-      <p>
-        <Placeholder>
-          [Have this page checked before launch: eRecht24, IHK or a lawyer.]
-        </Placeholder>
+        data protection authority.
       </p>
     </LegalPage>
   );

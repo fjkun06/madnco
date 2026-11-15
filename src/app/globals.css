@@ -22,6 +22,33 @@
   --color-case-ink: #3a2a30; /* body text on paper */
   --color-muted: #bbaab1; /* secondary text on dark */
   --color-live: #ff4d4d; /* live badges only */
+
+  /* Fluid type: each size grows smoothly from a 390 px phone to a 1440 px
+     desktop (rem, so browser font settings still scale it). The max is the
+     approved desktop design; the min is its phone design. */
+  --text-hero: clamp(5.5rem, 2.9rem + 11vw, 12.5rem); /* MAD n CO. */
+  --text-section: clamp(3rem, 1.9rem + 4.6vw, 6rem); /* section headings */
+  --text-band: clamp(3.75rem, 2rem + 6.7vw, 8rem); /* Join the madness. */
+  --text-row: clamp(2.25rem, 1.6rem + 3vw, 4.25rem); /* activity titles */
+  --text-sign: clamp(
+    3.5rem,
+    0.5rem + 9.5vw,
+    9rem
+  ); /* footer sign (not text-outline: that is the stroke style) */
+  --text-bio: clamp(3.25rem, 2.5rem + 2.4vw, 4.5rem); /* crew bio name */
+  --text-card: clamp(1.625rem, 1rem + 2.2vw, 2.75rem); /* crew card names */
+  --text-panel: clamp(2.5rem, 2.1rem + 1.4vw, 3.375rem); /* case file title */
+  --text-quest: clamp(2.25rem, 1.9rem + 1vw, 2.75rem); /* side quest title */
+  --text-handle: clamp(2rem, 1.6rem + 1.2vw, 2.5rem); /* link handles */
+  --text-amp: clamp(2.75rem, 1.6rem + 3vw, 4rem); /* & between mascots */
+  --text-tape: clamp(1.5rem, 1.1rem + 1.4vw, 2.125rem); /* tape words */
+  --text-lead: clamp(1.375rem, 1.1rem + 0.9vw, 1.75rem); /* hero slogan */
+  --text-body-lg: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem); /* 17 → 19 px */
+
+  /* Fluid spacing */
+  --spacing-gutter: clamp(1.25rem, 4vw, 3rem); /* page side padding, 20 → 48 px */
+  --spacing-section: clamp(4rem, 2.6rem + 4.5vw, 6rem); /* section padding */
+  --spacing-band: clamp(4.5rem, 2.5rem + 6vw, 6.875rem); /* Discord band padding */
 }
 
 @theme inline {
@@ -70,43 +97,48 @@
 
 /* ---------- base ---------- */
 
-html {
-  scroll-padding-top: 1rem;
-  background: var(--color-ink);
-  /* While html is overflow: visible, body's overflow is handed to the viewport
-     and body clips nothing: the tapes, mascot split and footer sign then widen
-     the page and phones zoom out. A value here keeps body's clip on body. */
-  overflow-x: clip;
-}
-
-body {
-  margin: 0;
-  background: var(--color-ink);
-  color: var(--color-paper);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  /* clip, never hidden: hidden makes body a scroll container and breaks
-     scroll-driven animations (AGENTS.md) */
-  overflow-x: clip;
-}
-
-a {
-  color: inherit;
-}
-
-button {
-  cursor: pointer;
-  font: inherit;
-}
-
-:where(a, button, [tabindex]):focus-visible {
-  outline: 3px solid var(--color-tq);
-  outline-offset: 3px;
-}
-
-@media (prefers-reduced-motion: no-preference) {
+/* In @layer base so utilities win: unlayered rules beat every Tailwind
+   utility, which made `a { color: inherit }` wipe the text colour of every
+   link button and `button { font: inherit }` wipe button font utilities. */
+@layer base {
   html {
-    scroll-behavior: smooth;
+    scroll-padding-top: 1rem;
+    background: var(--color-ink);
+    /* While html is overflow: visible, body's overflow is handed to the viewport
+       and body clips nothing: the tapes, mascot split and footer sign then widen
+       the page and phones zoom out. A value here keeps body's clip on body. */
+    overflow-x: clip;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    /* clip, never hidden: hidden makes body a scroll container and breaks
+       scroll-driven animations (AGENTS.md) */
+    overflow-x: clip;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+    font: inherit;
+  }
+
+  :where(a, button, [tabindex]):focus-visible {
+    outline: 3px solid var(--color-tq);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 }
 
@@ -327,9 +359,11 @@ button {
 @keyframes tilt {
   from {
     rotate: -3deg;
+    scale: 1.06;
   }
   to {
     rotate: 3deg;
+    scale: 1.06;
   }
 }
 

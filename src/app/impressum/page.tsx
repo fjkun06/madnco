@@ -30,16 +30,11 @@ export default function ImpressumPage() {
       </p>
       <h2>Kontakt</h2>
       <p>
-        E-Mail: <Fact value={provider.email} />
+        E-Mail: <a href={`mailto:${provider.email}`}>{provider.email}</a>
       </p>
       <h2>Verantwortlich für den Inhalt</h2>
       <p>
         <Fact value={provider.name} />, Anschrift wie oben.
-      </p>
-      <p>
-        <Placeholder>
-          [Have this page checked before launch: eRecht24, IHK or a lawyer.]
-        </Placeholder>
       </p>
     </LegalPage>
   );

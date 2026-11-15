@@ -12,23 +12,23 @@ export const siteConfig = {
   /** Mad's own site, credited in the footer. */
   builderUrl: "https://frankjordan.dev",
   links: {
-    discord: "[DISCORD INVITE LINK]",
+    discord: "https://discord.gg/sYYdUGR2pp",
     tiktok: "https://www.tiktok.com/@madnco8",
     /** MadnCo. goes live here until @madnco8 unlocks TikTok LIVE. */
     tiktokLive: "https://www.tiktok.com/@clipzhub06",
-    twitch: "[TWITCH LINK]",
-    youtube: "[YOUTUBE LINK]",
+    twitch: "https://www.twitch.tv/madnco8",
+    youtube: "https://www.youtube.com/@madnco8",
   },
   handles: {
     tiktok: "@madnco8",
     tiktokLive: "@clipzhub06",
-    twitch: "[TWITCH HANDLE]",
-    youtube: "[YOUTUBE HANDLE]",
+    twitch: "@madnco8",
+    youtube: "@madnco8",
   },
   animeCaseFiles: {
     name: "The Anime Case Files",
     tiktok: "https://www.tiktok.com/@theanimecasefiles",
-    youtube: "[ANIME CASE FILES YOUTUBE LINK]",
+    youtube: "https://www.youtube.com/@theanimecasefiles",
   },
   /** TikTok's follower minimum before an account may go LIVE. */
   liveFollowerGoal: 50,
@@ -36,7 +36,7 @@ export const siteConfig = {
    * Current @madnco8 follower count, updated by hand. `null` until known:
    * the side quest bar then stays empty and shows a placeholder.
    */
-  madncoFollowers: null as number | null,
+  madncoFollowers: 4 as number | null,
 } as const;
 
 /** `true` for an unconfirmed fact written as `[...]`. */

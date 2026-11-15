@@ -35,7 +35,7 @@ export function MobileMenu({
   }, [open]);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         ref={buttonRef}
         type="button"
@@ -55,7 +55,7 @@ export function MobileMenu({
         id={panelId}
         aria-label={openLabel}
         hidden={!open}
-        className="absolute inset-x-5 top-[68px] z-50 bg-ink-2 p-2"
+        className="absolute inset-x-gutter top-[68px] z-50 bg-ink-2 p-2 md:top-[84px]"
       >
         <ul className="m-0 flex list-none flex-col p-0">
           {links.map((link) => (

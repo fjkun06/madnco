@@ -10,6 +10,7 @@ export type RevealEffect =
   | "slide-right"
   | "wipe"
   | "stamp"
+  | "spin"
   | "draw";
 
 /** `"view"` animates when scrolled into view, `"mount"` right away (above the fold). */
@@ -32,6 +33,8 @@ const hiddenStates: Record<RevealEffect, Record<string, number | string>> = {
   // Lands like a rubber stamp. Rotation is relative to any CSS rotate on
   // the element, which keeps its final angle.
   stamp: { opacity: 0, scale: 2.6, rotate: -22 },
+  // An arrow swinging into place (link rows), overshooting a little.
+  spin: { rotate: -135 },
   // A line or bar drawing itself; pair with `origin-left` on the element.
   draw: { scaleX: 0 },
 };
@@ -84,7 +87,7 @@ export const zeroAreaViewport = { ...viewport, amount: "some" } as const;
 
 function transitionFor(effect: RevealEffect): Transition {
   if (effect === "stamp") return STAMP_SPRING;
-  if (effect === "pop") return SPRING;
+  if (effect === "pop" || effect === "spin") return SPRING;
   if (effect === "wipe") return { duration: WIPE_DURATION, ease: EASE_OUT };
   return { duration: DURATION, ease: EASE_OUT };
 }

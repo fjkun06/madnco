@@ -20,7 +20,7 @@ export function SectionHead({
   aside?: string;
 }) {
   return (
-    <div className="mb-8 flex flex-wrap items-end justify-between gap-6 md:mb-12">
+    <div className="mb-[clamp(2rem,1.5rem+1.6vw,3rem)] grid grid-cols-1 items-end gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22.5rem)] lg:gap-10">
       <div>
         <Reveal as="span" className={`${SECTION_LABEL} block`}>
           {label}
@@ -33,7 +33,7 @@ export function SectionHead({
         <Reveal
           as="p"
           delay={0.25}
-          className="m-0 max-w-[360px] text-[17px] leading-relaxed text-muted"
+          className="m-0 max-w-[22.5rem] text-[17px] leading-[1.55] text-muted"
         >
           {aside}
         </Reveal>

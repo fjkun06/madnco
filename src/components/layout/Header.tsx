@@ -3,7 +3,7 @@ import { Skull } from "@/components/icons/Mascots";
 import { en } from "@/locales/en";
 import { siteConfig } from "@/utils/app.constants";
 import { interpolate } from "@/utils/interpolate";
-import { WRAP } from "@/utils/ui.classes";
+import { DISPLAY_TRACKING, WRAP } from "@/utils/ui.classes";
 import { MobileMenu, type NavLink } from "./MobileMenu";
 
 /**
@@ -26,19 +26,22 @@ export function Header() {
       <a
         href="#top"
         aria-label={t.home}
-        className="flex items-center gap-2.5 font-display text-2xl text-paper no-underline md:text-[30px]"
+        className={`flex items-center gap-2.5 font-display text-2xl text-paper no-underline ${DISPLAY_TRACKING} md:text-[30px]`}
       >
         <Skull className="h-9 w-[34px]" teeth={false} />
         <span aria-hidden="true">
           MADNCO<span className="text-tq">.</span>
         </span>
       </a>
-      <nav aria-label={t.label} className="hidden items-center gap-8 md:flex">
+      <nav
+        aria-label={t.label}
+        className="hidden items-center gap-[clamp(1.25rem,2.4vw,2rem)] lg:flex"
+      >
         {links.map((link) => (
           <a
             key={link.href}
             href={link.href}
-            className="label-mono text-[13px] text-muted no-underline hover:text-tq"
+            className="label-mono text-[13px] whitespace-nowrap text-muted no-underline hover:text-tq"
           >
             {link.label}
           </a>
@@ -47,14 +50,14 @@ export function Header() {
       <div className="flex items-center gap-3.5">
         <a
           href={siteConfig.links.tiktokLive}
-          className="hidden h-9 items-center gap-2.5 bg-ink-3 px-3.5 label-mono text-xs font-extrabold text-muted no-underline cut-s hover:text-paper sm:inline-flex"
+          className="hidden h-9 items-center gap-2.5 bg-ink-3 px-3.5 label-mono text-xs font-extrabold text-muted no-underline whitespace-nowrap cut-s hover:text-paper sm:inline-flex"
         >
           <Radio aria-hidden="true" size={16} strokeWidth={2.5} className="text-live" />
           {interpolate(en.live.pill, { handle: siteConfig.handles.tiktokLive })}
         </a>
         <a
           href="#discord"
-          className="hidden min-h-11 items-center bg-tq px-[18px] label-mono text-[13px] font-extrabold text-ink no-underline focus-inset transition-colors cut hover:bg-paper md:inline-flex"
+          className="hidden min-h-11 items-center bg-tq px-[18px] label-mono text-[13px] font-extrabold text-ink no-underline focus-inset transition-colors whitespace-nowrap cut hover:bg-paper md:inline-flex"
         >
           {t.joinDiscord}
         </a>

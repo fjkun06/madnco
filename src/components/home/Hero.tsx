@@ -2,7 +2,7 @@ import { MessageSquare } from "lucide-react";
 import { Ghost, Skull } from "@/components/icons/Mascots";
 import { en } from "@/locales/en";
 import { siteConfig } from "@/utils/app.constants";
-import { BUTTON_GHOST, BUTTON_PRIMARY, WRAP } from "@/utils/ui.classes";
+import { BUTTON_GHOST, BUTTON_PRIMARY, DISPLAY_TRACKING, WRAP } from "@/utils/ui.classes";
 
 /**
  * Above the fold. Server-rendered and animated with CSS only (globals.css:
@@ -15,7 +15,7 @@ export function Hero() {
   return (
     <section
       aria-labelledby="hero-title"
-      className={`${WRAP} grid grid-cols-1 items-center gap-9 pt-7 pb-14 md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] md:gap-14 md:pt-14 md:pb-24`}
+      className={`${WRAP} grid grid-cols-1 items-center gap-[clamp(2.25rem,1rem+4vw,3.5rem)] pt-[clamp(1.75rem,0.9rem+3.5vw,3.5rem)] pb-[clamp(3.5rem,2rem+5vw,6rem)] lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]`}
     >
       <div>
         <p className="animate-rise-in m-0 inline-flex items-center gap-2.5 label-mono text-[13px] font-bold text-tq [animation-delay:0.1s]">
@@ -24,19 +24,19 @@ export function Hero() {
         </p>
         <h1
           id="hero-title"
-          className="hero-title mt-5 mb-0 font-display text-[104px] leading-[0.8] text-paper md:text-[clamp(96px,13.5vw,200px)]"
+          className={`hero-title mt-[22px] mb-0 font-display text-hero leading-[0.8] text-paper ${DISPLAY_TRACKING}`}
         >
           {t.titleTop}
-          <span className="block text-[0.42em] leading-[1.05] text-tq [text-shadow:none]">
+          <span className="mt-[0.12em] mb-[0.02em] block text-[0.42em] leading-[1.05] text-tq [text-shadow:none]">
             {t.titleMid}
           </span>
           {t.titleBottom}
         </h1>
-        <p className="animate-rise-in mt-6 mb-0 max-w-[560px] text-[22px] leading-tight font-bold [animation-delay:0.45s] md:mt-8 md:text-[28px]">
+        <p className="animate-rise-in mt-[clamp(1.5rem,1.1rem+1.2vw,2.125rem)] mb-0 max-w-[35rem] text-lead leading-tight font-bold [animation-delay:0.45s]">
           {t.sloganLead} <em className="text-bordeaux-hi not-italic">{t.sloganAccent}</em>{" "}
           {t.sloganRest}
         </p>
-        <div className="animate-rise-in mt-8 flex flex-col gap-4 [animation-delay:0.6s] md:mt-10 md:flex-row md:flex-wrap md:gap-5">
+        <div className="animate-rise-in mt-[clamp(1.875rem,1.6rem+0.8vw,2.5rem)] flex flex-col gap-4 [animation-delay:0.6s] sm:flex-row sm:flex-wrap sm:gap-[22px]">
           <span className="relative inline-flex">
             <span
               aria-hidden="true"
@@ -57,27 +57,27 @@ export function Hero() {
       <div
         role="img"
         aria-label={t.artLabel}
-        className="hud-scan relative aspect-square bg-ink-2 md:aspect-[1/1.05]"
+        className="hud-scan relative aspect-square w-full bg-ink-2 cut sm:aspect-[16/10] lg:aspect-[1/1.05]"
       >
         <Brackets />
-        <div className="absolute inset-x-6 top-5 flex items-center justify-between label-mono text-xs text-muted">
+        <div className="absolute inset-x-[26px] top-[22px] flex items-center justify-between label-mono text-xs text-muted">
           <span>{t.screenName}</span>
           <span>
             <b className="text-tq">P1</b> + <b className="text-tq">P2</b>
           </span>
         </div>
         <div className="absolute inset-x-6 top-[70px] bottom-[92px] flex items-center justify-center gap-[4%]">
-          <Skull className="mascot-skull w-[40%] max-w-[210px]" />
+          <Skull className="mascot-skull h-full max-h-[260px] w-[40%] max-w-[210px]" />
           <span
             aria-hidden="true"
-            className="mascot-amp font-display text-[44px] md:text-[64px]"
+            className={`mascot-amp font-display text-amp ${DISPLAY_TRACKING}`}
           >
             &amp;
           </span>
-          <Ghost className="mascot-ghost w-[40%] max-w-[210px]" />
+          <Ghost className="mascot-ghost h-full max-h-[260px] w-[40%] max-w-[210px]" />
         </div>
-        <div className="absolute inset-x-6 bottom-5 flex items-end justify-between gap-4 label-mono">
-          <p className="m-0 text-xs leading-loose text-muted">
+        <div className="absolute inset-x-[26px] bottom-[22px] flex items-end justify-between gap-4 label-mono">
+          <p className="m-0 text-xs leading-[1.8] text-muted">
             {t.nowPlayingLabel}
             <b className="block text-[15px] text-paper">{t.nowPlaying}</b>
           </p>

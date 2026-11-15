@@ -61,6 +61,42 @@ visitors), mapped in `@theme inline`:
 - `font-sans` — Rubik: body text
 - `font-mono` — JetBrains Mono: labels (`label-mono` utility), tags, numbers
 
+## Responsive system
+
+Nothing is sized for one screen. Type and spacing are fluid tokens in
+`@theme` (`globals.css`): each grows smoothly from the phone design (390 px)
+to the desktop design (1440 px) with `clamp()`, in `rem` so browser font
+settings still scale them.
+
+| Token          | Phone → desktop | Used for                    |
+| -------------- | --------------- | --------------------------- |
+| `text-hero`    | 88 → 200 px     | MAD n CO.                   |
+| `text-section` | 48 → 96 px      | Section headings            |
+| `text-band`    | 60 → 128 px     | Join the madness.           |
+| `text-row`     | 36 → 68 px      | Activity titles             |
+| `text-sign`    | 56 → 144 px     | Footer ENDLESS MADNESS      |
+| `text-bio`     | 52 → 72 px      | Crew bio name               |
+| `text-card`    | 26 → 44 px      | Crew card names             |
+| `text-panel`   | 40 → 54 px      | Case file title             |
+| `text-quest`   | 36 → 44 px      | Side quest title            |
+| `text-handle`  | 32 → 40 px      | Link handles                |
+| `text-lead`    | 22 → 28 px      | Hero slogan                 |
+| `text-tape`    | 24 → 34 px      | Tape words                  |
+| `px-gutter`    | 20 → 48 px      | Page side padding (never 0) |
+| `py-section`   | 64 → 96 px      | Section padding             |
+| `py-band`      | 72 → 110 px     | Discord band, footer top    |
+
+Layouts change at Tailwind's breakpoints, where the content needs it:
+
+- `sm` (640): hero buttons side by side; game screen goes wide (16:10).
+- `md` (768): Join Discord in the header; link rows get their 3-column layout.
+- `lg` (1024): full nav; two-column hero, crew, Discord band and Find us;
+  section notes beside their headings.
+- `xl` (1280): four-column activity rows (title, text and tag side by side).
+
+Don't name a font-size token after an existing utility class: `--text-outline`
+once generated `text-outline` and clashed with the stroke style of that name.
+
 ## Shape and utilities
 
 - `cut` / `cut-s` — the shape rule: chamfered corners, nothing rounded.

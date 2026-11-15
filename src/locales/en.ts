@@ -153,7 +153,7 @@ export const en = {
   caseFile: {
     label: "05 / Also by Mad",
     stamp: "CASE FILE",
-    text: "Mad's anime channel. [ONE LINE ABOUT WHAT THE CHANNEL DOES]",
+    text: "Mad's anime channel. Everything has a file.",
   },
   footer: {
     outlineA: "ENDLESS",

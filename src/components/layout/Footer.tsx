@@ -11,10 +11,9 @@ import { MotionToggle } from "./MotionToggle";
  */
 export function Footer() {
   const t = en.footer;
-  const line =
-    "font-display m-0 text-[64px] leading-[0.85] md:text-[clamp(70px,11vw,170px)] md:whitespace-nowrap";
+  const line = "font-display m-0 text-sign leading-[0.85] text-balance";
   return (
-    <footer className={`${WRAP} pt-[72px] pb-10 md:pt-[110px] md:pb-14`}>
+    <footer className={`${WRAP} pt-band pb-[clamp(2.5rem,2rem+1.5vw,3.5rem)]`}>
       <div className="relative" aria-label={`${t.outlineA} ${t.outlineB}`} role="img">
         <p aria-hidden="true" className={`${line} text-outline`}>
           {t.outlineA}{" "}
@@ -32,15 +31,15 @@ export function Footer() {
       <div className="mt-12 flex flex-wrap justify-between gap-5 label-mono text-xs text-muted">
         <span>{t.credit}</span>
         <nav aria-label="Legal" className="flex flex-wrap gap-5">
-          <Link href="/impressum" className="no-underline hover:text-tq">
+          <Link href="/impressum" className="underline-offset-2 hover:text-tq">
             {t.impressum}
           </Link>
-          <Link href="/privacy" className="no-underline hover:text-tq">
+          <Link href="/privacy" className="underline-offset-2 hover:text-tq">
             {t.privacy}
           </Link>
           <MotionToggle pause={t.pause} play={t.play} />
         </nav>
-        <a href={siteConfig.builderUrl} className="no-underline hover:text-tq">
+        <a href={siteConfig.builderUrl} className="underline-offset-2 hover:text-tq">
           {t.builtBy}
         </a>
       </div>

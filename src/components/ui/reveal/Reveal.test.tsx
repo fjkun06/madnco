@@ -15,6 +15,7 @@ const effects: RevealEffect[] = [
   "slide-right",
   "wipe",
   "stamp",
+  "spin",
   "draw",
 ];
 

@@ -11,3 +11,25 @@ export function interpolate(
     key in values ? String(values[key]) : slot,
   );
 }
+
+/** One piece of an interpolated text: plain text, or a filled slot. */
+export type TextPart = { text: string; slot?: string };
+
+/**
+ * Like `interpolate`, but returns the pieces so a component can style the
+ * filled slots (e.g. bold handles). Unknown slots stay as plain text.
+ */
+export function interpolateParts(
+  text: string,
+  values: Record<string, string | number>,
+): TextPart[] {
+  return text
+    .split(/(\{\w+\})/)
+    .filter(Boolean)
+    .map((piece) => {
+      const key = /^\{(\w+)\}$/.exec(piece)?.[1];
+      return key && key in values
+        ? { text: String(values[key]), slot: key }
+        : { text: piece };
+    });
+}

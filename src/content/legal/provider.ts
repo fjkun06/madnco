@@ -1,12 +1,8 @@
-/**
- * Who runs the site, for the Impressum (§ 5 DDG) and the privacy page.
- * Every field is a `[...]` placeholder until confirmed; have the final texts
- * checked (eRecht24, IHK or a lawyer) before relying on them.
- */
+/** Who runs the site, for the Impressum (§ 5 DDG) and the privacy page. */
 export const provider = {
-  name: "[FULL NAME]",
-  street: "[STREET AND NUMBER]",
-  city: "[POSTCODE AND CITY]",
-  country: "Germany",
-  email: "[CONTACT EMAIL]",
+  name: "Frank Jordan Zone Nguemfouo",
+  street: "Kronprinzenstr. 8",
+  city: "44581 Essen",
+  country: "Deutschland",
+  email: "madncou@gmail.com",
 } as const;

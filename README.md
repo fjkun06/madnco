@@ -30,16 +30,10 @@ npm run build && npm start
 | Impressum / privacy facts          | `src/content/legal/provider.ts`           |
 | Metadata, sitemap, robots          | `src/lib/seo/metadata.ts`, `src/app/`     |
 
-## Open facts (`[...]`)
+## Updating facts
 
-Placeholders render visibly and are never linked:
-
-- `siteConfig.links.discord` — Discord invite (set it to never expire)
-- `siteConfig.links.twitch` / `handles.twitch`
-- `siteConfig.links.youtube` / `handles.youtube`
-- `siteConfig.animeCaseFiles.youtube` and the one-line description in `en.caseFile.text`
-- `siteConfig.madncoFollowers` — current @madnco8 count for the side quest bar
-- `src/content/legal/provider.ts` — name, address, email for the Impressum
+- `siteConfig.madncoFollowers` in `src/utils/app.constants.ts` — set by hand
+  until @madnco8 reaches 50 (TikTok's LIVE minimum). Redeploy to update.
 
 ## Motion
 
