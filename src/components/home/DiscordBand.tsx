@@ -3,6 +3,7 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import { en } from "@/locales/en";
 import { confirmedHref, siteConfig } from "@/utils/app.constants";
 import { BUTTON_INK, DISPLAY_TRACKING, WRAP } from "@/utils/ui.classes";
+import { ExternalLink } from "@/components/ui/ExternalLink";
 
 /**
  * Channels shown in the server preview: text channels (#) and a voice
@@ -64,10 +65,10 @@ export function DiscordBand() {
               className="absolute inset-0 translate-x-1.5 translate-y-1.5 bg-bordeaux cut"
             />
             {href ? (
-              <a href={href} className={`${BUTTON_INK} relative w-full`}>
+              <ExternalLink href={href} className={`${BUTTON_INK} relative w-full`}>
                 {t.cta}
                 <ArrowUpRight aria-hidden="true" size={18} strokeWidth={2.5} />
-              </a>
+              </ExternalLink>
             ) : (
               <span data-nosnippet className={`${BUTTON_INK} relative w-full`}>
                 {t.missing}

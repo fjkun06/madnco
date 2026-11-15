@@ -10,6 +10,7 @@ import {
   WRAP,
 } from "@/utils/ui.classes";
 import { SectionHead } from "./SectionHead";
+import { ExternalLink } from "@/components/ui/ExternalLink";
 
 type Row = { key: keyof typeof en.links.platforms; handle: string; href: string };
 
@@ -49,9 +50,9 @@ export function FindUs() {
             return (
               <RevealItem as="li" key={key}>
                 {url ? (
-                  <a
+                  <ExternalLink
                     href={url}
-                    className={`${ROW} group text-paper transition-[background-color,color,padding] duration-150 hover:bg-tq hover:pl-6 hover:text-ink focus-visible:outline-offset-[-3px]`}
+                    className={`${ROW} group text-paper transition-[background-color,color,padding] duration-500 ease-heavy hover:bg-tq hover:pl-6 hover:text-ink focus-visible:outline-offset-[-3px]`}
                   >
                     <span className={`${PLATFORM} text-muted group-hover:text-ink`}>
                       {t.platforms[key]}
@@ -70,10 +71,10 @@ export function FindUs() {
                         aria-hidden="true"
                         size={28}
                         strokeWidth={2.5}
-                        className="transition-transform duration-300 group-hover:rotate-45"
+                        className="transition-transform duration-700 ease-heavy group-hover:rotate-45"
                       />
                     </RevealItem>
-                  </a>
+                  </ExternalLink>
                 ) : (
                   // Same layout as a linked row, but not a link: the muted
                   // arrow is decoration and the note is for screen readers.
@@ -164,9 +165,9 @@ function SideQuest() {
           / {goal}
         </span>
       </div>
-      <a href={siteConfig.links.tiktok} className={BUTTON_PRIMARY_S}>
+      <ExternalLink href={siteConfig.links.tiktok} className={BUTTON_PRIMARY_S}>
         {interpolate(t.cta, { handle: handles.tiktok })}
-      </a>
+      </ExternalLink>
     </Reveal>
   );
 }

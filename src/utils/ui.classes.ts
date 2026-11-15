@@ -15,7 +15,7 @@ export const DISPLAY_TRACKING = "tracking-[0.01em]";
 
 /** Button without its corner shape; the exports add `cut` or `cut-s`. */
 const BUTTON_CORE =
-  "focus-inset label-mono inline-flex min-h-14 items-center justify-center gap-3 px-7 text-[15px] font-extrabold no-underline transition-[transform,background-color,color] duration-150 hover:-translate-x-[3px] hover:-translate-y-[3px] motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0";
+  "focus-inset label-mono inline-flex min-h-14 items-center justify-center gap-3 px-7 text-[15px] font-extrabold no-underline transition-[transform,background-color,color] duration-500 ease-heavy hover:-translate-x-[3px] hover:-translate-y-[3px] motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0";
 const BUTTON_BASE = `cut ${BUTTON_CORE}`;
 
 /** Primary action: turquoise, dark text. */

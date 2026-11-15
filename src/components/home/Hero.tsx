@@ -3,6 +3,7 @@ import { Ghost, Skull } from "@/components/icons/Mascots";
 import { en } from "@/locales/en";
 import { siteConfig } from "@/utils/app.constants";
 import { BUTTON_GHOST, BUTTON_PRIMARY, DISPLAY_TRACKING, WRAP } from "@/utils/ui.classes";
+import { ExternalLink } from "@/components/ui/ExternalLink";
 
 /**
  * Above the fold. Server-rendered and animated with CSS only (globals.css:
@@ -47,10 +48,10 @@ export function Hero() {
               {t.ctaDiscord}
             </a>
           </span>
-          <a href={siteConfig.links.tiktokLive} className={BUTTON_GHOST}>
+          <ExternalLink href={siteConfig.links.tiktokLive} className={BUTTON_GHOST}>
             <span aria-hidden="true" className="size-2.5 rounded-full bg-live" />
             {t.ctaLive}
-          </a>
+          </ExternalLink>
         </div>
       </div>
 

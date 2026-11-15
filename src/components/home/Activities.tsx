@@ -26,7 +26,7 @@ export function Activities() {
             as="li"
             key={id}
             effect="slide-left"
-            className="group relative grid grid-cols-[clamp(3.25rem,2rem+4vw,4.5rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2.5 border-b-2 border-ink-3 px-1 py-[clamp(1.5rem,1.2rem+0.8vw,1.875rem)] transition-[background-color,padding] duration-200 hover:bg-bordeaux hover:pl-3 sm:px-3 xl:grid-cols-[120px_minmax(0,1fr)_minmax(0,0.9fr)_140px] xl:gap-8 xl:px-5 xl:hover:pl-9"
+            className="group relative grid grid-cols-[clamp(3.25rem,2rem+4vw,4.5rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2.5 border-b-2 border-ink-3 px-1 py-[clamp(1.5rem,1.2rem+0.8vw,1.875rem)] transition-[background-color,padding] duration-500 ease-heavy hover:bg-bordeaux hover:pl-3 sm:px-3 xl:grid-cols-[120px_minmax(0,1fr)_minmax(0,0.9fr)_140px] xl:gap-8 xl:px-5 xl:hover:pl-9"
           >
             <RevealItem
               as="span"

@@ -26,6 +26,17 @@ describe("home page", () => {
     }
   });
 
+  it("opens every outside link in a new tab", () => {
+    const outside = screen
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("href")?.startsWith("https://"));
+    expect(outside.length).toBeGreaterThan(0);
+    for (const link of outside) {
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    }
+  });
+
   it("shows every activity", () => {
     for (const item of Object.values(en.what.items)) {
       expect(screen.getByRole("heading", { name: item.title })).toBeInTheDocument();

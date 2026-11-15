@@ -4,6 +4,7 @@ import { siteConfig } from "@/utils/app.constants";
 import { WRAP } from "@/utils/ui.classes";
 import { FooterSign } from "./FooterSign";
 import { MotionToggle } from "./MotionToggle";
+import { ExternalLink } from "@/components/ui/ExternalLink";
 
 /**
  * The ENDLESS MADNESS sign (full width, see FooterSign), then credits, legal
@@ -25,9 +26,12 @@ export function Footer() {
           </Link>
           <MotionToggle pause={t.pause} play={t.play} />
         </nav>
-        <a href={siteConfig.builderUrl} className="underline-offset-2 hover:text-tq">
+        <ExternalLink
+          href={siteConfig.builderUrl}
+          className="underline-offset-2 hover:text-tq"
+        >
           {t.builtBy}
-        </a>
+        </ExternalLink>
       </div>
     </footer>
   );

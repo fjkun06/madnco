@@ -1,7 +1,8 @@
 import { Reveal } from "@/components/ui/reveal";
 import { en } from "@/locales/en";
 import { confirmedHref, siteConfig } from "@/utils/app.constants";
-import { BUTTON_INK_S, SECTION_LABEL, WRAP } from "@/utils/ui.classes";
+import { BUTTON_INK_S, SECTION_LABEL, WRAP, DISPLAY_TRACKING } from "@/utils/ui.classes";
+import { ExternalLink } from "@/components/ui/ExternalLink";
 
 /** 05 / Also by Mad — The Anime Case Files, as a paper case file with a stamp. */
 export function CaseFile() {
@@ -35,15 +36,40 @@ export function CaseFile() {
           </h3>
         </div>
         <div className="flex flex-col justify-between gap-7 p-[clamp(1.75rem,1.2rem+1.8vw,2.75rem)]">
-          <p className="m-0 text-body-lg leading-[1.55] text-case-ink">{t.text}</p>
+          <figure className="m-0">
+            <figcaption className="mb-4 label-mono text-xs font-bold text-case-ink">
+              {t.intro}
+            </figcaption>
+            <Reveal as="div" effect="wipe" delay={0.8}>
+              <blockquote className="relative m-0 pl-[clamp(2.75rem,2rem+2.4vw,4rem)]">
+                <span
+                  aria-hidden="true"
+                  className="absolute top-[-0.12em] left-0 font-display text-[clamp(4.5rem,3.4rem+3.6vw,7rem)] leading-none text-bordeaux"
+                >
+                  &ldquo;
+                </span>
+                <p
+                  className={`m-0 font-display text-[clamp(2rem,1.5rem+1.8vw,3rem)] leading-[1.02] text-ink text-balance ${DISPLAY_TRACKING}`}
+                >
+                  {t.quote}
+                  <span
+                    aria-hidden="true"
+                    className="ml-[0.08em] inline-block translate-y-[0.18em] align-top text-[1.6em] leading-[0.6] text-bordeaux"
+                  >
+                    &rdquo;
+                  </span>
+                </p>
+              </blockquote>
+            </Reveal>
+          </figure>
           <div className="flex flex-wrap gap-3.5">
-            <a href={show.tiktok} className={button}>
+            <ExternalLink href={show.tiktok} className={button}>
               TikTok
-            </a>
+            </ExternalLink>
             {youtube ? (
-              <a href={youtube} className={button}>
+              <ExternalLink href={youtube} className={button}>
                 YouTube
-              </a>
+              </ExternalLink>
             ) : (
               <span data-nosnippet className={`${button} opacity-70`}>
                 [YouTube link]

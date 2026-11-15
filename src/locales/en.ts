@@ -10,7 +10,11 @@ export const en = {
   meta: {
     title: "MadnCo. · The duo of endless madness",
     description:
-      "MadnCo. is Mad and Co: FIFA nights, RP chaos, story mode roasts, OmeTV lives and the funniest stuff online. Join the Discord, catch the next live.",
+      "MadnCo. is Mad and Co: game nights, RP chaos, story mode roasts, OmeTV lives and the funniest stuff online. Join the Discord, catch the next live.",
+  },
+  a11y: {
+    /** Read after every link that opens in a new tab. */
+    newTab: "(opens in a new tab)",
   },
   nav: {
     skip: "Skip to content",
@@ -35,7 +39,7 @@ export const en = {
     sloganLead: "The duo of",
     sloganAccent: "endless madness.",
     sloganRest:
-      "FIFA nights, RP chaos, story mode roasts, OmeTV and the funniest stuff on the internet.",
+      "Game nights, RP chaos, story mode roasts, OmeTV and the funniest stuff on the internet.",
     ctaDiscord: "Join the Discord",
     ctaLive: "Watch the lives",
     artLabel: "Skull and ghost mascots of Mad and Co on a game screen",
@@ -44,7 +48,7 @@ export const en = {
     nowPlaying: "FIFA · RP · Story mode",
   },
   tapes: {
-    a: ["FIFA NIGHTS", "RP CHAOS", "STORY MODE ROASTS", "OMETV CHAOS", "RAGE QUITS"],
+    a: ["GAME NIGHTS", "RP CHAOS", "STORY MODE ROASTS", "OMETV CHAOS", "RAGE QUITS"],
     b: ["THE DUO OF ENDLESS MADNESS", "JOIN THE FAM"],
   },
   crew: {
@@ -70,7 +74,7 @@ export const en = {
         role: "Co-host",
         time: "10%",
         blurb:
-          "Joins when school and work let him. When Co is in, FIFA nights and OmeTV lives get twice as loud.",
+          "Joins when school and work let him. When Co is in, game nights and OmeTV lives get twice as loud.",
         plays: ["FIFA", "OmeTV"],
       },
       guest: {
@@ -90,9 +94,9 @@ export const en = {
     aside:
       "No fixed schedule: school and work come first. Turn on Live Ping in the Discord and you will know the second we go live.",
     items: {
-      fifa: {
-        title: "FIFA nights",
-        text: "FC and eFootball with Co and the crew. Last-minute goals, rage moments, zero chill.",
+      games: {
+        title: "Game nights",
+        text: "FC, eFootball and whatever else the crew is playing that week. Last-minute goals, rage moments, zero chill.",
       },
       rp: {
         title: "RP chaos",
@@ -153,7 +157,8 @@ export const en = {
   caseFile: {
     label: "05 / Also by Mad",
     stamp: "CASE FILE",
-    text: "Mad's anime channel. Everything has a file.",
+    intro: "Mad's anime channel",
+    quote: "Everything has a file.",
   },
   footer: {
     outlineA: "ENDLESS",

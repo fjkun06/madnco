@@ -36,7 +36,7 @@ export function CrewSelect({ text }: { text: CrewText }) {
                 type="button"
                 aria-pressed={isOn}
                 onClick={() => setSelected(id)}
-                className={`relative flex h-full min-h-[clamp(12.5rem,6.5rem+22vw,25rem)] w-full flex-col justify-between border-0 p-[clamp(0.75rem,0.45rem+1.2vw,1.375rem)] text-left focus-inset transition-[transform,background-color] duration-200 cut hover:-translate-y-2 motion-reduce:hover:translate-y-0 ${isOn ? s.active : s.idle}`}
+                className={`relative flex h-full min-h-[clamp(12.5rem,6.5rem+22vw,25rem)] w-full flex-col justify-between border-0 p-[clamp(0.75rem,0.45rem+1.2vw,1.375rem)] text-left focus-inset transition-[transform,background-color] duration-500 ease-heavy cut hover:-translate-y-2 motion-reduce:hover:translate-y-0 ${isOn ? s.active : s.idle}`}
               >
                 <span
                   className={`font-mono text-[13px] font-extrabold tracking-[0.1em] ${isOn ? "" : s.tagIdle}`}
@@ -90,7 +90,7 @@ export function CrewSelect({ text }: { text: CrewText }) {
           </div>
           <div className="flex h-[18px] bg-ink-3 p-[3px]" aria-hidden="true">
             <span
-              className={`block h-full transition-[width] duration-500 ${scheme.fill}`}
+              className={`block h-full transition-[width] duration-700 ease-heavy ${scheme.fill}`}
               style={{ width: `${scheme.share * 100}%` }}
             />
           </div>

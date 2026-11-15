@@ -5,6 +5,7 @@ import { siteConfig } from "@/utils/app.constants";
 import { interpolate } from "@/utils/interpolate";
 import { DISPLAY_TRACKING, WRAP } from "@/utils/ui.classes";
 import { MobileMenu, type NavLink } from "./MobileMenu";
+import { ExternalLink } from "@/components/ui/ExternalLink";
 
 /**
  * Top bar: logo, in-page nav, where the lives happen, and a Discord button.
@@ -48,16 +49,16 @@ export function Header() {
         ))}
       </nav>
       <div className="flex items-center gap-3.5">
-        <a
+        <ExternalLink
           href={siteConfig.links.tiktokLive}
           className="hidden h-9 items-center gap-2.5 bg-ink-3 px-3.5 label-mono text-xs font-extrabold text-muted no-underline whitespace-nowrap cut-s hover:text-paper sm:inline-flex"
         >
           <Radio aria-hidden="true" size={16} strokeWidth={2.5} className="text-live" />
           {interpolate(en.live.pill, { handle: siteConfig.handles.tiktokLive })}
-        </a>
+        </ExternalLink>
         <a
           href="#discord"
-          className="hidden min-h-11 items-center bg-tq px-[18px] label-mono text-[13px] font-extrabold text-ink no-underline focus-inset transition-colors whitespace-nowrap cut hover:bg-paper md:inline-flex"
+          className="hidden min-h-11 items-center bg-tq px-[18px] label-mono text-[13px] font-extrabold text-ink no-underline focus-inset transition-colors duration-500 ease-heavy whitespace-nowrap cut hover:bg-paper md:inline-flex"
         >
           {t.joinDiscord}
         </a>
