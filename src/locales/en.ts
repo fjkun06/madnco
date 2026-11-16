@@ -8,9 +8,10 @@
  */
 export const en = {
   meta: {
-    title: "MadnCo. · The duo of endless madness",
+    // The handle is in the title: people search for what they saw on TikTok.
+    title: "MadnCo. (@madnco8) · The duo of endless madness",
     description:
-      "MadnCo. is Mad and Co: game nights, RP chaos, story mode roasts, OmeTV lives and the funniest stuff online. Join the Discord, catch the next live.",
+      "MadnCo. (@madnco8) is Mad and Co: game nights, RP chaos, story mode roasts and OmeTV lives on TikTok, Twitch and YouTube. Join the Discord.",
   },
   a11y: {
     /** Read after every link that opens in a new tab. */

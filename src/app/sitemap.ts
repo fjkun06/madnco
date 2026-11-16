@@ -1,12 +1,16 @@
 import type { MetadataRoute } from "next";
-import { routes } from "@/lib/seo/metadata";
+import { indexedRoutes } from "@/lib/seo/metadata";
 import { siteConfig } from "@/utils/app.constants";
 
-/** /sitemap.xml — every page, with the www URL. */
+/**
+ * /sitemap.xml — the pages that should show up in search, with the www URL.
+ * The legal pages are noindex, so they stay out: a sitemap entry would ask
+ * Google to index a page its own tag tells it not to.
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
-  return Object.values(routes).map((path) => ({
+  return indexedRoutes.map((path) => ({
     url: `${siteConfig.url}${path === "/" ? "" : path}`,
-    changeFrequency: path === "/" ? "weekly" : "yearly",
-    priority: path === "/" ? 1 : 0.2,
+    changeFrequency: "weekly",
+    priority: 1,
   }));
 }
