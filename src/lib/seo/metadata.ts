@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import { en } from "@/locales/en";
 import { siteConfig } from "@/utils/app.constants";
 
-/** Every page on the site, for the sitemap. Legal pages are listed but noindex. */
+/** Every page on the site. */
 export const routes = {
   home: "/",
   impressum: "/impressum",
   privacy: "/privacy",
 } as const;
+
+/** Pages meant for search results (the sitemap); the legal pages are noindex. */
+export const indexedRoutes: readonly string[] = [routes.home];
 
 /**
  * Title, description, canonical and share preview for one page. Paths are
@@ -36,7 +39,7 @@ export function pageMetadata({
       siteName: siteConfig.name,
       title,
       description,
-      locale: "en",
+      locale: "en_US",
       images: [
         { url: "/og-image.png", width: 1200, height: 630, alt: siteConfig.slogan },
       ],

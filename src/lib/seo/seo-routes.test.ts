@@ -3,13 +3,10 @@ import sitemap from "@/app/sitemap";
 import { siteConfig } from "@/utils/app.constants";
 
 describe("sitemap", () => {
-  it("lists every page on the www domain, home first", () => {
+  // The legal pages are noindex, so listing them would send mixed signals.
+  it("lists only the indexable pages on the www domain", () => {
     const urls = sitemap().map((entry) => entry.url);
-    expect(urls).toEqual([
-      siteConfig.url,
-      `${siteConfig.url}/impressum`,
-      `${siteConfig.url}/privacy`,
-    ]);
+    expect(urls).toEqual([siteConfig.url]);
   });
 });
 
