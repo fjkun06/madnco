@@ -108,7 +108,8 @@
    link button and `button { font: inherit }` wipe button font utilities. */
 @layer base {
   html {
-    scroll-padding-top: 1rem;
+    /* Room for the sticky header, which is showing after a jump down. */
+    scroll-padding-top: 6rem;
     background: var(--color-ink);
     /* While html is overflow: visible, body's overflow is handed to the viewport
        and body clips nothing: the tapes, mascot split and footer sign then widen
