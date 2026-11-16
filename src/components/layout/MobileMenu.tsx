@@ -2,6 +2,7 @@
 
 import { AnimatePresence, m, type Variants } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { useReduceMotion } from "@/components/ui/reveal/motion";
 
@@ -149,7 +150,7 @@ export function MobileMenu({
               <ul className="m-0 flex list-none flex-col p-0">
                 {links.map((link, index) => (
                   <m.li key={link.href} variants={linkVariants(reduce)}>
-                    <a
+                    <Link
                       href={link.href}
                       onClick={() => setOpen(false)}
                       className="group flex items-baseline gap-3 px-4 py-3.5 font-display text-3xl text-paper no-underline transition-colors duration-300 ease-smooth hover:bg-bordeaux focus-inset"
@@ -160,7 +161,7 @@ export function MobileMenu({
                       <span className="transition-transform duration-300 ease-smooth group-hover:translate-x-1.5">
                         {link.label}
                       </span>
-                    </a>
+                    </Link>
                   </m.li>
                 ))}
               </ul>
