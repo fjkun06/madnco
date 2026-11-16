@@ -1,9 +1,9 @@
 import { Radio } from "lucide-react";
-import { Skull } from "@/components/icons/Mascots";
+import Image from "next/image";
 import { en } from "@/locales/en";
 import { siteConfig } from "@/utils/app.constants";
 import { interpolate } from "@/utils/interpolate";
-import { DISPLAY_TRACKING, WRAP } from "@/utils/ui.classes";
+import { WRAP } from "@/utils/ui.classes";
 import { MobileMenu, type NavLink } from "./MobileMenu";
 import { ExternalLink } from "@/components/ui/ExternalLink";
 
@@ -24,15 +24,18 @@ export function Header() {
     <header
       className={`${WRAP} relative flex h-16 items-center justify-between gap-4 sm:h-[72px] sm:gap-6 md:h-[84px]`}
     >
-      <a
-        href="#top"
-        aria-label={t.home}
-        className={`flex items-center gap-2 font-display text-[21px] text-paper no-underline sm:gap-2.5 sm:text-2xl ${DISPLAY_TRACKING} md:text-[30px]`}
-      >
-        <Skull className="h-[26px] w-6 sm:h-9 sm:w-[34px]" teeth={false} />
-        <span aria-hidden="true">
-          MADNCO<span className="text-tq">.</span>
-        </span>
+      <a href="#top" aria-label={t.home} className="flex shrink-0 items-center no-underline">
+        {/* M + skull + C. A static SVG (masks + shading) rather than inline
+            markup, so the header HTML stays small and the file is cached. */}
+        <Image
+          src="/madnco-logo.svg"
+          alt=""
+          width={320}
+          height={178}
+          unoptimized
+          priority
+          className="h-[46px] w-auto sm:h-[54px] md:h-[66px]"
+        />
       </a>
       <nav
         aria-label={t.label}
