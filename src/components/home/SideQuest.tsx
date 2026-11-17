@@ -16,8 +16,15 @@ const MIN_XP = 0.02;
 
 /** Handles stay bold in the quest text, whatever the admin wrote around them. */
 function withHandles(text: string) {
-  const handles = [siteConfig.handles.tiktok, siteConfig.handles.tiktokLive];
-  const parts = text.split(new RegExp(`(${handles.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`));
+  const handles: readonly string[] = [
+    siteConfig.handles.tiktok,
+    siteConfig.handles.tiktokLive,
+  ];
+  const parts = text.split(
+    new RegExp(
+      `(${handles.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`,
+    ),
+  );
   return parts.map((part, i) =>
     handles.includes(part) ? (
       <b key={i} className="text-paper">
@@ -80,7 +87,11 @@ export function SideQuest() {
           className="block h-full transition-[width] duration-700 ease-smooth"
           style={{ width: `${Math.max(progress, MIN_XP) * 100}%` }}
         >
-          <ScrollProgress as="span" range={["start end", "center 55%"]} className="block h-full">
+          <ScrollProgress
+            as="span"
+            range={["start end", "center 55%"]}
+            className="block h-full"
+          >
             <span
               className={`${done ? "xp-fill-done" : "xp-fill"} block h-full origin-left scale-x-[var(--p)]`}
             />
