@@ -28,7 +28,8 @@ export function QuestTab({ form, update }: TabProps) {
   const set = (patch: Partial<Quest>) => update({ quest: { ...quest, ...patch } });
   const done = questDone(quest);
   const pct = Math.round(questProgress(quest) * 100);
-  const left = quest.followers === null ? quest.goal : Math.max(0, quest.goal - quest.followers);
+  const left =
+    quest.followers === null ? quest.goal : Math.max(0, quest.goal - quest.followers);
 
   return (
     <div className="flex flex-col gap-7">
@@ -54,7 +55,9 @@ export function QuestTab({ form, update }: TabProps) {
                   key={n}
                   type="button"
                   onClick={() =>
-                    set({ followers: Math.min(FOLLOWERS_MAX, (quest.followers ?? 0) + n) })
+                    set({
+                      followers: Math.min(FOLLOWERS_MAX, (quest.followers ?? 0) + n),
+                    })
                   }
                   className={`${CHIP_SM} ${CHIP_OFF}`}
                 >
@@ -199,8 +202,10 @@ function QuestPreview({ quest }: { quest: Quest }) {
       <div className="flex justify-between label-mono text-xs text-muted">
         <span>{en.quest.followers}</span>
         <span>
-          <b className={done ? "text-bordeaux-hi" : "text-tq"}>{quest.followers ?? "?"}</b> /{" "}
-          {quest.goal}
+          <b className={done ? "text-bordeaux-hi" : "text-tq"}>
+            {quest.followers ?? "?"}
+          </b>{" "}
+          / {quest.goal}
         </span>
       </div>
       <span className="self-start bg-tq px-5 py-3 label-mono text-xs font-extrabold text-ink cut-s">

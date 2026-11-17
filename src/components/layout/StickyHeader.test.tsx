@@ -18,10 +18,14 @@ describe("nextVisible", () => {
 });
 
 describe("StickyHeader", () => {
+  // Frames run after the scroll event, as in a browser, not inside the
+  // requestAnimationFrame call (that would leave the frame id stuck).
+  let frames: FrameRequestCallback[] = [];
   beforeEach(() => {
+    frames = [];
     jest.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
-      cb(0);
-      return 1;
+      frames.push(cb);
+      return frames.length;
     });
   });
   afterEach(() => jest.restoreAllMocks());
@@ -30,13 +34,16 @@ describe("StickyHeader", () => {
     act(() => {
       Object.defineProperty(window, "scrollY", { value: y, configurable: true });
       fireEvent.scroll(window);
+      const pending = frames;
+      frames = [];
+      pending.forEach((cb) => cb(0));
     });
   }
 
   it("slides away on scroll up and comes back on scroll down", () => {
     render(
       <StickyHeader>
-        <a href="/">home</a>
+        <a href="#top">home</a>
       </StickyHeader>,
     );
     const bar = screen.getByRole("link").parentElement as HTMLElement;
@@ -51,7 +58,7 @@ describe("StickyHeader", () => {
   it("comes back when something inside gets keyboard focus", () => {
     render(
       <StickyHeader>
-        <a href="/">home</a>
+        <a href="#top">home</a>
       </StickyHeader>,
     );
     const link = screen.getByRole("link");

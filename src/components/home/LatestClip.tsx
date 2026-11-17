@@ -27,7 +27,9 @@ function ClipSection({ clip }: { clip: ShownClip }) {
   const [src, setSrc] = useState<string | null>(null);
   const platform = t.platforms[clip.platform];
   const portrait = clip.platform === "tiktok";
-  const playLabel = clip.title ? interpolate(t.play, { title: clip.title }) : t.playFallback;
+  const playLabel = clip.title
+    ? interpolate(t.play, { title: clip.title })
+    : t.playFallback;
 
   return (
     <section id="clip" aria-labelledby="clip-title" className={`${WRAP} py-section`}>

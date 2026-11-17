@@ -74,7 +74,8 @@ export function TimePicker({
         list?.querySelector<HTMLElement>("[aria-pressed='true']") ??
         list?.querySelector<HTMLElement>("[data-now]");
       if (list && target) {
-        list.scrollTop = target.offsetTop - list.clientHeight / 2 + target.clientHeight / 2;
+        list.scrollTop =
+          target.offsetTop - list.clientHeight / 2 + target.clientHeight / 2;
       }
     }
   }, [open]);
@@ -82,8 +83,7 @@ export function TimePicker({
   const hourPast = (h: number) => Boolean(pastBefore && h < pastBefore.h);
   const minutePast = (m: number) =>
     Boolean(
-      pastBefore &&
-      (hour < pastBefore.h || (hour === pastBefore.h && m <= pastBefore.m)),
+      pastBefore && (hour < pastBefore.h || (hour === pastBefore.h && m <= pastBefore.m)),
     );
 
   return (
@@ -120,10 +120,7 @@ export function TimePicker({
           <div role="dialog" aria-label={label} className={`${POPOVER_INNER} flex gap-3`}>
             <div className="flex flex-col gap-2">
               <span className={LABEL}>{t.hour}</span>
-              <div
-                ref={hoursRef}
-                className={COLUMN}
-              >
+              <div ref={hoursRef} className={COLUMN}>
                 {HOURS.map((h) => {
                   const past = hourPast(h);
                   return (
@@ -154,10 +151,7 @@ export function TimePicker({
             </span>
             <div className="flex flex-col gap-2">
               <span className={LABEL}>{t.minute}</span>
-              <div
-                ref={minutesRef}
-                className={COLUMN}
-              >
+              <div ref={minutesRef} className={COLUMN}>
                 {MINUTES.map((m) => {
                   const past = minutePast(m);
                   return (

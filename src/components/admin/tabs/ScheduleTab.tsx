@@ -12,7 +12,9 @@ import type { TabProps } from "./shared";
 
 export function ScheduleTab({ form, update, now, issueFor }: TabProps) {
   const t = en.admin.next;
-  const clock = now ? { h: new Date(now).getHours(), m: new Date(now).getMinutes() } : null;
+  const clock = now
+    ? { h: new Date(now).getHours(), m: new Date(now).getMinutes() }
+    : null;
   const today = now ? toDateValue(now) : "";
   const nextAt = fromDateTime(form.nextDate, "12:00");
   const hasNext = Boolean(form.nextDate || form.nextTime || form.nextPlan);

@@ -17,17 +17,19 @@ const SHOW_MS = 4000;
 const LEAVE_MS = 300;
 const MAX = 3;
 
-const TONE: Record<ToastKind, { border: string; icon: string; bar: string; mark: string }> =
-  {
-    ok: { border: "border-tq", icon: "bg-tq", bar: "bg-tq", mark: "✓" },
-    warn: {
-      border: "border-bordeaux-hi",
-      icon: "bg-bordeaux-hi",
-      bar: "bg-bordeaux-hi",
-      mark: "↺",
-    },
-    error: { border: "border-live", icon: "bg-live", bar: "bg-live", mark: "!" },
-  };
+const TONE: Record<
+  ToastKind,
+  { border: string; icon: string; bar: string; mark: string }
+> = {
+  ok: { border: "border-tq", icon: "bg-tq", bar: "bg-tq", mark: "✓" },
+  warn: {
+    border: "border-bordeaux-hi",
+    icon: "bg-bordeaux-hi",
+    bar: "bg-bordeaux-hi",
+    mark: "↺",
+  },
+  error: { border: "border-live", icon: "bg-live", bar: "bg-live", mark: "!" },
+};
 
 /** Notifications for the admin panel: push one, it slides out after 4 s. */
 export function useToasts() {
@@ -84,14 +86,16 @@ export function ToastStack({
               {tone.mark}
             </span>
             <div className="min-w-0">
-              <p className="toast-title m-0 font-display text-[22px] leading-none">{toast.title}</p>
+              <p className="toast-title m-0 font-display text-[22px] leading-none">
+                {toast.title}
+              </p>
               <p className="mt-1.5 mb-0 text-sm leading-snug text-muted">{toast.text}</p>
             </div>
             <button
               type="button"
               aria-label={en.admin.toasts.close}
               onClick={() => onClose(toast.id)}
-              className="focus-inset absolute top-2.5 right-2.5 flex size-7 items-center justify-center text-muted hover:text-paper"
+              className="absolute top-2.5 right-2.5 flex size-7 items-center justify-center text-muted focus-inset hover:text-paper"
             >
               ✕
             </button>

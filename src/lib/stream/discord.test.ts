@@ -9,7 +9,11 @@ describe("discord ping", () => {
   });
 
   it("pings only the Live Ping role and links the right account", () => {
-    const body = discordMessage({ topic: "@everyone FIFA", game: "FIFA" }, "live", "1234567890");
+    const body = discordMessage(
+      { topic: "@everyone FIFA", game: "FIFA" },
+      "live",
+      "1234567890",
+    );
     expect(body.content).toBe("<@&1234567890> we're LIVE on TikTok 🔴");
     expect(body.allowed_mentions).toEqual({ parse: [], roles: ["1234567890"] });
     expect(body.embeds[0]).toMatchObject({

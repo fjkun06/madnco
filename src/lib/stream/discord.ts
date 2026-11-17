@@ -28,9 +28,9 @@ export function tiktokLiveUrl(account: TikTokAccount): string {
 export function isWebhookUrl(value: string | undefined): value is string {
   return Boolean(
     value &&
-      /^https:\/\/(?:canary\.|ptb\.)?discord(?:app)?\.com\/api\/webhooks\/\d+\/[\w-]+$/.test(
-        value,
-      ),
+    /^https:\/\/(?:canary\.|ptb\.)?discord(?:app)?\.com\/api\/webhooks\/\d+\/[\w-]+$/.test(
+      value,
+    ),
   );
 }
 

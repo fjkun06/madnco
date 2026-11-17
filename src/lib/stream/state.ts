@@ -136,7 +136,11 @@ export function sanitizeState(input: unknown, now: number): StreamState {
     ticker: sanitizeTicker(raw.ticker),
     quest: sanitizeQuest(raw.quest),
     clip: sanitizeClip(raw.clip),
-    presets: sanitizePresets(raw.presets, { topic: TOPIC_MAX, game: GAME_MAX, plan: PLAN_MAX }),
+    presets: sanitizePresets(raw.presets, {
+      topic: TOPIC_MAX,
+      game: GAME_MAX,
+      plan: PLAN_MAX,
+    }),
     updatedAt: isTime(raw.updatedAt) ? raw.updatedAt : now,
   };
 }
@@ -251,19 +255,21 @@ export function publicStatus(
     next,
     brb: {
       message: state.brb.message,
-      until: state.brb.until && state.brb.until + BRB_GRACE_MS > now ? state.brb.until : null,
+      until:
+        state.brb.until && state.brb.until + BRB_GRACE_MS > now ? state.brb.until : null,
     },
     ticker: state.ticker,
     quest: { ...state.quest, done: questDone(state.quest) },
-    clip: state.clip && state.clip.show
-      ? {
-          url: state.clip.url,
-          platform: state.clip.platform,
-          id: state.clip.id,
-          title: state.clip.title,
-          tag: state.clip.tag,
-        }
-      : null,
+    clip:
+      state.clip && state.clip.show
+        ? {
+            url: state.clip.url,
+            platform: state.clip.platform,
+            id: state.clip.id,
+            title: state.clip.title,
+            tag: state.clip.tag,
+          }
+        : null,
   };
 }
 

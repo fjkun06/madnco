@@ -29,7 +29,14 @@ function Arrow() {
 function CopyIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true" fill="none">
-      <rect x="4.5" y="4.5" width="8" height="8" stroke="currentColor" strokeWidth="1.8" />
+      <rect
+        x="4.5"
+        y="4.5"
+        width="8"
+        height="8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
       <path d="M2 9.5V2h7.5" stroke="currentColor" strokeWidth="1.8" />
     </svg>
   );
@@ -132,8 +139,10 @@ export function WhereItShows({ onToast }: { onToast: Toast }) {
               type="button"
               aria-pressed={format === key}
               onClick={() => setFormat(key)}
-              className={`focus-inset min-h-9 px-3 label-mono text-[11px] font-extrabold cut-s ${
-                format === key ? "bg-tq text-ink" : "bg-ink-3 text-paper hover:bg-bordeaux"
+              className={`min-h-9 px-3 label-mono text-[11px] font-extrabold focus-inset cut-s ${
+                format === key
+                  ? "bg-tq text-ink"
+                  : "bg-ink-3 text-paper hover:bg-bordeaux"
               }`}
             >
               {key === "landscape" ? w.landscape : w.portrait}

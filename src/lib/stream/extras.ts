@@ -147,7 +147,8 @@ export function questProgress(quest: Pick<Quest, "followers" | "goal">): number 
 
 /** The text to show (done or not), with the fill-ins replaced. */
 export function questText(quest: Quest): string {
-  const left = quest.followers === null ? quest.goal : Math.max(0, quest.goal - quest.followers);
+  const left =
+    quest.followers === null ? quest.goal : Math.max(0, quest.goal - quest.followers);
   const fill: Record<string, string> = {
     handle: siteConfig.handles.tiktok,
     liveHandle: siteConfig.handles.tiktokLive,

@@ -24,13 +24,13 @@ export function CaseFile() {
             as="span"
             effect="stamp"
             delay={0.55}
-            className="inline-block -rotate-6 border-2 border-bordeaux px-[9px] py-1.5 label-mono text-[11px] sm:border-[3px] sm:px-3 sm:py-2 sm:text-[13px] font-extrabold tracking-[0.14em] text-bordeaux"
+            className="inline-block -rotate-6 border-2 border-bordeaux px-[9px] py-1.5 label-mono text-[11px] font-extrabold tracking-[0.14em] text-bordeaux sm:border-[3px] sm:px-3 sm:py-2 sm:text-[13px]"
           >
             {t.stamp}
           </Reveal>
           <h3
             id="case-title"
-            className="mt-4 mb-0 font-display text-panel sm:mt-[34px] leading-[0.92] font-normal"
+            className="mt-4 mb-0 font-display text-panel leading-[0.92] font-normal sm:mt-[34px]"
           >
             {show.name}
           </h3>
@@ -49,7 +49,7 @@ export function CaseFile() {
                   &ldquo;
                 </span>
                 <p
-                  className={`m-0 font-display text-[clamp(1.75rem,1.1rem+2.5vw,3rem)] leading-[1.02] text-ink text-balance ${DISPLAY_TRACKING}`}
+                  className={`m-0 font-display text-[clamp(1.75rem,1.1rem+2.5vw,3rem)] leading-[1.02] text-balance text-ink ${DISPLAY_TRACKING}`}
                 >
                   {t.quote}
                   <span

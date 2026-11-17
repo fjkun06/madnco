@@ -49,7 +49,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "json-only" }, { status: 415 });
   }
   const url = webhook();
-  if (!url) return NextResponse.json({ error: "discord-not-configured" }, { status: 503 });
+  if (!url)
+    return NextResponse.json({ error: "discord-not-configured" }, { status: 503 });
   if (!redisConfigured()) {
     return NextResponse.json({ error: "storage-not-configured" }, { status: 503 });
   }
@@ -83,7 +84,9 @@ export async function POST(request: Request) {
     const res = await fetch(`${url}?wait=true`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(discordMessage(state, account, process.env.DISCORD_LIVE_ROLE_ID)),
+      body: JSON.stringify(
+        discordMessage(state, account, process.env.DISCORD_LIVE_ROLE_ID),
+      ),
       cache: "no-store",
     });
     if (!res.ok) throw new Error(`Discord answered ${res.status}`);

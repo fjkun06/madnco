@@ -88,7 +88,9 @@ export function WebTab({ form, update, issueFor }: TabProps) {
         {form.clipUrl ? (
           <button
             type="button"
-            onClick={() => update({ clipUrl: "", clipTitle: "", clipTag: "", clipShow: true })}
+            onClick={() =>
+              update({ clipUrl: "", clipTitle: "", clipTag: "", clipShow: true })
+            }
             className={`${CHIP} ${CHIP_OFF} self-start`}
           >
             {t.remove}
@@ -116,14 +118,20 @@ export function WebTab({ form, update, issueFor }: TabProps) {
                 </svg>
               </span>
               <span className="absolute top-3.5 left-3.5 bg-ink px-2.5 py-1.5 label-mono text-[11px] font-extrabold cut-s">
-                {[en.clip.platforms[parsed.platform], form.clipTag].filter(Boolean).join(" · ")}
+                {[en.clip.platforms[parsed.platform], form.clipTag]
+                  .filter(Boolean)
+                  .join(" · ")}
               </span>
             </div>
             {form.clipTitle ? (
-              <p className="m-0 font-display text-[32px] leading-none">{form.clipTitle}</p>
+              <p className="m-0 font-display text-[32px] leading-none">
+                {form.clipTitle}
+              </p>
             ) : null}
             <span className="self-start px-5 py-3 label-mono text-xs font-extrabold shadow-[inset_0_0_0_2px_var(--color-ink-3)] cut-s">
-              {interpolate(en.clip.watchOn, { platform: en.clip.platforms[parsed.platform] })}
+              {interpolate(en.clip.watchOn, {
+                platform: en.clip.platforms[parsed.platform],
+              })}
             </span>
           </div>
         ) : (

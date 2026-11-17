@@ -352,7 +352,13 @@ export const en = {
       hint: "BRB screen",
       message: "Message",
       placeholder: "Ghosting for a sec",
-      quick: ["Snack run", "Toilet break", "Tech issues", "Switching games", "Ghosting for a sec"],
+      quick: [
+        "Snack run",
+        "Toilet break",
+        "Tech issues",
+        "Switching games",
+        "Ghosting for a sec",
+      ],
       backIn: "Back in",
       minutes: "+{n} min",
       noTimer: "No timer",
@@ -365,14 +371,16 @@ export const en = {
       title: "Notify Discord",
       hint: "For TikTok lives",
       text: "Twitch and YouTube already ping the server. This posts a TikTok LIVE ping with the Live Ping role. It sends right away, no Save needed.",
-      savedNote: "It uses the saved topic and game, so Save first if you just changed them.",
+      savedNote:
+        "It uses the saved topic and game, so Save first if you just changed them.",
       liveOn: "Live on",
       send: "Send to Discord",
       sending: "Sending…",
       lastSent: "Last sent {time}",
       unlocksAt: "Locked until {time} so nobody gets pinged twice",
       never: "Not sent recently.",
-      notConfigured: "Add DISCORD_WEBHOOK_URL and DISCORD_LIVE_ROLE_ID on Vercel to switch this on.",
+      notConfigured:
+        "Add DISCORD_WEBHOOK_URL and DISCORD_LIVE_ROLE_ID on Vercel to switch this on.",
       sentTitle: "Pinged on Discord",
       sentText: "The TikTok LIVE ping is in the server.",
       bot: "MadnCo. Live",
@@ -464,7 +472,12 @@ export const en = {
     where: {
       title: "Where it shows",
       scenes: [
-        { name: "Starting Soon", what: "Topic · countdown", file: "starting-soon", vertical: true },
+        {
+          name: "Starting Soon",
+          what: "Topic · countdown",
+          file: "starting-soon",
+          vertical: true,
+        },
         { name: "Just Chatting", what: "Topic", file: "just-chatting", vertical: true },
         { name: "Gaming", what: "Game tag", file: "gaming", vertical: true },
         { name: "Ending", what: "Next stream", file: "ending", vertical: true },

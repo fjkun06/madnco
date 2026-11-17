@@ -135,14 +135,18 @@
       hides[i].hidden = !!v[hides[i].getAttribute("data-hide")];
     var qbars = document.querySelectorAll('[data-bar="quest"]');
     for (i = 0; i < qbars.length; i++) {
-      var qp = v._quest && v._quest.followers !== null && v._quest.goal > 0
-        ? Math.min(1, v._quest.followers / v._quest.goal)
-        : 0;
+      var qp =
+        v._quest && v._quest.followers !== null && v._quest.goal > 0
+          ? Math.min(1, v._quest.followers / v._quest.goal)
+          : 0;
       qbars[i].style.width = (Math.max(qp, 0.02) * 100).toFixed(1) + "%";
     }
     var tracks = document.querySelectorAll("[data-ticker]");
     for (i = 0; i < tracks.length; i++)
-      fillTicker(tracks[i], v["ticker-" + tracks[i].getAttribute("data-ticker")] ? v._items : null);
+      fillTicker(
+        tracks[i],
+        v["ticker-" + tracks[i].getAttribute("data-ticker")] ? v._items : null,
+      );
     var bars = document.querySelectorAll('[data-bar="countdown"]');
     for (i = 0; i < bars.length; i++) {
       if (v._cd) {
@@ -185,7 +189,9 @@
       for (var n = 0; n < items.length; n++) {
         var a = document.createElement("span");
         if (span) a.setAttribute("style", span.getAttribute("style") || "");
-        a.textContent = track.hasAttribute("data-upper") ? items[n].toUpperCase() : items[n];
+        a.textContent = track.hasAttribute("data-upper")
+          ? items[n].toUpperCase()
+          : items[n];
         track.appendChild(a);
         var b = document.createElement("i");
         if (sep) b.setAttribute("style", sep.getAttribute("style") || "");

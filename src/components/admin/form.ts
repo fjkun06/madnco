@@ -94,9 +94,7 @@ export function fromForm(form: AdminForm, saved: StreamState): StreamState {
   const untouched =
     form.nextDate === savedForm.nextDate && form.nextTime === savedForm.nextTime;
   const at =
-    untouched && saved.next
-      ? saved.next.at
-      : fromDateTime(form.nextDate, form.nextTime);
+    untouched && saved.next ? saved.next.at : fromDateTime(form.nextDate, form.nextTime);
   const clip = parseClipUrl(form.clipUrl);
   return {
     mode: form.mode,
@@ -130,7 +128,11 @@ export function fromForm(form: AdminForm, saved: StreamState): StreamState {
  * was saved earlier may pass while the stream runs; it is only checked once
  * it changes.
  */
-export function formIssues(form: AdminForm, saved: StreamState, now: number): FormIssue[] {
+export function formIssues(
+  form: AdminForm,
+  saved: StreamState,
+  now: number,
+): FormIssue[] {
   const t = en.admin.issues;
   const issues: FormIssue[] = [];
   const next = (field: FormField, message: string) =>
@@ -204,9 +206,7 @@ export function changedFields(
     ["clipTag", "web", form.clipTag.trim(), b.clipTag],
     ["clipShow", "web", form.clipShow, b.clipShow],
   ];
-  return checks
-    .filter(([, , x, y]) => !same(x, y))
-    .map(([key, tab]) => ({ key, tab }));
+  return checks.filter(([, , x, y]) => !same(x, y)).map(([key, tab]) => ({ key, tab }));
 }
 
 /** How many fields differ from the saved state. */

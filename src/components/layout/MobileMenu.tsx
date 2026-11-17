@@ -112,12 +112,16 @@ export function MobileMenu({
         aria-controls={panelId}
         aria-label={open ? closeLabel : openLabel}
         onClick={() => setOpen((v) => !v)}
-        className={`relative z-50 inline-flex size-10 items-center justify-center border-0 text-paper transition-colors duration-300 ease-smooth focus-inset cut-s sm:size-12 ${
+        className={`relative z-50 inline-flex size-10 items-center justify-center border-0 text-paper focus-inset transition-colors duration-300 ease-smooth cut-s sm:size-12 ${
           open ? "bg-bordeaux" : "bg-ink-3"
         }`}
       >
         <AnimatePresence mode="wait" initial={false}>
-          <m.span key={open ? "close" : "open"} className="inline-flex" {...iconMotion(reduce)}>
+          <m.span
+            key={open ? "close" : "open"}
+            className="inline-flex"
+            {...iconMotion(reduce)}
+          >
             <Icon aria-hidden="true" size={22} strokeWidth={2.5} />
           </m.span>
         </AnimatePresence>
@@ -153,9 +157,12 @@ export function MobileMenu({
                     <Link
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className="group flex items-baseline gap-3 px-4 py-3.5 font-display text-3xl text-paper no-underline transition-colors duration-300 ease-smooth hover:bg-bordeaux focus-inset"
+                      className="group flex items-baseline gap-3 px-4 py-3.5 font-display text-3xl text-paper no-underline focus-inset transition-colors duration-300 ease-smooth hover:bg-bordeaux"
                     >
-                      <span aria-hidden="true" className="label-mono text-[11px] font-extrabold text-tq transition-colors duration-300 group-hover:text-paper">
+                      <span
+                        aria-hidden="true"
+                        className="label-mono text-[11px] font-extrabold text-tq transition-colors duration-300 group-hover:text-paper"
+                      >
                         {String(index + 1).padStart(2, "0")}
                       </span>
                       <span className="transition-transform duration-300 ease-smooth group-hover:translate-x-1.5">

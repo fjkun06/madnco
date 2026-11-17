@@ -47,7 +47,7 @@ export function FindUs() {
                 {url ? (
                   <ExternalLink
                     href={url}
-                    className={`${ROW} group text-paper transition-[background-color,color,padding] duration-300 ease-smooth hover:bg-tq hover:pl-2.5 hover:text-ink sm:hover:pl-6 focus-visible:outline-offset-[-3px]`}
+                    className={`${ROW} group text-paper transition-[background-color,color,padding] duration-300 ease-smooth hover:bg-tq hover:pl-2.5 hover:text-ink focus-visible:outline-offset-[-3px] sm:hover:pl-6`}
                   >
                     <span className={`${PLATFORM} text-muted group-hover:text-ink`}>
                       {t.platforms[key]}
