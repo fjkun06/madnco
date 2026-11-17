@@ -43,19 +43,19 @@ export function DatePicker({
 }) {
   const t = en.admin.picker;
   const w = en.admin.when;
-  const { open, setOpen, ref } = usePopover();
+  const { open, closing, setOpen, toggle, ref } = usePopover();
   const [view, setView] = useState({ year: 2026, month: 0 });
 
   const today = now ? toDateValue(now) : "";
   const [ty, tm] = today ? today.split("-").map(Number) : [0, 0];
   const atFirstMonth = view.year < ty || (view.year === ty && view.month <= tm - 1);
 
-  function toggle() {
-    if (!open) {
+  function onField() {
+    if (!open || closing) {
       const [y, m] = (value || today || "2026-01-01").split("-").map(Number);
       setView({ year: y, month: m - 1 });
     }
-    setOpen(!open);
+    toggle();
   }
 
   function shift(delta: number) {
@@ -91,7 +91,7 @@ export function DatePicker({
         aria-labelledby={`${id}-label ${id}-value`}
         aria-invalid={issue ? true : undefined}
         aria-describedby={issue ? `${id}-issue` : undefined}
-        onClick={toggle}
+        onClick={onField}
         className={fieldClass(open, Boolean(issue))}
       >
         <CalendarIcon />
@@ -112,7 +112,7 @@ export function DatePicker({
       ) : null}
 
       {open ? (
-        <div className={POPOVER}>
+        <div className={POPOVER} data-closing={closing ? "" : undefined}>
           <div role="dialog" aria-label={label} className={POPOVER_INNER}>
             <div className="mb-3 flex items-center justify-between gap-3">
               <button

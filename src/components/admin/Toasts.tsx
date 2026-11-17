@@ -4,9 +4,17 @@ import { useRef, useState } from "react";
 import { en } from "@/locales/en";
 
 export type ToastKind = "ok" | "warn" | "error";
-export type Toast = { id: number; kind: ToastKind; title: string; text: string };
+export type Toast = {
+  id: number;
+  kind: ToastKind;
+  title: string;
+  text: string;
+  leaving?: boolean;
+};
 
 const SHOW_MS = 4000;
+/** Length of the slide-out animation (globals.css, .toast[data-leaving]). */
+const LEAVE_MS = 300;
 const MAX = 3;
 
 const TONE: Record<ToastKind, { border: string; icon: string; bar: string; mark: string }> =
@@ -21,13 +29,20 @@ const TONE: Record<ToastKind, { border: string; icon: string; bar: string; mark:
     error: { border: "border-live", icon: "bg-live", bar: "bg-live", mark: "!" },
   };
 
-/** Notifications for the admin panel: push one, it leaves after 4 s. */
+/** Notifications for the admin panel: push one, it slides out after 4 s. */
 export function useToasts() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const lastId = useRef(0);
 
+  /** Slide out, then remove. */
   function dismiss(id: number) {
-    setToasts((current) => current.filter((toast) => toast.id !== id));
+    setToasts((current) =>
+      current.map((toast) => (toast.id === id ? { ...toast, leaving: true } : toast)),
+    );
+    window.setTimeout(
+      () => setToasts((current) => current.filter((toast) => toast.id !== id)),
+      LEAVE_MS,
+    );
   }
 
   function push(kind: ToastKind, title: string, text: string) {
@@ -59,16 +74,17 @@ export function ToastStack({
         return (
           <div
             key={toast.id}
+            data-leaving={toast.leaving ? "" : undefined}
             className={`toast pointer-events-auto relative flex items-start gap-3.5 overflow-hidden border-l-[6px] ${tone.border} bg-ink-2 py-4 pr-10 pl-4 shadow-[inset_0_0_0_1px_var(--color-ink-3)] cut-s`}
           >
             <span
               aria-hidden="true"
-              className={`flex size-7 flex-none items-center justify-center font-mono text-base font-extrabold text-ink cut-s ${tone.icon}`}
+              className={`toast-icon flex size-7 flex-none items-center justify-center font-mono text-base font-extrabold text-ink cut-s ${tone.icon}`}
             >
               {tone.mark}
             </span>
             <div className="min-w-0">
-              <p className="m-0 font-display text-[22px] leading-none">{toast.title}</p>
+              <p className="toast-title m-0 font-display text-[22px] leading-none">{toast.title}</p>
               <p className="mt-1.5 mb-0 text-sm leading-snug text-muted">{toast.text}</p>
             </div>
             <button

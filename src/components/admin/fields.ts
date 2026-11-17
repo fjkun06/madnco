@@ -20,7 +20,7 @@ export function fieldClass(open: boolean, error: boolean): string {
 
 /** The floating panel under a field. */
 export const POPOVER =
-  "absolute top-full left-0 z-30 mt-2 drop-shadow-[0_24px_40px_rgba(0,0,0,0.6)]";
+  "picker-pop absolute top-full left-0 z-30 mt-2 drop-shadow-[0_24px_40px_rgba(0,0,0,0.6)]";
 export const POPOVER_INNER = "border-2 border-tq bg-ink-2 p-4 cut-s";
 
 /** Small mono text on the right of a field ("today", "in 4 days"). */

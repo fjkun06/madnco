@@ -20,6 +20,10 @@ const pad = (n: number) => String(n).padStart(2, "0");
 const SLOT =
   "focus-inset flex h-10 w-24 flex-none items-center justify-center font-mono text-[17px] font-extrabold transition-colors duration-150";
 
+/** A scrolling column with a thin turquoise scrollbar (no white OS bar). */
+const COLUMN =
+  "picker-column relative flex max-h-[236px] flex-col gap-1.5 overflow-x-hidden overflow-y-auto overscroll-contain pr-1.5";
+
 function slotClass(selected: boolean, past: boolean): string {
   if (selected) return `${SLOT} bg-tq text-ink`;
   if (past) return `${SLOT} bg-transparent text-line line-through hover:bg-ink-3`;
@@ -28,6 +32,7 @@ function slotClass(selected: boolean, past: boolean): string {
 
 /**
  * A time field that opens an hour and a minute column (5-minute steps).
+ * Picking a minute first uses the suggested hour, so one tap is enough.
  * `pastBefore` crosses out times before it (same day); they stay pickable
  * unless `disablePast`, so the caller decides what a past time means.
  */
@@ -51,11 +56,15 @@ export function TimePicker({
   disablePast?: boolean;
 }) {
   const t = en.admin.picker;
-  const { open, setOpen, ref } = usePopover();
+  const { open, closing, setOpen, toggle, ref } = usePopover();
   const hoursRef = useRef<HTMLDivElement>(null);
   const minutesRef = useRef<HTMLDivElement>(null);
 
   const [hh, mm] = value ? value.split(":").map(Number) : [null, null];
+  // Without a value, the lists open at a sensible hour: the next one from
+  // now when past times matter, otherwise 20:00 (usual stream time).
+  const suggested = pastBefore ? Math.min(pastBefore.h + 1, 23) : 20;
+  const hour = hh ?? suggested;
 
   // Scroll the picked (or the current) hour into the middle when opening.
   useEffect(() => {
@@ -74,8 +83,7 @@ export function TimePicker({
   const minutePast = (m: number) =>
     Boolean(
       pastBefore &&
-      hh !== null &&
-      (hh < pastBefore.h || (hh === pastBefore.h && m <= pastBefore.m)),
+      (hour < pastBefore.h || (hour === pastBefore.h && m <= pastBefore.m)),
     );
 
   return (
@@ -91,7 +99,7 @@ export function TimePicker({
         aria-labelledby={`${id}-label ${id}-value`}
         aria-invalid={issue ? true : undefined}
         aria-describedby={issue ? `${id}-issue` : undefined}
-        onClick={() => setOpen(!open)}
+        onClick={toggle}
         className={fieldClass(open, Boolean(issue))}
       >
         <ClockIcon />
@@ -108,13 +116,13 @@ export function TimePicker({
       ) : null}
 
       {open ? (
-        <div className={POPOVER}>
+        <div className={POPOVER} data-closing={closing ? "" : undefined}>
           <div role="dialog" aria-label={label} className={`${POPOVER_INNER} flex gap-3`}>
             <div className="flex flex-col gap-2">
               <span className={LABEL}>{t.hour}</span>
               <div
                 ref={hoursRef}
-                className="relative flex max-h-[236px] flex-col gap-1.5 overflow-y-auto overscroll-contain pr-1"
+                className={COLUMN}
               >
                 {HOURS.map((h) => {
                   const past = hourPast(h);
@@ -123,10 +131,14 @@ export function TimePicker({
                       key={h}
                       type="button"
                       aria-pressed={hh === h}
-                      data-now={pastBefore?.h === h ? "" : undefined}
+                      data-now={h === suggested ? "" : undefined}
                       disabled={disablePast && past}
                       onClick={() => onPick(`${pad(h)}:${pad(mm ?? 0)}`)}
-                      className={`${slotClass(hh === h, past)} disabled:cursor-not-allowed`}
+                      className={`${slotClass(hh === h, past)} disabled:cursor-not-allowed ${
+                        hh === null && h === suggested
+                          ? "shadow-[inset_0_0_0_2px_var(--color-tq)]"
+                          : ""
+                      }`}
                     >
                       {pad(h)}
                     </button>
@@ -144,7 +156,7 @@ export function TimePicker({
               <span className={LABEL}>{t.minute}</span>
               <div
                 ref={minutesRef}
-                className="relative flex max-h-[236px] flex-col gap-1.5 overflow-y-auto overscroll-contain pr-1"
+                className={COLUMN}
               >
                 {MINUTES.map((m) => {
                   const past = minutePast(m);
@@ -153,12 +165,12 @@ export function TimePicker({
                       key={m}
                       type="button"
                       aria-pressed={mm === m}
-                      disabled={hh === null || (disablePast && past)}
+                      disabled={disablePast && past}
                       onClick={() => {
-                        onPick(`${pad(hh ?? 0)}:${pad(m)}`);
+                        onPick(`${pad(hour)}:${pad(m)}`);
                         setOpen(false);
                       }}
-                      className={`${slotClass(mm === m, past)} disabled:cursor-not-allowed disabled:opacity-40`}
+                      className={`${slotClass(mm === m, past)} disabled:cursor-not-allowed`}
                     >
                       {pad(m)}
                     </button>
