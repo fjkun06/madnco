@@ -4,8 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { StreamState } from "@/lib/stream/state";
 import { en } from "@/locales/en";
-import { siteConfig } from "@/utils/app.constants";
-import { interpolate, interpolateParts } from "@/utils/interpolate";
+import { interpolate } from "@/utils/interpolate";
 import { BUTTON_GHOST, BUTTON_PRIMARY } from "@/utils/ui.classes";
 import { errorText } from "./errors";
 import { CHIP, CHIP_OFF } from "./fields";
@@ -27,7 +26,6 @@ import { ScreenTab } from "./tabs/ScreenTab";
 import type { TabProps } from "./tabs/shared";
 import { WebTab } from "./tabs/WebTab";
 import { ToastStack, useToasts } from "./Toasts";
-import { Toggle } from "./Toggle";
 import { readNow, useNow } from "./useNow";
 import { WhereItShows } from "./WhereItShows";
 
@@ -263,32 +261,7 @@ export function AdminPanel({
           {tab === "quest" ? <QuestTab {...props} /> : null}
           {tab === "web" ? <WebTab {...props} /> : null}
         </div>
-
-        {/* Where it shows */}
-        <aside
-          aria-labelledby="where-title"
-          className="flex flex-col gap-4 bg-ink-2 p-5 cut sm:p-7 lg:sticky lg:top-28"
-        >
-          <h2 id="where-title" className="m-0 font-display text-[26px] leading-none">
-            {t.where.title}
-          </h2>
-          <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-            {t.where.rows.map(([place, what]) => (
-              <li
-                key={place}
-                className="flex justify-between gap-3 bg-ink px-3.5 py-3 text-[15px]"
-              >
-                <span>{place}</span>
-                <b className="label-mono text-xs text-tq">{what}</b>
-              </li>
-            ))}
-          </ul>
-          <p className="m-0 text-sm leading-relaxed text-muted">{t.where.note}</p>
-          <span className={LABEL}>{t.where.urls}</span>
-          <code className="block bg-ink p-3 font-mono text-[13px] font-bold break-all text-tq">
-            {`${siteConfig.url}/overlay/starting-soon.html`}
-          </code>
-        </aside>
+        <WhereItShows onToast={push} />
       </div>
 
       {/* Action bar: sticks to the bottom of the screen, full width */}
