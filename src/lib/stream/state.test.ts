@@ -1,0 +1,115 @@
+import {
+  COUNTDOWN_GRACE_MS,
+  DEFAULT_STATE,
+  NEXT_GRACE_MS,
+  TOPIC_MAX,
+  cleanText,
+  formatNextWhen,
+  nowPlayingText,
+  publicStatus,
+  sanitizeState,
+} from "./state";
+
+const NOW = Date.UTC(2026, 10, 17, 12, 0, 0);
+
+describe("cleanText", () => {
+  it("collapses whitespace, drops control characters and cuts to the limit", () => {
+    expect(cleanText("  FIFA \n\t night\u0007 ", 80)).toBe("FIFA night");
+    expect(cleanText("x".repeat(200), 10)).toHaveLength(10);
+    expect(cleanText(42, 10)).toBe("");
+  });
+});
+
+describe("sanitizeState", () => {
+  it("falls back to defaults for junk", () => {
+    expect(sanitizeState(null, NOW)).toEqual({ ...DEFAULT_STATE, updatedAt: NOW });
+    expect(sanitizeState({ mode: "party" }, NOW).mode).toBe("auto");
+  });
+
+  it("keeps valid values and limits text length", () => {
+    const state = sanitizeState(
+      {
+        mode: "live",
+        topic: "t".repeat(500),
+        game: "RDR2",
+        countdown: { from: NOW, to: NOW + 60_000 },
+        next: { at: NOW + 3_600_000, plan: "Story mode", show: true },
+        extra: "dropped",
+      },
+      NOW,
+    );
+    expect(state.mode).toBe("live");
+    expect(state.topic).toHaveLength(TOPIC_MAX);
+    expect(state.game).toBe("RDR2");
+    expect(state.countdown).toEqual({ from: NOW, to: NOW + 60_000 });
+    expect(state.next).toEqual({ at: NOW + 3_600_000, plan: "Story mode", show: true });
+    expect(state).not.toHaveProperty("extra");
+  });
+
+  it("drops a countdown that ends before it starts", () => {
+    expect(
+      sanitizeState({ countdown: { from: NOW, to: NOW - 1 } }, NOW).countdown,
+    ).toBeNull();
+  });
+});
+
+describe("publicStatus", () => {
+  const base = { ...DEFAULT_STATE, updatedAt: NOW };
+
+  it("follows Twitch in auto mode", () => {
+    expect(publicStatus(base, true, NOW)).toMatchObject({ live: true, source: "twitch" });
+    expect(publicStatus(base, false, NOW)).toMatchObject({ live: false, source: "none" });
+    expect(publicStatus(base, null, NOW)).toMatchObject({ live: false, source: "none" });
+  });
+
+  it("lets the admin force live or offline", () => {
+    expect(publicStatus({ ...base, mode: "live" }, false, NOW)).toMatchObject({
+      live: true,
+      source: "manual",
+    });
+    expect(publicStatus({ ...base, mode: "off" }, true, NOW).live).toBe(false);
+  });
+
+  it("uses the Twitch game only when the admin left the game empty", () => {
+    expect(publicStatus(base, true, NOW, "EA Sports FC").game).toBe("EA Sports FC");
+    expect(publicStatus({ ...base, game: "FIFA" }, true, NOW, "EA Sports FC").game).toBe(
+      "FIFA",
+    );
+    expect(publicStatus(base, false, NOW, "EA Sports FC").game).toBe("");
+  });
+
+  it("drops an old countdown and a past or hidden next stream", () => {
+    const old = { from: NOW - 2 * COUNTDOWN_GRACE_MS, to: NOW - COUNTDOWN_GRACE_MS - 1 };
+    expect(publicStatus({ ...base, countdown: old }, null, NOW).countdown).toBeNull();
+    const past = { at: NOW - NEXT_GRACE_MS - 1, plan: "", show: true };
+    expect(publicStatus({ ...base, next: past }, null, NOW).next).toBeNull();
+    const hidden = { at: NOW + 1000, plan: "x", show: false };
+    expect(publicStatus({ ...base, next: hidden }, null, NOW).next).toBeNull();
+    const soon = { at: NOW + 1000, plan: "x", show: true };
+    expect(publicStatus({ ...base, next: soon }, null, NOW).next).toEqual({
+      at: NOW + 1000,
+      plan: "x",
+    });
+  });
+});
+
+describe("nowPlayingText", () => {
+  it("joins game and topic, skipping empty parts", () => {
+    expect(nowPlayingText({ game: "FIFA", topic: "Road to Div 1" })).toBe(
+      "FIFA · Road to Div 1",
+    );
+    expect(nowPlayingText({ game: "", topic: "Chill" })).toBe("Chill");
+    expect(nowPlayingText({ game: "", topic: "" })).toBe("");
+  });
+});
+
+describe("formatNextWhen", () => {
+  it("shows weekday and time within a week, the date further out", () => {
+    const soon = Date.UTC(2026, 10, 21, 19, 0); // Sat 21 Nov, 20:00 in Berlin
+    expect(formatNextWhen(soon, NOW, "en-GB", "Europe/Berlin")).toBe("Sat · 20:00");
+    const later = Date.UTC(2026, 10, 28, 19, 0);
+    expect(formatNextWhen(later, NOW, "en-GB", "Europe/Berlin")).toBe(
+      "Sat 28 Nov · 20:00",
+    );
+  });
+});

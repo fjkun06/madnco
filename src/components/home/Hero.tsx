@@ -1,9 +1,9 @@
 import { MessageSquare } from "lucide-react";
 import { Ghost, Skull } from "@/components/icons/Mascots";
 import { en } from "@/locales/en";
-import { siteConfig } from "@/utils/app.constants";
 import { BUTTON_GHOST, BUTTON_PRIMARY, DISPLAY_TRACKING, WRAP } from "@/utils/ui.classes";
-import { ExternalLink } from "@/components/ui/ExternalLink";
+import { HeroLiveCta } from "@/components/live/HeroLiveCta";
+import { NowPlaying } from "@/components/live/NowPlaying";
 
 /**
  * Above the fold. The entrance is CSS only (globals.css: `.hero-title`,
@@ -51,16 +51,7 @@ export function Hero() {
               {t.ctaDiscord}
             </a>
           </span>
-          <ExternalLink
-            href={siteConfig.links.tiktokLive}
-            className={`${BUTTON_GHOST} min-w-0 flex-1 sm:flex-none`}
-          >
-            <span
-              aria-hidden="true"
-              className="size-2 shrink-0 rounded-full bg-live sm:size-2.5"
-            />
-            {t.ctaLive}
-          </ExternalLink>
+          <HeroLiveCta className={`${BUTTON_GHOST} min-w-0 flex-1 sm:flex-none`} />
         </div>
       </div>
 
@@ -86,12 +77,7 @@ export function Hero() {
           </span>
           <Ghost className="mascot-ghost h-full max-h-[260px] w-[34%] max-w-[210px] sm:w-[40%]" />
         </div>
-        <div className="absolute inset-x-4 bottom-3 flex items-end justify-between gap-4 label-mono sm:inset-x-[26px] sm:bottom-[22px]">
-          <p className="m-0 text-[10px] leading-[1.6] text-muted sm:text-xs sm:leading-[1.8]">
-            {t.nowPlayingLabel}
-            <b className="block text-xs text-paper sm:text-[15px]">{t.nowPlaying}</b>
-          </p>
-        </div>
+        <NowPlaying />
       </div>
     </section>
   );

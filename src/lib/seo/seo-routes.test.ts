@@ -11,9 +11,11 @@ describe("sitemap", () => {
 });
 
 describe("robots", () => {
-  it("allows crawling and points to the sitemap", () => {
+  it("allows crawling except the tools, and points to the sitemap", () => {
     const result = robots();
     expect(result.sitemap).toBe(`${siteConfig.url}/sitemap.xml`);
-    expect(result.rules).toEqual([{ userAgent: "*", allow: "/" }]);
+    expect(result.rules).toEqual([
+      { userAgent: "*", allow: "/", disallow: ["/admin", "/api/", "/overlay/"] },
+    ]);
   });
 });

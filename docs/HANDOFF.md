@@ -18,7 +18,7 @@ school and work); other friends drop in to game.
   the page: get them into the **Discord** and to the **socials** in one tap.
 - URL: `https://www.madnco.frankjordan.dev` (www is primary; the short
   `madnco.frankjordan.dev` should redirect to it in Vercel).
-- English only for now. No live/offline badge (see §5).
+- English only for now. Live status comes from Twitch or the admin panel (see §5).
 
 ## 2. Design source of truth
 
@@ -87,18 +87,22 @@ House rule: every section reveals on scroll; each element animates once.
 
 ## 5. Decisions (and why)
 
-- **No live/offline badge.** TikTok has no public live status API; a hand-set
-  badge would lie most of the time. The header says "Lives on @clipzhub06"
-  instead. If live status is wanted later, use Twitch's API (server-side,
-  cached) and keep TikTok out of it.
+- **Live status from Twitch, or set by hand in /admin.** TikTok has no public
+  live status API, so it never decides. In "Auto" mode the server asks
+  Twitch's Helix API (app token, cached 60 s in Redis); the admin can force
+  Live or Offline. Offline, the header still says "Lives on @clipzhub06".
+  The page HTML stays static and offline; `useStreamStatus` updates the
+  pill, the hero button and the HUD after hydration (see
+  `docs/control-room.md`).
 - **Lives happen on @clipzhub06** (Mad's other TikTok, 1400 followers, can go
   live and has a clickable bio link) until **@madnco8** reaches 50 followers.
   The side quest card shows that progress from `siteConfig.madncoFollowers`
   (set by hand; `null` = unknown, shows `[...]`).
 - **Placeholders are never links.** A `[...]` value in `siteConfig` renders as
   visible, unlinked text with `data-nosnippet`. A test enforces it.
-- **Prototype vs code:** the prototype has an Offline/Live pill and status;
-  the code doesn't (decision above). Everything else should match.
+- **Prototype vs code:** the prototype's Live pill and status chip now
+  exist, driven by /api/stream. Offline the HUD shows no "Offline" chip
+  (an "Offline" badge would be wrong while live on TikTok).
 - **English only**, structured like Herzog so FR/DE can be added later with
   next-international.
 - **Impressum/privacy** exist with placeholders because a German-run site

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MadnCo. · Twitch chat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Rubik:wght@400;500;700&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* MadnCo. chat overlay
+   OBS: Browser source, untick "Local file", URL:
+   file:///D:/MadnCo/Stream%20Assets/overlays/landscape/chat.html?channel=madnco8
+   Size: 576 x 1025 (fits the chat panel in just-chatting.html)
+   Options: &demo=1 (test messages)  &max=30 (messages kept)  &fade=60 (hide after N seconds, 0 = never)
+            &hide=nightbot,streamelements (users to hide)  &commands=0 (hide !commands, default)  */
+:root{--ink:#110A0C;--ink2:#1B1014;--ink3:#26161C;--bdx:#800020;--pink:#E8557A;--tq:#30D5C8;--paper:#F4EFE6;--mute:#BBAAB1}
+html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}
+/* Style B: compact lines */
+#chat{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;gap:14px;padding:8px 6px 10px 6px;box-sizing:border-box}
+.m{position:relative;color:var(--paper);font-family:Rubik,system-ui,sans-serif;font-size:21px;line-height:1.42;padding:0 4px 12px;border-bottom:2px solid var(--ink3);word-wrap:break-word;overflow-wrap:anywhere;
+  animation:in .4s cubic-bezier(.22,1,.36,1) both}
+.m.out{animation:out .3s ease-in both}
+@keyframes in{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+@keyframes out{to{opacity:0;transform:translateX(-40px)}}
+.bd{display:inline-block;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:11px;letter-spacing:.1em;line-height:1;padding:4px 6px;margin-right:8px;vertical-align:3px;color:var(--ink);background:var(--tq);
+  clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px)}
+.bd.host{background:var(--pink)}.bd.mod{background:var(--tq)}.bd.vip{background:var(--paper)}.bd.sub{background:var(--bdx);color:var(--paper)}
+.nm{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--c,var(--tq))}
+.sep{color:#5A464E;margin:0 8px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:15px}
+.tx img{height:1.35em;vertical-align:-0.32em;margin:0 1px}
+.m.me .tx{font-style:italic;color:var(--c,var(--tq))}
+.m.hl{border-bottom-color:var(--pink)}
+[hidden]{display:none!important}</style>
+</head>
+<body>
+<div id="chat" aria-live="polite"></div>
+<script>
+(function(){
+var q=new URLSearchParams(location.search);
+var CH=(q.get('channel')||'madnco8').toLowerCase().replace(/^#/,'');
+var MAX=+(q.get('max')||30), FADE=+(q.get('fade')||0);
+var HIDE=(q.get('hide')||'nightbot,streamelements,streamlabs,moobot,fossabot').toLowerCase().split(',');
+var SHOW_CMDS=q.get('commands')==='1';
+var box=document.getElementById('chat');
+var PAL=['#30D5C8','#E8557A','#F4EFE6','#7FE3DA','#F08AA6','#C9B8FF','#FFC46B'];
+function colorFor(n){var h=0;for(var i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))>>>0;return PAL[h%PAL.length];}
+
+function add(o){
+  if(HIDE.indexOf(o.login)>=0) return;
+  if(!SHOW_CMDS && o.text.charAt(0)==='!') return;
+  var m=document.createElement('div'); m.className='m'; m.dataset.id=o.id||''; m.dataset.user=o.login;
+  m.style.setProperty('--c',o.color||colorFor(o.login));
+  if(o.me) m.classList.add('me');
+  if(o.highlight) m.classList.add('hl');
+  [['broadcaster','HOST','host'],['moderator','MOD','mod'],['vip','VIP','vip'],['subscriber','SUB','sub'],['founder','SUB','sub']].forEach(function(b){
+    if(o.badges[b[0]] && !(b[0]==='founder'&&o.badges.subscriber)){var s=document.createElement('span');s.className='bd '+b[2];s.textContent=b[1];m.appendChild(s);}
+  });
+  var nm=document.createElement('span'); nm.className='nm'; nm.textContent=o.name; m.appendChild(nm);
+  var sep=document.createElement('span'); sep.className='sep'; sep.textContent='//'; m.appendChild(sep);
+  var tx=document.createElement('span'); tx.className='tx';
+  renderText(tx,o.text,o.emotes);
+  m.appendChild(tx); box.appendChild(m);
+  while(box.children.length>MAX) box.removeChild(box.firstChild);
+  // drop messages that scrolled out of view
+  while(box.children.length>1 && box.firstChild.offsetTop<0) box.removeChild(box.firstChild);
+  if(FADE>0) setTimeout(function(){remove(m);},FADE*1000);
+}
+function remove(m){ if(!m||!m.parentNode) return; m.classList.add('out'); setTimeout(function(){m.remove();},350); }
+
+function renderText(el,text,emotes){
+  var chars=Array.from(text), marks=[];
+  if(emotes){ emotes.split('/').forEach(function(e){ var p=e.split(':'); if(p.length<2) return;
+    p[1].split(',').forEach(function(r){ var a=r.split('-'); marks.push([+a[0],+a[1],p[0]]); }); }); }
+  marks.sort(function(a,b){return a[0]-b[0];});
+  var i=0;
+  marks.forEach(function(k){
+    if(k[0]>i) el.appendChild(document.createTextNode(chars.slice(i,k[0]).join('')));
+    var img=document.createElement('img'); img.alt=chars.slice(k[0],k[1]+1).join('');
+    img.src='https://static-cdn.jtvnw.net/emoticons/v2/'+k[2]+'/default/dark/2.0'; el.appendChild(img);
+    i=k[1]+1;
+  });
+  if(i<chars.length) el.appendChild(document.createTextNode(chars.slice(i).join('')));
+}
+
+function parse(line){
+  var tags={}, rest=line;
+  if(rest.charAt(0)==='@'){ var sp=rest.indexOf(' '); rest.slice(1,sp).split(';').forEach(function(t){var kv=t.split('=');tags[kv[0]]=(kv[1]||'').replace(/\\s/g,' ').replace(/\\:/g,';').replace(/\\\\/g,'\\');}); rest=rest.slice(sp+1); }
+  var prefix=''; if(rest.charAt(0)===':'){ var sp2=rest.indexOf(' '); prefix=rest.slice(1,sp2); rest=rest.slice(sp2+1); }
+  var ti=rest.indexOf(' :'), trailing=null; if(ti>=0){ trailing=rest.slice(ti+2); rest=rest.slice(0,ti); }
+  var parts=rest.split(' ');
+  return {tags:tags,prefix:prefix,cmd:parts[0],params:parts.slice(1),text:trailing};
+}
+
+var ws, retry=1000;
+function connect(){
+  ws=new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+  ws.onopen=function(){
+    retry=1000;
+    ws.send('CAP REQ :twitch.tv/tags twitch.tv/commands');
+    ws.send('PASS SCHMOOPIIE');
+    ws.send('NICK justinfan'+Math.floor(10000+Math.random()*80000));
+    ws.send('JOIN #'+CH);
+  };
+  ws.onmessage=function(ev){
+    ev.data.split('\r\n').forEach(function(line){
+      if(!line) return;
+      if(line.indexOf('PING')===0){ ws.send('PONG :tmi.twitch.tv'); return; }
+      var p=parse(line);
+      if(p.cmd==='PRIVMSG' && p.text!=null){
+        var login=p.prefix.split('!')[0], text=p.text, me=false;
+        if(text.indexOf('\u0001ACTION ')===0){ me=true; text=text.slice(8).replace(/\u0001$/,''); }
+        var badges={}; (p.tags.badges||'').split(',').forEach(function(b){ if(b) badges[b.split('/')[0]]=1; });
+        add({id:p.tags.id,login:login,name:p.tags['display-name']||login,color:null,text:text,emotes:p.tags.emotes,badges:badges,me:me,
+             highlight:p.tags['msg-id']==='highlighted-message'});
+      } else if(p.cmd==='CLEARMSG'){
+        var id=p.tags['target-msg-id']; Array.prototype.slice.call(box.children).forEach(function(m){ if(m.dataset.id===id) remove(m); });
+      } else if(p.cmd==='CLEARCHAT'){
+        var u=(p.text||'').toLowerCase(); Array.prototype.slice.call(box.children).forEach(function(m){ if(!u||m.dataset.user===u) remove(m); });
+      } else if(p.cmd==='RECONNECT'){ ws.close(); }
+    });
+  };
+  ws.onclose=function(){ setTimeout(connect,retry); retry=Math.min(retry*2,30000); };
+}
+
+if(q.get('demo')==='1'){
+  var demo=[
+    {login:'madnco8',name:'MadnCo8',badges:{broadcaster:1},text:'Test message from the host. This is how my messages look.'},
+    {login:'viewer_one',name:'Viewer_One',badges:{},text:'Normal chat message, short.'},
+    {login:'mod_test',name:'Mod_Test',badges:{moderator:1},text:'A moderator message with a badge.'},
+    {login:'sub_test',name:'Sub_Test',badges:{subscriber:1},text:'A subscriber message. Longer text wraps onto a second line so you can check the spacing.'},
+    {login:'viewer_two',name:'Viewer_Two',badges:{},text:'waves at the stream',me:true}
+  ], di=0;
+  setInterval(function(){ var d=demo[di++%demo.length]; add({id:'d'+di,login:d.login,name:d.name,color:null,text:d.text,emotes:'',badges:d.badges,me:!!d.me}); },1600);
+} else { connect(); }
+})();
+</script>
+</body>
+</html>
