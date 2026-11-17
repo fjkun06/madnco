@@ -21,11 +21,11 @@ export function Toggle({
       aria-checked={checked}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className="focus-inset flex cursor-pointer items-center gap-3.5 text-left text-base text-paper disabled:cursor-not-allowed disabled:opacity-50"
+      className="flex cursor-pointer items-center gap-3.5 text-left text-base text-paper focus-inset disabled:cursor-not-allowed disabled:opacity-50"
     >
       <span
         aria-hidden="true"
-        className={`relative h-[34px] w-16 flex-none cut-s transition-colors duration-200 ${
+        className={`relative h-[34px] w-16 flex-none transition-colors duration-200 cut-s ${
           checked ? "bg-tq" : "bg-ink-3"
         }`}
       >

@@ -326,6 +326,15 @@
   );
 }
 
+/* Goal reached: the bar turns pink. */
+.xp-fill-done {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-bordeaux-hi) 0 14px,
+    color-mix(in srgb, var(--color-bordeaux-hi) 78%, black) 14px 18px
+  );
+}
+
 /* ---------- live dot (header pill, hero button while live) ---------- */
 
 @keyframes live-pulse {

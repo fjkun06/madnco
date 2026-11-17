@@ -4,6 +4,7 @@ import { Crew } from "@/components/home/Crew";
 import { DiscordBand } from "@/components/home/DiscordBand";
 import { FindUs } from "@/components/home/FindUs";
 import { Hero } from "@/components/home/Hero";
+import { LatestClip } from "@/components/home/LatestClip";
 import { Tapes } from "@/components/home/Tapes";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { pageMetadata, routes } from "@/lib/seo/metadata";
@@ -21,6 +22,7 @@ export default function HomePage() {
       <Activities />
       <DiscordBand />
       <FindUs />
+      <LatestClip />
       <CaseFile />
     </>
   );

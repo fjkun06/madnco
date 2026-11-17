@@ -18,7 +18,7 @@ export function Hero() {
       className={`${WRAP} grid grid-cols-1 items-center gap-[clamp(1.25rem,0.2rem+3.7vw,3.5rem)] pt-[clamp(0.625rem,-0.6rem+4.55vw,3.5rem)] pb-[clamp(1.75rem,0.1rem+6.5vw,6rem)] lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]`}
     >
       <div>
-        <p className="animate-rise-in m-0 inline-flex items-center gap-2 label-mono text-[11px] font-bold text-tq sm:gap-2.5 sm:text-[13px] [animation-delay:0.1s]">
+        <p className="animate-rise-in m-0 inline-flex items-center gap-2 label-mono text-[11px] font-bold text-tq [animation-delay:0.1s] sm:gap-2.5 sm:text-[13px]">
           <span aria-hidden="true" className="h-[3px] w-[18px] bg-tq sm:w-7" />
           {t.kicker}
         </p>
@@ -32,7 +32,7 @@ export function Hero() {
           </span>
           {t.titleBottom}
         </h1>
-        <p className="animate-rise-in mt-[clamp(0.875rem,0.6rem+1.2vw,2.125rem)] mb-0 max-w-[35rem] text-lead leading-[1.35] font-bold sm:leading-tight [animation-delay:0.45s]">
+        <p className="animate-rise-in mt-[clamp(0.875rem,0.6rem+1.2vw,2.125rem)] mb-0 max-w-[35rem] text-lead leading-[1.35] font-bold [animation-delay:0.45s] sm:leading-tight">
           {t.sloganLead} <em className="text-bordeaux-hi not-italic">{t.sloganAccent}</em>{" "}
           {t.sloganRest}
         </p>

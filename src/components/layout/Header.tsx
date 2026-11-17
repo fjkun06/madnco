@@ -61,7 +61,7 @@ export function Header() {
           <LivePill />
           <Link
             href="/#discord"
-            className="inline-flex min-h-10 items-center bg-tq px-3.5 label-mono text-[11px] font-extrabold sm:min-h-11 sm:px-[18px] sm:text-[13px] text-ink no-underline focus-inset transition-colors duration-300 ease-smooth whitespace-nowrap cut hover:bg-paper"
+            className="inline-flex min-h-10 items-center bg-tq px-3.5 label-mono text-[11px] font-extrabold whitespace-nowrap text-ink no-underline focus-inset transition-colors duration-300 ease-smooth cut hover:bg-paper sm:min-h-11 sm:px-[18px] sm:text-[13px]"
           >
             {t.joinDiscord}
           </Link>

@@ -1,18 +1,22 @@
 "use client";
 
+import { useState } from "react";
 import { en } from "@/locales/en";
 import { siteConfig } from "@/utils/app.constants";
 import { interpolate } from "@/utils/interpolate";
 import type { ToastKind } from "./Toasts";
 
-const ROW =
-  "group flex flex-col gap-2.5 bg-ink px-3.5 py-3 transition-colors duration-200 hover:bg-ink-3/60";
-const NAME =
-  "focus-inset flex items-center gap-2 text-[15px] font-bold text-paper hover:text-tq";
 const PART =
   "focus-inset flex min-h-9 items-center gap-1.5 px-2.5 label-mono text-[11px] font-extrabold transition-colors duration-200";
+const NAME =
+  "focus-inset flex items-center gap-1.5 text-[15px] font-bold text-paper hover:text-tq";
 
-const overlayUrl = (file: string) => `${siteConfig.url}/overlay/${file}.html`;
+type Format = "landscape" | "portrait";
+type Toast = (kind: ToastKind, title: string, text: string) => void;
+
+/** Same-origin path for the preview, absolute URL for OBS. */
+const overlayPath = (file: string) => `/overlay/${file}.html`;
+const overlayUrl = (file: string) => `${siteConfig.url}${overlayPath(file)}`;
 
 function Arrow() {
   return (
@@ -25,16 +29,20 @@ function Arrow() {
 function CopyIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true" fill="none">
-      <rect x="4.5" y="4.5" width="8" height="8" stroke="currentColor" strokeWidth="1.8" />
+      <rect
+        x="4.5"
+        y="4.5"
+        width="8"
+        height="8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
       <path d="M2 9.5V2h7.5" stroke="currentColor" strokeWidth="1.8" />
     </svg>
   );
 }
 
-/**
- * One format of a scene: opens the overlay, plus a copy button for the
- * OBS browser source URL.
- */
+/** Open (↗) and copy-for-OBS for one format of a scene. */
 function FormatLink({
   name,
   format,
@@ -44,7 +52,7 @@ function FormatLink({
   name: string;
   format: string;
   url: string;
-  onToast: (kind: ToastKind, title: string, text: string) => void;
+  onToast: Toast;
 }) {
   const w = en.admin.where;
 
@@ -81,48 +89,102 @@ function FormatLink({
   );
 }
 
-/** The scenes the admin feeds, each clickable, with 16:9 and 9:16 links. */
-export function WhereItShows({
-  onToast,
-}: {
-  onToast: (kind: ToastKind, title: string, text: string) => void;
-}) {
+/**
+ * A live, scaled-down overlay. The overlay pages scale themselves to their
+ * window, so the iframe only needs the right shape. Not focusable: the
+ * links next to it are the way in.
+ */
+function Thumb({ file, format, name }: { file: string; format: Format; name: string }) {
+  return (
+    <div
+      className={`relative overflow-hidden bg-ink cut-s ${
+        format === "landscape" ? "aspect-video w-full" : "aspect-[9/16] w-full"
+      }`}
+    >
+      <iframe
+        src={overlayPath(file)}
+        title={name}
+        loading="lazy"
+        tabIndex={-1}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 size-full border-0"
+      />
+    </div>
+  );
+}
+
+/**
+ * The sidebar on every tab: live previews of the overlays (saved state),
+ * each with open and copy-for-OBS links for both formats.
+ */
+export function WhereItShows({ onToast }: { onToast: Toast }) {
   const w = en.admin.where;
+  const p = en.admin.preview;
+  const [format, setFormat] = useState<Format>("landscape");
+  const scenes = w.scenes.filter((scene) => format === "landscape" || scene.vertical);
 
   return (
     <aside
       aria-labelledby="where-title"
-      className="flex flex-col gap-4 bg-ink-2 p-5 cut sm:p-7 lg:sticky lg:top-28"
+      className="flex flex-col gap-4 bg-ink-2 p-5 cut sm:p-7 lg:sticky lg:top-40 lg:max-h-[calc(100dvh-14rem)] lg:overflow-y-auto lg:overscroll-contain"
     >
-      <h2 id="where-title" className="m-0 font-display text-[26px] leading-none">
-        {w.title}
-      </h2>
-      <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-        {w.scenes.map((scene) => {
-          const landscape = overlayUrl(scene.file);
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 id="where-title" className="m-0 font-display text-[26px] leading-none">
+          {p.title}
+        </h2>
+        <div role="group" aria-label={p.format} className="flex gap-1.5">
+          {(["landscape", "portrait"] as const).map((key) => (
+            <button
+              key={key}
+              type="button"
+              aria-pressed={format === key}
+              onClick={() => setFormat(key)}
+              className={`min-h-9 px-3 label-mono text-[11px] font-extrabold focus-inset cut-s ${
+                format === key
+                  ? "bg-tq text-ink"
+                  : "bg-ink-3 text-paper hover:bg-bordeaux"
+              }`}
+            >
+              {key === "landscape" ? w.landscape : w.portrait}
+            </button>
+          ))}
+        </div>
+      </div>
+      <p className="m-0 text-sm leading-relaxed text-muted">{p.note}</p>
+
+      <ul
+        className={`m-0 grid list-none gap-3.5 p-0 ${
+          format === "landscape" ? "grid-cols-1" : "grid-cols-3"
+        }`}
+      >
+        {scenes.map((scene) => {
+          const file = format === "landscape" ? scene.file : `v-${scene.file}`;
           return (
-            <li key={scene.file} className={ROW}>
-              <div className="flex items-baseline justify-between gap-3">
+            <li key={scene.file} className="flex flex-col gap-2">
+              <Thumb file={file} format={format} name={scene.name} />
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <a
-                  href={landscape}
+                  href={overlayUrl(file)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={NAME}
                 >
                   {scene.name}
-                  <span className="text-muted transition-colors group-hover:text-tq">
-                    <Arrow />
-                  </span>
+                  <Arrow />
                 </a>
-                <b className="label-mono text-right text-xs text-tq">{scene.what}</b>
+                {format === "landscape" ? (
+                  <span className="label-mono text-[11px] text-tq">{scene.what}</span>
+                ) : null}
               </div>
               <div className="flex flex-wrap gap-2">
-                <FormatLink
-                  name={scene.name}
-                  format={w.landscape}
-                  url={landscape}
-                  onToast={onToast}
-                />
+                {format === "landscape" ? (
+                  <FormatLink
+                    name={scene.name}
+                    format={w.landscape}
+                    url={overlayUrl(scene.file)}
+                    onToast={onToast}
+                  />
+                ) : null}
                 {scene.vertical ? (
                   <FormatLink
                     name={scene.name}
@@ -135,16 +197,14 @@ export function WhereItShows({
             </li>
           );
         })}
-        <li className={`${ROW} flex-row items-baseline justify-between`}>
-          <a href="/" target="_blank" rel="noopener noreferrer" className={NAME}>
-            {w.website.name}
-            <span className="text-muted transition-colors group-hover:text-tq">
-              <Arrow />
-            </span>
-          </a>
-          <b className="label-mono text-right text-xs text-tq">{w.website.what}</b>
-        </li>
       </ul>
+      <a href="/" target="_blank" rel="noopener noreferrer" className={NAME}>
+        {w.website.name}
+        <Arrow />
+        <span className="ml-auto label-mono text-[11px] font-normal text-tq">
+          {w.website.what}
+        </span>
+      </a>
       <p className="m-0 text-sm leading-relaxed text-muted">{w.note}</p>
     </aside>
   );

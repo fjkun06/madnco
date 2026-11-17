@@ -54,7 +54,7 @@ export function DiscordBand() {
             as="h2"
             delay={0.1}
             id="discord-title"
-            className={`mt-2 mb-0 font-display text-band sm:mt-3.5 leading-[0.85] text-paper ${DISPLAY_TRACKING}`}
+            className={`mt-2 mb-0 font-display text-band leading-[0.85] text-paper sm:mt-3.5 ${DISPLAY_TRACKING}`}
           >
             {t.titleLead} <span className="text-tq">{t.titleAccent}</span>
           </Reveal>

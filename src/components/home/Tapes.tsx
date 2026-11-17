@@ -14,16 +14,16 @@ export function Tapes() {
   return (
     <ScrollProgress
       aria-hidden
-      className="relative mb-1 h-[92px] scale-[1.06] sm:mb-2.5 sm:h-[150px] rotate-[calc(-3deg+var(--p)*6deg)] md:mt-2.5 md:mb-10 md:h-[190px]"
+      className="relative mb-1 h-[92px] scale-[1.06] rotate-[calc(-3deg+var(--p)*6deg)] sm:mb-2.5 sm:h-[150px] md:mt-2.5 md:mb-10 md:h-[190px]"
     >
       <Tape
         words={en.tapes.a}
-        className="top-3.5 z-[2] -rotate-[2.4deg] sm:top-6 translate-x-[calc(var(--p)*-22vw)] bg-tq text-ink md:top-[30px]"
+        className="top-3.5 z-[2] translate-x-[calc(var(--p)*-22vw)] -rotate-[2.4deg] bg-tq text-ink sm:top-6 md:top-[30px]"
         trackClassName="tape-track"
       />
       <Tape
         words={en.tapes.b}
-        className="top-[50px] rotate-[1.8deg] sm:top-[78px] translate-x-[calc(var(--p)*22vw)] bg-bordeaux text-paper md:top-24"
+        className="top-[50px] translate-x-[calc(var(--p)*22vw)] rotate-[1.8deg] bg-bordeaux text-paper sm:top-[78px] md:top-24"
         trackClassName="tape-track-reverse"
       />
     </ScrollProgress>

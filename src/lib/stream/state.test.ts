@@ -169,3 +169,23 @@ describe("saveError and prepareSave", () => {
     expect(prepareSave(fresh, saved, NOW).updatedAt).toBe(NOW);
   });
 });
+
+describe("public extras", () => {
+  it("drops an old BRB timer, hides a clip that is switched off and flags a done quest", () => {
+    const state = sanitizeState(
+      {
+        brb: { message: "Snack run", until: NOW - 31 * 60_000 },
+        clip: { url: "https://youtu.be/dQw4w9WgXcQ", title: "GOAL", show: false },
+        quest: { followers: 60, goal: 50 },
+        presets: [{ name: "Secret" }],
+      },
+      NOW,
+    );
+    const status = publicStatus(state, null, NOW);
+    expect(status.brb).toEqual({ message: "Snack run", until: null });
+    expect(status.clip).toBeNull();
+    expect(status.quest.done).toBe(true);
+    expect(JSON.stringify(status)).not.toContain("Secret");
+    expect(pruneState(state, NOW).brb.until).toBeNull();
+  });
+});

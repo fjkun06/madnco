@@ -39,7 +39,9 @@ export function StickyHeader({ children }: { children: ReactNode }) {
       frame = requestAnimationFrame(() => {
         frame = 0;
         const y = window.scrollY;
-        setVisible((v) => nextVisible(prevY, y, v));
+        // React may run the updater later, after prevY below has moved on.
+        const from = prevY;
+        setVisible((v) => nextVisible(from, y, v));
         setScrolled(y > 8);
         if (Math.abs(y - prevY) >= MIN_DELTA || y <= TOP_ZONE) prevY = y;
       });
