@@ -7,6 +7,7 @@ export const routes = {
   home: "/",
   impressum: "/impressum",
   privacy: "/privacy",
+  admin: "/admin",
 } as const;
 
 /** Pages meant for search results (the sitemap); the legal pages are noindex. */
