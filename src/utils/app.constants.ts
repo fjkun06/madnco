@@ -33,8 +33,8 @@ export const siteConfig = {
   /** TikTok's follower minimum before an account may go LIVE. */
   liveFollowerGoal: 50,
   /**
-   * Current @madnco8 follower count, updated by hand. `null` until known:
-   * the side quest bar then stays empty and shows a placeholder.
+   * @madnco8 follower count before the control room (/admin → Side quest)
+   * has one. `null` = unknown: the bar stays empty with a placeholder.
    */
   madncoFollowers: 4 as number | null,
 } as const;

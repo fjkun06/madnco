@@ -5,6 +5,28 @@
  * Pure functions only (no I/O), so every rule here is unit-tested.
  */
 
+import {
+  DEFAULT_BRB,
+  DEFAULT_QUEST,
+  DEFAULT_TICKER,
+  BRB_GRACE_MS,
+  cleanText,
+  isTime,
+  questDone,
+  sanitizeBrb,
+  sanitizeClip,
+  sanitizePresets,
+  sanitizeQuest,
+  sanitizeTicker,
+  type Brb,
+  type Clip,
+  type Preset,
+  type Quest,
+  type Ticker,
+} from "./extras";
+
+export { cleanText };
+
 /** How the live status is decided. */
 export type LiveMode = "auto" | "live" | "off";
 
@@ -31,6 +53,12 @@ export type StreamState = {
   game: string;
   countdown: Countdown | null;
   next: NextStream | null;
+  brb: Brb;
+  ticker: Ticker;
+  quest: Quest;
+  clip: Clip | null;
+  /** Admin only, never in the public status. */
+  presets: Preset[];
   updatedAt: number;
 };
 
@@ -43,6 +71,11 @@ export type PublicStatus = {
   game: string;
   countdown: Countdown | null;
   next: { at: number; plan: string } | null;
+  brb: Brb;
+  ticker: Ticker;
+  quest: Quest & { done: boolean };
+  /** Only when it should show on the website. */
+  clip: Omit<Clip, "show"> | null;
 };
 
 export const TOPIC_MAX = 80;
@@ -60,22 +93,13 @@ export const DEFAULT_STATE: StreamState = {
   game: "",
   countdown: null,
   next: null,
+  brb: DEFAULT_BRB,
+  ticker: DEFAULT_TICKER,
+  quest: DEFAULT_QUEST,
+  clip: null,
+  presets: [],
   updatedAt: 0,
 };
-
-/** Collapse whitespace, strip control characters and cut to `max`. */
-export function cleanText(value: unknown, max: number): string {
-  if (typeof value !== "string") return "";
-  return value
-    .replace(/[\u0000-\u001f\u007f]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, max);
-}
-
-function isTime(value: unknown): value is number {
-  return typeof value === "number" && Number.isFinite(value) && value > 0;
-}
 
 /**
  * Turn untrusted input (the admin's request body, or whatever is stored)
@@ -108,6 +132,11 @@ export function sanitizeState(input: unknown, now: number): StreamState {
     game: cleanText(raw.game, GAME_MAX),
     countdown,
     next,
+    brb: sanitizeBrb(raw.brb),
+    ticker: sanitizeTicker(raw.ticker),
+    quest: sanitizeQuest(raw.quest),
+    clip: sanitizeClip(raw.clip),
+    presets: sanitizePresets(raw.presets, { topic: TOPIC_MAX, game: GAME_MAX, plan: PLAN_MAX }),
     updatedAt: isTime(raw.updatedAt) ? raw.updatedAt : now,
   };
 }
@@ -123,8 +152,14 @@ export function pruneState(state: StreamState, now: number): StreamState {
       ? state.countdown
       : null;
   const next = state.next && state.next.at + NEXT_GRACE_MS > now ? state.next : null;
-  if (countdown === state.countdown && next === state.next) return state;
-  return { ...state, countdown, next };
+  const brb =
+    state.brb.until && state.brb.until + BRB_GRACE_MS <= now
+      ? { ...state.brb, until: null }
+      : state.brb;
+  if (countdown === state.countdown && next === state.next && brb === state.brb) {
+    return state;
+  }
+  return { ...state, countdown, next, brb };
 }
 
 /** Why a save is refused. */
@@ -214,6 +249,21 @@ export function publicStatus(
     game: state.game || (source === "twitch" ? cleanText(twitchGame, GAME_MAX) : ""),
     countdown,
     next,
+    brb: {
+      message: state.brb.message,
+      until: state.brb.until && state.brb.until + BRB_GRACE_MS > now ? state.brb.until : null,
+    },
+    ticker: state.ticker,
+    quest: { ...state.quest, done: questDone(state.quest) },
+    clip: state.clip && state.clip.show
+      ? {
+          url: state.clip.url,
+          platform: state.clip.platform,
+          id: state.clip.id,
+          title: state.clip.title,
+          tag: state.clip.tag,
+        }
+      : null,
   };
 }
 

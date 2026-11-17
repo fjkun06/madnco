@@ -67,6 +67,33 @@ Redis read per 5 s.
 - On load, a countdown that ended over 30 min ago and a next stream that
   started over 2 h ago are dropped (`pruneState`), so they never come back.
 
+## Tabs and extras (v3)
+
+The panel has a sub navbar: **Live** (presets, live status, today, countdown,
+BRB, Notify Discord), **Schedule** (next stream), **On screen** (ticker, side
+quest on stream), **Side quest** (followers, goal, texts) and **Website**
+(latest clip). A pink dot on a tab = unsaved changes there, red = something to
+fix. One Save & push saves every tab. The **Live preview** column embeds the
+real overlays (`/overlay/*.html`, saved state) with open and copy-for-OBS
+links. Pure logic: `src/lib/stream/extras.ts` and `discord.ts` (tested).
+
+- **BRB:** message + optional "back in" timer → `brb.html`, `v-brb.html`.
+- **Ticker:** up to 8 lines; scenes Gaming (new strip at the bottom, cam and
+  follow badge move up), Just Chatting / BRB / Starting Soon (their tapes), and
+  the vertical versions (their tapes). Off = the tapes keep their own text.
+- **Side quest:** follower count and goal replace the hard-coded numbers in
+  `app.constants.ts` (those are now only the defaults). Website card
+  (`components/home/SideQuest.tsx`) switches to "Quest complete" by itself;
+  optional XP card on BRB and Starting Soon.
+- **Latest clip:** TikTok video, YouTube video/Short or Twitch clip link only
+  (`parseClipUrl`); homepage section `components/home/LatestClip.tsx` loads
+  the third-party player only after a tap.
+- **Presets:** admin only, never in `/api/stream`; kept on Reset.
+- **Notify Discord:** `POST /api/admin/discord` posts a TikTok LIVE ping with
+  the saved topic/game. Only the Live Ping role can be mentioned
+  (`allowed_mentions`). Locked for 10 minutes per send (Redis `SET NX EX`).
+  Needs `DISCORD_WEBHOOK_URL` and `DISCORD_LIVE_ROLE_ID` on Vercel.
+
 ## Not verified
 
 Written without npm access: the pure modules (`state`, `session`, admin
