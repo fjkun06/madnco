@@ -2,33 +2,50 @@ import "server-only";
 import { getJSON, redisConfigured, setJSON } from "./redis";
 import {
   DEFAULT_STATE,
+  prepareSave,
+  pruneState,
   publicStatus,
   sanitizeState,
+  saveError,
   type PublicStatus,
+  type SaveError,
   type StreamState,
 } from "./state";
 import { twitchStatus } from "./twitch";
 
 const STATE_KEY = "madnco:stream:state";
 
-/** The saved state, or the defaults when nothing is saved or Redis is down. */
+/**
+ * The saved state without anything long over, or the defaults when nothing
+ * is saved or Redis is down.
+ */
 export async function loadState(): Promise<StreamState> {
   if (!redisConfigured()) return DEFAULT_STATE;
   try {
     const raw = await getJSON<unknown>(STATE_KEY);
-    return raw ? sanitizeState(raw, Date.now()) : DEFAULT_STATE;
+    const now = Date.now();
+    return raw ? pruneState(sanitizeState(raw, now), now) : DEFAULT_STATE;
   } catch (error) {
     console.error("[stream] load failed", error);
     return DEFAULT_STATE;
   }
 }
 
-/** Validate and save; returns what was stored. Throws if Redis fails. */
-export async function saveState(input: unknown): Promise<StreamState> {
+/**
+ * Validate and save. Returns what was stored, or why it was refused (a new
+ * date that is already over). Throws if Redis fails.
+ */
+export async function saveState(
+  input: unknown,
+): Promise<{ state: StreamState } | { error: SaveError }> {
   const now = Date.now();
-  const state = { ...sanitizeState(input, now), updatedAt: now };
-  await setJSON(STATE_KEY, state);
-  return state;
+  const saved = await loadState();
+  const state = sanitizeState(input, now);
+  const error = saveError(state, saved, now);
+  if (error) return { error };
+  const stored = prepareSave(state, saved, now);
+  await setJSON(STATE_KEY, stored);
+  return { state: stored };
 }
 
 /** The public status for the website and the overlays. Never throws. */

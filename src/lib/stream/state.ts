@@ -113,6 +113,70 @@ export function sanitizeState(input: unknown, now: number): StreamState {
 }
 
 /**
+ * Drop what is long over: a countdown that ended more than
+ * COUNTDOWN_GRACE_MS ago and a next stream that started more than
+ * NEXT_GRACE_MS ago. Runs on load, so an old countdown never comes back.
+ */
+export function pruneState(state: StreamState, now: number): StreamState {
+  const countdown =
+    state.countdown && state.countdown.to + COUNTDOWN_GRACE_MS > now
+      ? state.countdown
+      : null;
+  const next = state.next && state.next.at + NEXT_GRACE_MS > now ? state.next : null;
+  if (countdown === state.countdown && next === state.next) return state;
+  return { ...state, countdown, next };
+}
+
+/** Why a save is refused. */
+export type SaveError = "next-in-past" | "countdown-in-past";
+
+/** A minute of slack for clocks that are a little off. */
+const PAST_SLACK_MS = 60 * 1000;
+
+/**
+ * Refuse a new date that is already over. Only *changed* times are checked:
+ * a stream that started ten minutes ago may still be saved unchanged while
+ * the topic is edited.
+ */
+export function saveError(
+  state: StreamState,
+  saved: StreamState,
+  now: number,
+): SaveError | null {
+  if (
+    state.next &&
+    state.next.at !== saved.next?.at &&
+    state.next.at < now - PAST_SLACK_MS
+  ) {
+    return "next-in-past";
+  }
+  if (
+    state.countdown &&
+    state.countdown.to !== saved.countdown?.to &&
+    state.countdown.to <= now
+  ) {
+    return "countdown-in-past";
+  }
+  return null;
+}
+
+/**
+ * What gets stored: a new or changed countdown starts counting at the save,
+ * so the progress bar on Starting Soon starts empty.
+ */
+export function prepareSave(
+  state: StreamState,
+  saved: StreamState,
+  now: number,
+): StreamState {
+  const countdown =
+    state.countdown && state.countdown.to !== saved.countdown?.to
+      ? { from: Math.min(now, state.countdown.to - 1000), to: state.countdown.to }
+      : state.countdown;
+  return { ...state, countdown, updatedAt: now };
+}
+
+/**
  * The public view. `twitchLive` is the Twitch API answer (`null` when it is
  * unknown, e.g. no credentials or Twitch is down); `twitchGame` fills the
  * game when the admin left it empty.

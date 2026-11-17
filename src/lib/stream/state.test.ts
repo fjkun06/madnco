@@ -6,8 +6,11 @@ import {
   cleanText,
   formatNextWhen,
   nowPlayingText,
+  prepareSave,
+  pruneState,
   publicStatus,
   sanitizeState,
+  saveError,
 } from "./state";
 
 const NOW = Date.UTC(2026, 10, 17, 12, 0, 0);
@@ -111,5 +114,58 @@ describe("formatNextWhen", () => {
     expect(formatNextWhen(later, NOW, "en-GB", "Europe/Berlin")).toBe(
       "Sat 28 Nov · 20:00",
     );
+  });
+});
+
+describe("pruneState", () => {
+  const base = { ...DEFAULT_STATE, updatedAt: NOW };
+
+  it("drops a countdown and a next stream that are long over", () => {
+    const old = {
+      ...base,
+      countdown: { from: NOW - 4_000_000, to: NOW - COUNTDOWN_GRACE_MS - 1 },
+      next: { at: NOW - NEXT_GRACE_MS - 1, plan: "x", show: true },
+    };
+    expect(pruneState(old, NOW)).toMatchObject({ countdown: null, next: null });
+  });
+
+  it("keeps recent ones and returns the same object when nothing changes", () => {
+    const fresh = {
+      ...base,
+      countdown: { from: NOW - 60_000, to: NOW - 60_000 + 1 },
+      next: { at: NOW - 60_000, plan: "", show: true },
+    };
+    expect(pruneState(fresh, NOW)).toBe(fresh);
+  });
+});
+
+describe("saveError and prepareSave", () => {
+  const saved = {
+    ...DEFAULT_STATE,
+    next: { at: NOW - 10 * 60_000, plan: "", show: true },
+    updatedAt: NOW - 1,
+  };
+
+  it("refuses a new next stream in the past, but not the unchanged saved one", () => {
+    const yesterday = { ...saved, next: { at: NOW - 86_400_000, plan: "", show: true } };
+    expect(saveError(yesterday, saved, NOW)).toBe("next-in-past");
+    expect(saveError({ ...saved, topic: "new" }, saved, NOW)).toBeNull();
+    const later = { ...saved, next: { at: NOW + 3_600_000, plan: "", show: true } };
+    expect(saveError(later, saved, NOW)).toBeNull();
+  });
+
+  it("refuses a new countdown that already ended", () => {
+    const cd = { ...saved, countdown: { from: NOW - 120_000, to: NOW - 1 } };
+    expect(saveError(cd, saved, NOW)).toBe("countdown-in-past");
+  });
+
+  it("starts a new countdown at the save and keeps an unchanged one", () => {
+    const fresh = { ...saved, countdown: { from: NOW - 600_000, to: NOW + 600_000 } };
+    expect(prepareSave(fresh, saved, NOW).countdown).toEqual({
+      from: NOW,
+      to: NOW + 600_000,
+    });
+    expect(prepareSave(fresh, fresh, NOW).countdown).toEqual(fresh.countdown);
+    expect(prepareSave(fresh, saved, NOW).updatedAt).toBe(NOW);
   });
 });

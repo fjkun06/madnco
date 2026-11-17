@@ -12,7 +12,10 @@ export async function GET() {
   });
 }
 
-/** PUT /api/admin/state — validate and save the whole state (admin only). */
+/**
+ * PUT /api/admin/state — validate and save the whole state (admin only).
+ * 422 when a new date is already over.
+ */
 export async function PUT(request: Request) {
   if (!(await isAdmin()))
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -24,8 +27,13 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "storage-not-configured" }, { status: 503 });
   }
   try {
-    const saved = await saveState(await request.json());
-    return NextResponse.json(saved, { headers: { "Cache-Control": "no-store" } });
+    const result = await saveState(await request.json());
+    if ("error" in result) {
+      return NextResponse.json({ error: result.error }, { status: 422 });
+    }
+    return NextResponse.json(result.state, {
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (error) {
     console.error("[admin] save failed", error);
     return NextResponse.json({ error: "save-failed" }, { status: 500 });
