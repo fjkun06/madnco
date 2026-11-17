@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
 import {
   GAME_CHIPS,
   GAME_MAX,
@@ -12,28 +12,56 @@ import {
 } from "@/lib/stream/state";
 import { en } from "@/locales/en";
 import { siteConfig } from "@/utils/app.constants";
-import { interpolate } from "@/utils/interpolate";
-import { BUTTON_PRIMARY } from "@/utils/ui.classes";
+import { interpolate, interpolateParts } from "@/utils/interpolate";
+import { BUTTON_GHOST, BUTTON_PRIMARY } from "@/utils/ui.classes";
+import { DatePicker } from "./DatePicker";
 import { errorText } from "./errors";
-import { fromDateTime, nextOccurrence, toDateValue, toTimeValue } from "./time";
+import { CHIP, CHIP_OFF, CHIP_ON, CHIP_SM, INPUT, LABEL } from "./fields";
+import {
+  EMPTY_FORM,
+  changedCount,
+  formIssues,
+  fromForm,
+  toForm,
+  type AdminForm,
+  type FormField,
+} from "./form";
+import {
+  dayOffset,
+  formatDuration,
+  fromDateTime,
+  nextOccurrence,
+  relativeDay,
+  toDateValue,
+  toTimeValue,
+} from "./time";
+import { TimePicker } from "./TimePicker";
+import { ToastStack, useToasts } from "./Toasts";
+import { Toggle } from "./Toggle";
+import { readNow, useNow } from "./useNow";
 
 const MODES: LiveMode[] = ["auto", "live", "off"];
 const QUICK_MINUTES = [5, 10, 15];
-
-const CARD = "flex flex-col gap-4 bg-ink-2 p-5 cut sm:p-7";
-const LABEL = "label-mono text-xs font-extrabold text-muted";
-const INPUT =
-  "min-h-13 w-full border-2 border-ink-3 bg-ink px-4 text-lg text-paper outline-none cut-s placeholder:text-muted/70 focus:border-tq";
-const CHIP =
-  "focus-inset label-mono min-h-11 px-4 text-[13px] font-extrabold whitespace-nowrap cut-s transition-colors duration-200";
-const CHIP_OFF = "bg-ink-3 text-paper hover:bg-bordeaux";
-const CHIP_ON = "bg-tq text-ink";
-
-type Status = { kind: "idle" | "saving" | "saved" | "error"; message?: string };
+const RESET_CONFIRM_MS = 3000;
 
 /**
- * The control room. Edits stay local until "Save", which sends the whole
- * state; the server validates it and the overlays pick it up within seconds.
+ * A section card. The cut corners sit on a pseudo-element, not on the card,
+ * so the pickers can open past the card's edge; a card with an open picker
+ * rises above the cards after it.
+ */
+const CARD =
+  "relative z-0 flex flex-col gap-4 p-5 sm:p-7 before:absolute before:inset-0 before:-z-10 before:bg-ink-2 before:cut has-[[aria-expanded=true]]:z-30";
+
+const BUTTON_DANGER =
+  "focus-inset label-mono inline-flex min-h-12 items-center justify-center px-4 text-[11px] font-extrabold whitespace-nowrap cut transition-colors duration-200 sm:min-h-14 sm:px-6 sm:text-[14px]";
+
+const isOtherGame = (game: string) =>
+  game !== "" && !(GAME_CHIPS as readonly string[]).includes(game);
+
+/**
+ * The control room. Edits stay local until "Save" (or Ctrl+S), which sends
+ * the whole state; the server checks it again and the overlays pick it up
+ * within seconds.
  */
 export function AdminPanel({
   initial,
@@ -46,60 +74,83 @@ export function AdminPanel({
 }) {
   const t = en.admin;
   const router = useRouter();
-  const [draft, setDraft] = useState<StreamState>(initial);
-  const [otherGame, setOtherGame] = useState(
-    initial.game !== "" && !(GAME_CHIPS as readonly string[]).includes(initial.game),
-  );
-  const [nextDate, setNextDate] = useState(toDateValue(initial.next?.at));
-  const [nextTime, setNextTime] = useState(toTimeValue(initial.next?.at));
-  const [dirty, setDirty] = useState(false);
-  const [status, setStatus] = useState<Status>({ kind: "idle" });
+  const now = useNow();
+  const [saved, setSaved] = useState<StreamState>(initial);
+  const [form, setForm] = useState<AdminForm>(() => toForm(initial));
+  const [otherGame, setOtherGame] = useState(isOtherGame(initial.game));
+  const [saving, setSaving] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
+  const resetTimer = useRef<number | undefined>(undefined);
+  const { toasts, push, dismiss } = useToasts();
 
-  function update(patch: Partial<StreamState>) {
-    setDraft((current) => ({ ...current, ...patch }));
-    setDirty(true);
+  const changes = changedCount(form, saved);
+  const dirty = changes > 0;
+  const issues = formIssues(form, saved, now);
+  const issueFor = (field: FormField) =>
+    issues.find((issue) => issue.field === field)?.message;
+
+  function update(patch: Partial<AdminForm>) {
+    setForm((current) => ({ ...current, ...patch }));
   }
 
-  function updateNext(
-    date: string,
-    time: string,
-    patch: { plan?: string; show?: boolean } = {},
-  ) {
-    const at = fromDateTime(date, time);
-    const current = draft.next;
-    update({
-      next: at
-        ? {
-            at,
-            plan: patch.plan ?? current?.plan ?? "",
-            show: patch.show ?? current?.show ?? true,
-          }
-        : null,
-    });
+  function load(state: StreamState) {
+    setForm(toForm(state));
+    setOtherGame(isOtherGame(state.game));
   }
 
   async function save() {
-    setStatus({ kind: "saving" });
+    if (saving || !storageReady) return;
+    const problems = formIssues(form, saved, readNow());
+    if (problems.length) {
+      push("error", t.toasts.blockedTitle, `${t.next.title}: ${problems[0].message}.`);
+      return;
+    }
+    setSaving(true);
     try {
       const res = await fetch("/api/admin/state", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(draft),
+        body: JSON.stringify(fromForm(form, saved)),
       });
       const body = (await res.json().catch(() => ({}))) as StreamState & {
         error?: string;
       };
       if (!res.ok) {
-        setStatus({ kind: "error", message: errorText(body.error) });
+        push("error", t.toasts.errorTitle, errorText(body.error));
         if (res.status === 401) router.refresh();
         return;
       }
-      setDraft(body);
-      setDirty(false);
-      setStatus({ kind: "saved" });
+      setSaved(body);
+      load(body);
+      setConfirmReset(false);
+      push("ok", t.toasts.savedTitle, t.toasts.savedText);
     } catch {
-      setStatus({ kind: "error", message: errorText() });
+      push("error", t.toasts.errorTitle, errorText());
+    } finally {
+      setSaving(false);
     }
+  }
+
+  function undo() {
+    load(saved);
+    setConfirmReset(false);
+    push("warn", t.toasts.undoTitle, t.toasts.undoText);
+  }
+
+  function reset() {
+    window.clearTimeout(resetTimer.current);
+    if (!confirmReset) {
+      setConfirmReset(true);
+      resetTimer.current = window.setTimeout(
+        () => setConfirmReset(false),
+        RESET_CONFIRM_MS,
+      );
+      return;
+    }
+    setConfirmReset(false);
+    setForm(EMPTY_FORM);
+    setOtherGame(false);
+    push("warn", t.toasts.resetTitle, t.toasts.resetText);
   }
 
   async function logout() {
@@ -107,18 +158,69 @@ export function AdminPanel({
     router.refresh();
   }
 
-  const live = draft.mode === "live";
-  const saveLabel =
-    status.kind === "saving"
-      ? t.saving
-      : dirty
-        ? t.unsaved
-        : status.kind === "saved"
-          ? t.saved
-          : "";
+  // Ctrl+S / Cmd+S saves.
+  const onKeyDown = useEffectEvent((event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+      event.preventDefault();
+      void save();
+    }
+  });
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => onKeyDown(event);
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  // Warn before leaving with unsaved changes.
+  useEffect(() => {
+    if (!dirty) return;
+    const handler = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [dirty]);
+
+  const live = form.mode === "live";
+  const clock = now ? { h: new Date(now).getHours(), m: new Date(now).getMinutes() } : null;
+  const today = now ? toDateValue(now) : "";
+
+  // Countdown summary
+  const cdTo = form.countdown?.to ?? null;
+  const cdTomorrow = Boolean(cdTo && now && dayOffset(cdTo, now) >= 1);
+  let cdLine: ReactNode = t.countdown.none;
+  if (cdTo && now && cdTo > now) {
+    cdLine = interpolateParts(t.countdown.running, {
+      when: `${toTimeValue(cdTo)} ${relativeDay(cdTo, now)}`,
+      left: formatDuration(cdTo - now),
+    }).map((part, i) =>
+      part.slot === "when" ? (
+        <b key={i} className={cdTomorrow ? "text-bordeaux-hi" : "text-tq"}>
+          {part.text}
+        </b>
+      ) : (
+        <span key={i}>{part.text}</span>
+      ),
+    );
+  } else if (cdTo && now) {
+    cdLine = interpolate(t.countdown.ended, { time: toTimeValue(cdTo) });
+  } else if (cdTo) {
+    cdLine = toTimeValue(cdTo);
+  }
+
+  const nextAt = fromDateTime(form.nextDate, "12:00");
+  const nextDateSub = nextAt && now ? relativeDay(nextAt, now) : undefined;
+  const hasNext = Boolean(form.nextDate || form.nextTime || form.nextPlan);
+
+  const changesLabel =
+    changes === 0
+      ? t.changes.none
+      : changes === 1
+        ? t.changes.one
+        : interpolate(t.changes.other, { n: changes });
 
   return (
     <div className="flex flex-col gap-8">
+      <ToastStack toasts={toasts} onClose={dismiss} />
+
       {/* Title bar */}
       <div className="flex flex-wrap items-center gap-4 border-b-2 border-ink-3 pb-5">
         <h1 className="m-0 font-display text-3xl leading-none">
@@ -131,14 +233,15 @@ export function AdminPanel({
         >
           <span
             aria-hidden="true"
-            className={`size-2.5 rounded-full ${live ? "bg-ink" : "bg-off"}`}
+            className={`size-2.5 rounded-full ${live ? "live-dot bg-ink" : "bg-off"}`}
           />
-          {t.live.modes[draft.mode]}
+          {t.live.modes[form.mode]}
         </span>
-        <span aria-live="polite" className="ml-auto label-mono text-xs text-muted">
-          {saveLabel}
-        </span>
-        <button type="button" onClick={logout} className={`${CHIP} ${CHIP_OFF}`}>
+        <button
+          type="button"
+          onClick={logout}
+          className={`${CHIP} ${CHIP_OFF} ml-auto`}
+        >
           {t.logout}
         </button>
       </div>
@@ -164,7 +267,7 @@ export function AdminPanel({
           <Card title={t.live.title} hint={t.live.hint}>
             <div role="group" aria-label={t.live.title} className="flex flex-wrap gap-2">
               {MODES.map((mode) => {
-                const on = draft.mode === mode;
+                const on = form.mode === mode;
                 const onClass = mode === "live" ? "bg-live text-ink" : CHIP_ON;
                 return (
                   <button
@@ -180,8 +283,8 @@ export function AdminPanel({
               })}
             </div>
             <p className="m-0 text-[15px] leading-relaxed text-muted">
-              {t.live.help[draft.mode]}
-              {draft.mode === "auto" && !twitchReady
+              {t.live.help[form.mode]}
+              {form.mode === "auto" && !twitchReady
                 ? " (TWITCH_CLIENT_ID/SECRET missing, so Auto stays offline.)"
                 : ""}
             </p>
@@ -194,7 +297,7 @@ export function AdminPanel({
               <input
                 type="text"
                 maxLength={TOPIC_MAX}
-                value={draft.topic}
+                value={form.topic}
                 placeholder={t.today.topicPlaceholder}
                 onChange={(event) => update({ topic: event.target.value })}
                 className={INPUT}
@@ -210,7 +313,7 @@ export function AdminPanel({
                 className="flex flex-wrap gap-2"
               >
                 {GAME_CHIPS.map((game) => {
-                  const on = !otherGame && draft.game === game;
+                  const on = !otherGame && form.game === game;
                   return (
                     <button
                       key={game}
@@ -230,7 +333,7 @@ export function AdminPanel({
                   type="button"
                   aria-pressed={otherGame}
                   onClick={() => {
-                    setOtherGame(true);
+                    setOtherGame(!otherGame);
                     update({ game: "" });
                   }}
                   className={`${CHIP} ${otherGame ? CHIP_ON : CHIP_OFF}`}
@@ -243,7 +346,7 @@ export function AdminPanel({
                   type="text"
                   aria-label={t.today.otherPlaceholder}
                   maxLength={GAME_MAX}
-                  value={draft.game}
+                  value={form.game}
                   placeholder={t.today.otherPlaceholder}
                   onChange={(event) => update({ game: event.target.value })}
                   className={INPUT}
@@ -255,19 +358,18 @@ export function AdminPanel({
           {/* Countdown */}
           <Card title={t.countdown.title} hint={t.countdown.hint}>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <label className="flex flex-col gap-2">
-                <span className={LABEL}>{t.countdown.at}</span>
-                <input
-                  type="time"
-                  value={toTimeValue(draft.countdown?.to)}
-                  onChange={(event) => {
-                    const now = Date.now();
-                    const to = nextOccurrence(event.target.value, now);
-                    update({ countdown: to ? { from: now, to } : null });
-                  }}
-                  className={INPUT}
-                />
-              </label>
+              <TimePicker
+                id="countdown-time"
+                label={t.countdown.at}
+                value={toTimeValue(cdTo)}
+                sub={cdTo && now ? relativeDay(cdTo, now) : undefined}
+                pastBefore={clock}
+                onPick={(value) => {
+                  const at = readNow();
+                  const to = nextOccurrence(value, at);
+                  update({ countdown: to ? { from: at, to } : null });
+                }}
+              />
               <div className="flex flex-col gap-2">
                 <span className={LABEL}>{t.countdown.quick}</span>
                 <div className="flex flex-wrap gap-2">
@@ -276,8 +378,8 @@ export function AdminPanel({
                       key={n}
                       type="button"
                       onClick={() => {
-                        const now = Date.now();
-                        update({ countdown: { from: now, to: now + n * 60_000 } });
+                        const at = readNow();
+                        update({ countdown: { from: at, to: at + n * 60_000 } });
                       }}
                       className={`${CHIP} ${CHIP_OFF}`}
                     >
@@ -287,89 +389,73 @@ export function AdminPanel({
                 </div>
               </div>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="m-0 text-[15px] text-muted">
-                {draft.countdown
-                  ? interpolate(t.countdown.running, {
-                      time: toTimeValue(draft.countdown.to),
-                    })
-                  : t.countdown.none}
-              </p>
-              {draft.countdown ? (
+            <div
+              className={`flex flex-wrap items-center gap-3 border-l-4 bg-ink px-4 py-3 text-base ${
+                cdTomorrow ? "border-bordeaux-hi" : cdTo ? "border-tq" : "border-ink-3"
+              }`}
+            >
+              <p className="m-0 min-w-48 flex-1 text-paper">{cdLine}</p>
+              {cdTo ? (
                 <button
                   type="button"
                   onClick={() => update({ countdown: null })}
-                  className={`${CHIP} ${CHIP_OFF}`}
+                  className={`${CHIP_SM} ${CHIP_OFF}`}
                 >
                   {t.countdown.clear}
                 </button>
               ) : null}
             </div>
+            {cdTomorrow ? (
+              <p className="m-0 text-sm text-bordeaux-hi">{t.countdown.tomorrowNote}</p>
+            ) : null}
           </Card>
 
           {/* Next stream */}
           <Card title={t.next.title} hint={t.next.hint}>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <label className="flex flex-col gap-2">
-                <span className={LABEL}>{t.next.date}</span>
-                <input
-                  type="date"
-                  value={nextDate}
-                  onChange={(event) => {
-                    setNextDate(event.target.value);
-                    updateNext(event.target.value, nextTime);
-                  }}
-                  className={INPUT}
-                />
-              </label>
-              <label className="flex flex-col gap-2">
-                <span className={LABEL}>{t.next.time}</span>
-                <input
-                  type="time"
-                  value={nextTime}
-                  onChange={(event) => {
-                    setNextTime(event.target.value);
-                    updateNext(nextDate, event.target.value);
-                  }}
-                  className={INPUT}
-                />
-              </label>
+              <DatePicker
+                id="next-date"
+                label={t.next.date}
+                value={form.nextDate}
+                now={now}
+                sub={nextDateSub}
+                issue={issueFor("nextDate")}
+                onPick={(nextDate) => update({ nextDate })}
+              />
+              <TimePicker
+                id="next-time"
+                label={t.next.time}
+                value={form.nextTime}
+                issue={issueFor("nextTime")}
+                pastBefore={form.nextDate && form.nextDate === today ? clock : null}
+                disablePast
+                onPick={(nextTime) => update({ nextTime })}
+              />
             </div>
             <label className="flex flex-col gap-2">
               <span className={LABEL}>{t.next.plan}</span>
               <input
                 type="text"
                 maxLength={PLAN_MAX}
-                value={draft.next?.plan ?? ""}
+                value={form.nextPlan}
                 placeholder={t.next.planPlaceholder}
-                disabled={!draft.next}
-                onChange={(event) =>
-                  updateNext(nextDate, nextTime, { plan: event.target.value })
-                }
-                className={`${INPUT} disabled:opacity-50`}
+                onChange={(event) => update({ nextPlan: event.target.value })}
+                className={INPUT}
               />
             </label>
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <label className="flex cursor-pointer items-center gap-3 text-base">
-                <input
-                  type="checkbox"
-                  checked={draft.next?.show ?? true}
-                  disabled={!draft.next}
-                  onChange={(event) =>
-                    updateNext(nextDate, nextTime, { show: event.target.checked })
-                  }
-                  className="size-5 accent-tq"
-                />
+              <Toggle
+                checked={form.nextShow}
+                onChange={(nextShow) => update({ nextShow })}
+              >
                 {t.next.show}
-              </label>
-              {draft.next ? (
+              </Toggle>
+              {hasNext ? (
                 <button
                   type="button"
-                  onClick={() => {
-                    setNextDate("");
-                    setNextTime("");
-                    update({ next: null });
-                  }}
+                  onClick={() =>
+                    update({ nextDate: "", nextTime: "", nextPlan: "", nextShow: true })
+                  }
                   className={`${CHIP} ${CHIP_OFF}`}
                 >
                   {t.next.clear}
@@ -377,26 +463,13 @@ export function AdminPanel({
               ) : null}
             </div>
           </Card>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <button
-              type="button"
-              onClick={save}
-              disabled={status.kind === "saving" || !storageReady}
-              className={`${BUTTON_PRIMARY} disabled:opacity-60`}
-            >
-              {status.kind === "saving" ? t.saving : t.save}
-            </button>
-            {status.kind === "error" ? (
-              <p role="alert" className="m-0 label-mono text-xs font-extrabold text-live">
-                {status.message}
-              </p>
-            ) : null}
-          </div>
         </div>
 
         {/* Where it shows */}
-        <aside aria-labelledby="where-title" className={`${CARD} lg:sticky lg:top-28`}>
+        <aside
+          aria-labelledby="where-title"
+          className="flex flex-col gap-4 bg-ink-2 p-5 cut sm:p-7 lg:sticky lg:top-28"
+        >
           <h2 id="where-title" className="m-0 font-display text-[26px] leading-none">
             {t.where.title}
           </h2>
@@ -417,6 +490,69 @@ export function AdminPanel({
             {`${siteConfig.url}/overlay/starting-soon.html`}
           </code>
         </aside>
+      </div>
+
+      {/* Action bar: sticks to the bottom of the screen, full width */}
+      <div className="sticky bottom-0 z-20 bg-ink-2 py-4 shadow-[0_0_0_100vmax_var(--color-ink-2)] [clip-path:inset(-2px_-100vmax_0)]">
+        <span
+          aria-hidden="true"
+          className="absolute inset-x-0 -top-0.5 h-0.5 bg-bordeaux-hi shadow-[0_0_0_100vmax_var(--color-bordeaux-hi)] [clip-path:inset(0_-100vmax)]"
+        />
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+          <span
+            aria-live="polite"
+            className={`flex items-center gap-2.5 label-mono text-xs font-extrabold ${
+              dirty ? "text-bordeaux-hi" : "text-muted"
+            }`}
+          >
+            <span
+              aria-hidden="true"
+              className={`size-2.5 rounded-full ${dirty ? "bg-bordeaux-hi" : "bg-off"}`}
+            />
+            {changesLabel}
+          </span>
+          <div className="flex flex-wrap gap-2 sm:ml-auto sm:gap-3.5">
+            <button
+              type="button"
+              onClick={save}
+              disabled={saving || !storageReady}
+              className={`${BUTTON_PRIMARY} disabled:opacity-60`}
+            >
+              {saving ? t.saving : t.save}
+              <span className="hidden text-[11px] opacity-60 sm:inline">
+                {t.shortcut}
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={undo}
+              disabled={!dirty || saving}
+              className={`${BUTTON_GHOST} disabled:pointer-events-none disabled:opacity-40`}
+            >
+              <span className="sm:hidden">{t.undoShort}</span>
+              <span className="hidden sm:inline">{t.undo}</span>
+            </button>
+            <button
+              type="button"
+              onClick={reset}
+              disabled={saving}
+              className={`${BUTTON_DANGER} ${
+                confirmReset
+                  ? "bg-live text-ink"
+                  : "bg-transparent text-live shadow-[inset_0_0_0_2px_var(--color-live)] hover:bg-live hover:text-ink"
+              }`}
+            >
+              {confirmReset ? (
+                t.resetConfirm
+              ) : (
+                <>
+                  <span className="sm:hidden">{t.resetShort}</span>
+                  <span className="hidden sm:inline">{t.reset}</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
