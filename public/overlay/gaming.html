@@ -123,18 +123,38 @@ if(logo!=='off'){if(ok.indexOf(logo)<0)logo='t'+(cam[1]==='l'?'r':'l');
  if(logo===cam)logo=logo[0]+(logo[1]==='l'?'r':'l');place(l,logo,28,22);place(g,logo,30,logo[0]==='t'?118:150);}else{l.style.display='none';place(g,'t'+(cam[1]==='l'?'r':'l'),30,28);}
 var used=[cam,logo];
 if(used.indexOf('br')>=0){if(used.indexOf('bl')<0){f.style.right='auto';f.style.left='0';f.classList.add('fl');h.style.right='auto';h.style.left='0';h.classList.add('fl');}else{f.style.bottom='420px';h.style.bottom='420px';}}
-// Game title card: the game's preferred corner, or the next free one
-// (not where the cam, logo or Follow toast sit). Called by live.js.
-var taken=used.slice();taken.push(used.indexOf('br')>=0&&used.indexOf('bl')<0?'bl':'br');
+// Game title card: always in the game's chosen row (top or bottom), so a
+// bottom-left football card never jumps up onto the in-game scoreboard.
+// Order: chosen corner, then the other side of the same row, then the
+// chosen corner again, stacked past whatever sits there (cam, logo,
+// Follow toast). Called by live.js.
+var follow=used.indexOf('br')>=0&&used.indexOf('bl')<0?'bl':'br';
+var taken=used.slice();taken.push(follow);
+var H=1080,GAP=16,lastPref="tl";
+function inCorner(p){var out=[];
+ if(cam===p)out.push(c);
+ if(logo!=='off'&&logo===p){out.push(l);out.push(g);}
+ if(follow===p){out.push(f);out.push(h);}
+ return out.filter(function(e){return e&&e.offsetParent!==null;});}
 window.MadnPlacePlay=function(pref){
- var v=function(p){return (p[0]==='t'?'b':'t')+p[1];},hz=function(p){return p[0]+(p[1]==='l'?'r':'l');};
- var order=[pref,v(pref),hz(pref),v(hz(pref))],pos=pref;
- for(var i=0;i<order.length;i++){if(taken.indexOf(order[i])<0){pos=order[i];break;}}
+ if(ok.indexOf(pref)<0)pref='tl';lastPref=pref;
+ var hz=function(p){return p[0]+(p[1]==='l'?'r':'l');};
+ var pos=pref,shift=0;
+ if(taken.indexOf(pref)>=0){
+  if(taken.indexOf(hz(pref))<0)pos=hz(pref);
+  else inCorner(pref).forEach(function(e){
+   var d=pref[0]==='t'?e.offsetTop+e.offsetHeight:H-e.offsetTop;
+   if(d>shift)shift=d;});
+ }
  pl.style.left=pl.style.right=pl.style.top=pl.style.bottom='auto';
  if(pos[1]==='l')pl.style.left='32px';else pl.style.right='32px';
- if(pos[0]==='t')pl.style.top='28px';else pl.style.bottom='100px';
+ if(pos[0]==='t')pl.style.top=(shift?shift+GAP:28)+'px';
+ else pl.style.bottom=(shift?shift+GAP:100)+'px';
  pl.style.alignItems=pos[1]==='l'?'flex-start':'flex-end';
 };
+// The ticker lifts the cam and Follow toast: re-stack when it shows/hides.
+var tk=document.getElementById('ticker');
+if(tk&&window.MutationObserver)new MutationObserver(function(){window.MadnPlacePlay(lastPref);}).observe(tk,{attributes:true,attributeFilter:['hidden']});
 window.MadnPlacePlay('tl');
 // Alert lane: along the top, beside the cam when the cam is up there.
 var lane=document.getElementById('alert-lane');
