@@ -9,6 +9,7 @@ import type { QuickOp } from "@/lib/stream/quick";
 import type { StreamState } from "@/lib/stream/state";
 import { en } from "@/locales/en";
 import { interpolate } from "@/utils/interpolate";
+import { BackToTop } from "../BackToTop";
 import { errorText } from "../errors";
 
 const t = en.remote;
@@ -142,6 +143,7 @@ export function RemotePanel({
 
   return (
     <div className="flex flex-col gap-4">
+      <BackToTop />
       {/* Top bar */}
       <div className="flex flex-wrap items-center gap-3">
         <h1 className="m-0 font-display text-3xl leading-none">{t.title}</h1>
