@@ -64,3 +64,21 @@ export async function hit(key: string, windowSeconds: number): Promise<number> {
   if (count === 1) await redis(["EXPIRE", key, windowSeconds]);
   return count;
 }
+
+/** Run several commands in one round trip. Throws on HTTP errors. */
+export async function redisPipeline<T = unknown>(
+  commands: (string | number)[][],
+): Promise<(T | null)[]> {
+  if (commands.length === 0) return [];
+  const cfg = config();
+  if (!cfg) throw new Error("Redis is not configured (UPSTASH_REDIS_REST_URL/TOKEN).");
+  const res = await fetch(`${cfg.url}/pipeline`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${cfg.token}`, "Content-Type": "application/json" },
+    body: JSON.stringify(commands),
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Redis pipeline failed: ${res.status}`);
+  const body = (await res.json().catch(() => [])) as { result?: T; error?: string }[];
+  return commands.map((_, i) => (body[i] && !body[i].error ? (body[i].result ?? null) : null));
+}

@@ -27,7 +27,18 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "storage-not-configured" }, { status: 503 });
   }
   try {
-    const result = await saveState(await request.json());
+    const body: unknown = await request.json();
+    // The Remote may have changed things since this form was loaded: refuse
+    // a save that is based on an older state, and send the latest back.
+    const base =
+      typeof body === "object" && body !== null && "updatedAt" in body
+        ? Number((body as { updatedAt: unknown }).updatedAt)
+        : NaN;
+    const latest = await loadState();
+    if (Number.isFinite(base) && base < latest.updatedAt) {
+      return NextResponse.json({ error: "stale", state: latest }, { status: 409 });
+    }
+    const result = await saveState(body);
     if ("error" in result) {
       return NextResponse.json({ error: result.error }, { status: 422 });
     }

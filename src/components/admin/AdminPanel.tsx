@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { StreamState } from "@/lib/stream/state";
@@ -19,6 +20,7 @@ import {
   type AdminTab,
   type FormField,
 } from "./form";
+import { GamesTab } from "./tabs/GamesTab";
 import { LiveTab, isOtherGame } from "./tabs/LiveTab";
 import { QuestTab } from "./tabs/QuestTab";
 import { ScheduleTab } from "./tabs/ScheduleTab";
@@ -94,7 +96,15 @@ export function AdminPanel({
       });
       const body = (await res.json().catch(() => ({}))) as StreamState & {
         error?: string;
+        state?: StreamState;
       };
+      if (res.status === 409 && body.error === "stale" && body.state) {
+        // Changed from the Remote meanwhile: show the latest, nothing overwritten.
+        setSaved(body.state);
+        load(body.state);
+        push("warn", t.toasts.staleTitle, t.toasts.staleText);
+        return;
+      }
       if (!res.ok) {
         push("error", t.toasts.errorTitle, errorText(body.error));
         if (res.status === 401) router.refresh();
@@ -189,7 +199,13 @@ export function AdminPanel({
           />
           {t.live.modes[form.mode]}
         </span>
-        <button type="button" onClick={logout} className={`${CHIP} ${CHIP_OFF} ml-auto`}>
+        <Link
+          href="/admin/remote"
+          className={`${CHIP} ml-auto inline-flex items-center bg-bordeaux-hi text-ink no-underline hover:bg-paper`}
+        >
+          {t.remoteLink}
+        </Link>
+        <button type="button" onClick={logout} className={`${CHIP} ${CHIP_OFF}`}>
           {t.logout}
         </button>
       </div>
@@ -199,10 +215,7 @@ export function AdminPanel({
         aria-label={t.tabs.label}
         className="sticky top-16 z-20 -mx-4 overflow-x-auto bg-ink px-4 sm:top-[72px] sm:mx-0 sm:px-0 md:top-[84px]"
       >
-        <ul
-          role="tablist"
-          className="m-0 flex list-none gap-1 border-b-2 border-ink-3 p-0"
-        >
+        <ul role="tablist" className="m-0 flex list-none gap-1 border-b-2 border-ink-3 p-0">
           {ADMIN_TABS.map((key) => {
             const active = tab === key;
             const changed = changes.some((change) => change.tab === key);
@@ -216,7 +229,7 @@ export function AdminPanel({
                   aria-selected={active}
                   aria-controls="admin-tabpanel"
                   onClick={() => setTab(key)}
-                  className={`relative flex items-center gap-2.5 px-4 py-4 label-mono text-[12px] font-extrabold whitespace-nowrap focus-inset transition-colors duration-200 sm:px-5 sm:text-[13px] ${
+                  className={`focus-inset relative flex items-center gap-2.5 px-4 py-4 label-mono text-[12px] font-extrabold whitespace-nowrap transition-colors duration-200 sm:px-5 sm:text-[13px] ${
                     active ? "text-paper" : "text-muted hover:text-paper"
                   }`}
                 >
@@ -259,6 +272,7 @@ export function AdminPanel({
               twitchReady={twitchReady}
             />
           ) : null}
+          {tab === "games" ? <GamesTab {...props} /> : null}
           {tab === "schedule" ? <ScheduleTab {...props} /> : null}
           {tab === "screen" ? <ScreenTab {...props} /> : null}
           {tab === "quest" ? <QuestTab {...props} /> : null}
@@ -294,9 +308,7 @@ export function AdminPanel({
               className={`${BUTTON_PRIMARY} disabled:opacity-60`}
             >
               {saving ? t.saving : t.save}
-              <span className="hidden text-[11px] opacity-60 sm:inline">
-                {t.shortcut}
-              </span>
+              <span className="hidden text-[11px] opacity-60 sm:inline">{t.shortcut}</span>
             </button>
             <button
               type="button"

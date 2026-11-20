@@ -76,11 +76,7 @@ describe("admin form", () => {
   it("checks clip links and maps changes to tabs", () => {
     const base = toForm(saved);
     expect(formIssues({ ...base, clipUrl: "https://example.com" }, saved, now)).toEqual([
-      {
-        field: "clipUrl",
-        tab: "web",
-        message: "Not a TikTok video, YouTube video or Twitch clip link",
-      },
+      { field: "clipUrl", tab: "web", message: "Not a TikTok video, YouTube video or Twitch clip link" },
     ]);
     const form = {
       ...base,
@@ -93,19 +89,22 @@ describe("admin form", () => {
     expect(tabs).toEqual(["live", "screen", "screen", "quest", "web"]);
     const state = fromForm(form, saved);
     expect(state.ticker.items).toEqual(["!discord"]);
-    expect(state.clip).toMatchObject({
-      platform: "youtube",
-      id: "dQw4w9WgXcQ",
-      show: true,
-    });
+    expect(state.clip).toMatchObject({ platform: "youtube", id: "dQw4w9WgXcQ", show: true });
   });
 
   it("keeps presets when everything is reset", () => {
-    const withPresets = {
-      ...toForm(saved),
-      presets: [{ name: "FIFA night", topic: "", game: "FIFA", plan: "" }],
-    };
+    const withPresets = { ...toForm(saved), presets: [{ name: "FIFA night", topic: "", game: "FIFA", plan: "" }] };
     expect(emptyForm(withPresets).presets).toHaveLength(1);
     expect(emptyForm(withPresets).topic).toBe("");
+  });
+
+  it("keeps the game library on reset and marks game changes on the Games tab", () => {
+    const withGame = { ...saved, games: { ...saved.games, current: saved.games.list[0].id } };
+    const form = toForm(withGame);
+    const reset = emptyForm(form);
+    expect(reset.games.list).toHaveLength(withGame.games.list.length);
+    expect(reset.games.current).toBeNull();
+    expect(changedFields(reset, withGame).some((c) => c.key === "games" && c.tab === "games")).toBe(true);
+    expect(fromForm(form, withGame).games.current).toBe(saved.games.list[0].id);
   });
 });

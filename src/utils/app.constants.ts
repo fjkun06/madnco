@@ -6,7 +6,7 @@
 
 export const siteConfig = {
   name: "MadnCo.",
-  slogan: "The duo of endless madness",
+  slogan: "Madness loves company",
   /** Final URL with www (Vercel primary domain); also metadataBase. */
   url: "https://www.madnco.frankjordan.dev",
   /** Mad's own site, credited in the footer. */

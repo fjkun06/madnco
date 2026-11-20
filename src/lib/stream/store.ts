@@ -11,6 +11,8 @@ import {
   type SaveError,
   type StreamState,
 } from "./state";
+import { completedProfiles } from "./games";
+import { loadGameLive } from "./gameStore";
 import { twitchStatus } from "./twitch";
 
 const STATE_KEY = "madnco:stream:state";
@@ -51,6 +53,13 @@ export async function saveState(
 /** The public status for the website and the overlays. Never throws. */
 export async function loadPublicStatus(): Promise<PublicStatus> {
   const state = await loadState();
-  const twitch = state.mode === "auto" ? await twitchStatus() : null;
-  return publicStatus(state, twitch?.live ?? null, Date.now(), twitch?.game);
+  const ids = [
+    ...(state.games.current ? [state.games.current] : []),
+    ...completedProfiles(state.games).map((g) => g.id),
+  ];
+  const [twitch, live] = await Promise.all([
+    state.mode === "auto" ? twitchStatus() : Promise.resolve(null),
+    loadGameLive(ids),
+  ]);
+  return publicStatus(state, twitch?.live ?? null, Date.now(), twitch?.game, live);
 }

@@ -1,0 +1,71 @@
+/*
+ * MadnCo. game modes: the title card and stats box on the gaming overlays.
+ * live.js sets data-mood on <html> and the colours --a, --b, --lab, --tl.
+ * Without a game on stream every rule falls back to the house colours.
+ */
+.sc{--a:#30D5C8;--b:#E8557A;--lab:#110A0C;--tl:#E8557A}
+html[data-mood] .sc{--a:var(--mood-a);--b:var(--mood-b);--lab:var(--mood-lab);--tl:var(--mood-a)}
+.br{border-color:var(--a)!important}
+.br.bb{border-color:var(--b)!important}
+.tlabel{background:var(--tl)!important;color:var(--lab)!important}
+.tk i{color:var(--a)!important}
+.vtape{background:var(--a)!important;color:var(--lab)!important}
+.vframe{border-top-color:var(--a)!important}
+
+.play{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.play .row{display:flex;gap:8px;align-items:stretch}
+.gm{position:relative;background:rgba(17,10,12,.92);padding:12px 20px 14px 18px;border-left:6px solid var(--a)}
+.gm .k{font-size:13px;color:var(--a)}
+.gm .t{font-size:40px;line-height:1;margin-top:6px;white-space:nowrap}
+.hzb{display:none;position:absolute;left:0;top:0;bottom:0;width:12px;background:repeating-linear-gradient(-45deg,#FFB23E 0 12px,#110A0C 12px 24px)}
+html[data-mood="action"] .gm{border-left:0;padding-left:30px}
+html[data-mood="action"] .hzb{display:block}
+.pt{background:var(--a);color:var(--lab);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 16px;min-width:96px}
+.pt small{font-size:11px;white-space:nowrap}
+.pt b{font-family:'Lilita One',sans-serif;font-weight:400;font-size:44px;line-height:1}
+.final{background:var(--b);color:#110A0C;padding:7px 14px;font-size:14px;animation:finalp 1.6s ease-in-out infinite}
+@keyframes finalp{0%,100%{opacity:1}50%{opacity:.55}}
+.goal{background:rgba(17,10,12,.85);padding:9px 14px;font-size:14px;color:#F4EFE6;display:inline-flex;gap:10px;align-items:center}
+.goal i{font-style:normal;color:var(--a)}
+.stats{margin-top:12px}
+.box{display:flex;align-items:center;gap:14px;background:rgba(17,10,12,.92);padding:10px 18px 10px 14px}
+html[data-mood="horror"] .box{outline:2px solid var(--a);outline-offset:-2px}
+.box .lb{font-size:11px;color:var(--b)}
+.box .n{font-family:'Lilita One',sans-serif;font-weight:400;font-size:44px;line-height:1;display:block}
+.box .n.a{color:var(--a)}
+.box .sep{width:2px;align-self:stretch;background:#26161C}
+.ic{display:none;flex:none}
+html[data-mood="horror"] .ic-horror,html[data-mood="action"] .ic-action,html[data-mood="story"] .ic-story{display:block}
+.fb{display:inline-flex;align-items:stretch;background:rgba(17,10,12,.92)}
+.fb .c{padding:10px 16px;display:flex;flex-direction:column;align-items:center;border-right:2px solid #26161C}
+.fb .c span{font-size:11px}
+.fb .c b,.fb .g b{font-family:'Lilita One',sans-serif;font-weight:400;font-size:40px;line-height:1}
+.fb .g{padding:10px 18px;display:flex;flex-direction:column;justify-content:center;background:var(--a);color:var(--lab)}
+.fb .g span{font-size:11px}
+.poll{width:420px;background:#F4EFE6;color:#110A0C;padding:16px 18px 18px}
+.poll .h{display:flex;justify-content:space-between;font-size:12px;color:#800020}
+.poll .q{font-size:26px;line-height:1.05;margin:8px 0 12px}
+.poll .opts{display:flex;flex-direction:column;gap:7px}
+.poll .o{position:relative;height:30px;background:#E7DFD1}
+.poll .o .f{position:absolute;left:0;top:0;bottom:0;width:0;background:#D9CDB8;transition:width .6s ease}
+.poll .o.lead .f{background:#E8C26A}
+.poll .o span{position:relative;line-height:30px;padding:0 10px;font-size:12px}
+
+/* moods on the cam */
+.camfx,.rec{display:none}
+html[data-mood="horror"] .camfx,html[data-mood="retro"] .camfx{display:block;position:absolute;inset:0;pointer-events:none}
+html[data-mood="horror"] .camfx{background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 2px,transparent 2px 5px)}
+html[data-mood="retro"] .camfx{background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 2px,transparent 2px 4px);box-shadow:inset 0 0 60px rgba(180,140,255,.35)}
+html[data-mood="horror"] .rec{display:block;position:absolute;right:14px;top:12px;font-size:13px;color:#E0213A;animation:finalp 1.2s steps(2) infinite}
+html[data-mood="retro"] .gm .t,html[data-mood="retro"] .pt b,html[data-mood="retro"] .box .n,html[data-mood="retro"] .fb b{font-family:'Silkscreen','JetBrains Mono',monospace;letter-spacing:0}
+html[data-mood="retro"] .gm .t{font-size:34px}
+#follow{background:var(--a)!important;color:var(--lab)!important}
+
+/* Starting soon / Ending: the game card */
+.upnext{display:inline-flex;flex-direction:column;gap:6px;background:rgba(17,10,12,.9);border-left:6px solid var(--a);padding:14px 22px 16px 18px;max-width:640px}
+.upnext .k{font-size:13px;color:var(--a)}
+.upnext .t{font-size:40px;line-height:1}
+.upnext .p{font-size:18px;line-height:1.35;color:#F4EFE6}
+.upnext .p i{font-style:normal;color:var(--b);font-size:12px;margin-right:8px}
+.wrapstamp{display:inline-flex;align-items:center;gap:12px;background:var(--a);color:var(--lab);padding:10px 18px;font-size:15px;transform:rotate(-2deg)}
+.wrapstamp b{font-family:'Lilita One',sans-serif;font-weight:400;font-size:26px;letter-spacing:0;text-transform:none}

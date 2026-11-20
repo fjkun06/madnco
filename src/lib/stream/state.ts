@@ -24,6 +24,27 @@ import {
   type Quest,
   type Ticker,
 } from "./extras";
+import {
+  DEFAULT_CHANNELS,
+  DEFAULT_CO,
+  publicChannels,
+  sanitizeChannels,
+  sanitizeCo,
+  type Channels,
+  type Co,
+  type PublicChannels,
+} from "./channels";
+import {
+  DEFAULT_GAMES,
+  currentProfile,
+  publicPlay,
+  sanitizeGames,
+  shelf,
+  type GameLive,
+  type Games,
+  type PublicPlay,
+  type ShelfItem,
+} from "./games";
 
 export { cleanText };
 
@@ -57,6 +78,12 @@ export type StreamState = {
   ticker: Ticker;
   quest: Quest;
   clip: Clip | null;
+  /** Game profiles and which one is on stream (game modes). */
+  games: Games;
+  /** Home (@madnco8) or Guest (borrowed channel), per canvas. */
+  channels: Channels;
+  /** Who's in the Co seat tonight, and every past Co. */
+  co: Co;
   /** Admin only, never in the public status. */
   presets: Preset[];
   updatedAt: number;
@@ -76,6 +103,14 @@ export type PublicStatus = {
   quest: Quest & { done: boolean };
   /** Only when it should show on the website. */
   clip: Omit<Clip, "show"> | null;
+  /** The game on stream with its counters, or `null` (game modes). */
+  play: PublicPlay | null;
+  /** Finished series, newest first. */
+  shelf: ShelfItem[];
+  /** Home or guest channel per canvas. */
+  channels: PublicChannels;
+  /** Tonight's Co ("" = solo) and the roster of past Cos. */
+  co: Co;
 };
 
 export const TOPIC_MAX = 80;
@@ -97,6 +132,9 @@ export const DEFAULT_STATE: StreamState = {
   ticker: DEFAULT_TICKER,
   quest: DEFAULT_QUEST,
   clip: null,
+  games: DEFAULT_GAMES,
+  channels: DEFAULT_CHANNELS,
+  co: DEFAULT_CO,
   presets: [],
   updatedAt: 0,
 };
@@ -136,11 +174,10 @@ export function sanitizeState(input: unknown, now: number): StreamState {
     ticker: sanitizeTicker(raw.ticker),
     quest: sanitizeQuest(raw.quest),
     clip: sanitizeClip(raw.clip),
-    presets: sanitizePresets(raw.presets, {
-      topic: TOPIC_MAX,
-      game: GAME_MAX,
-      plan: PLAN_MAX,
-    }),
+    games: sanitizeGames(raw.games),
+    channels: sanitizeChannels(raw.channels),
+    co: sanitizeCo(raw.co),
+    presets: sanitizePresets(raw.presets, { topic: TOPIC_MAX, game: GAME_MAX, plan: PLAN_MAX }),
     updatedAt: isTime(raw.updatedAt) ? raw.updatedAt : now,
   };
 }
@@ -218,13 +255,15 @@ export function prepareSave(
 /**
  * The public view. `twitchLive` is the Twitch API answer (`null` when it is
  * unknown, e.g. no credentials or Twitch is down); `twitchGame` fills the
- * game when the admin left it empty.
+ * game when the admin left it empty. `gameLive` holds the game modes' live
+ * values (part, counters …) by game id.
  */
 export function publicStatus(
   state: StreamState,
   twitchLive: boolean | null,
   now: number,
   twitchGame = "",
+  gameLive: Record<string, GameLive> = {},
 ): PublicStatus {
   let live = false;
   let source: PublicStatus["source"] = "none";
@@ -246,30 +285,38 @@ export function publicStatus(
       ? { at: state.next.at, plan: state.next.plan }
       : null;
 
+  const current = currentProfile(state.games);
+  const play = current ? publicPlay(current, gameLive[current.id]) : null;
+
   return {
     live,
     source,
     topic: state.topic,
-    game: state.game || (source === "twitch" ? cleanText(twitchGame, GAME_MAX) : ""),
+    game:
+      play?.name ||
+      state.game ||
+      (source === "twitch" ? cleanText(twitchGame, GAME_MAX) : ""),
     countdown,
     next,
     brb: {
       message: state.brb.message,
-      until:
-        state.brb.until && state.brb.until + BRB_GRACE_MS > now ? state.brb.until : null,
+      until: state.brb.until && state.brb.until + BRB_GRACE_MS > now ? state.brb.until : null,
     },
     ticker: state.ticker,
     quest: { ...state.quest, done: questDone(state.quest) },
-    clip:
-      state.clip && state.clip.show
-        ? {
-            url: state.clip.url,
-            platform: state.clip.platform,
-            id: state.clip.id,
-            title: state.clip.title,
-            tag: state.clip.tag,
-          }
-        : null,
+    clip: state.clip && state.clip.show
+      ? {
+          url: state.clip.url,
+          platform: state.clip.platform,
+          id: state.clip.id,
+          title: state.clip.title,
+          tag: state.clip.tag,
+        }
+      : null,
+    play,
+    shelf: shelf(state.games, gameLive),
+    channels: publicChannels(state.channels),
+    co: state.co,
   };
 }
 

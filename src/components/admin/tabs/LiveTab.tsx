@@ -13,6 +13,7 @@ import { CHIP, CHIP_OFF, CHIP_ON, CHIP_SM, INPUT, LABEL } from "../fields";
 import { nextOccurrence, toTimeValue } from "../time";
 import { TimePicker } from "../TimePicker";
 import { readNow } from "../useNow";
+import { ChannelsCard, CoCard } from "./LiveExtras";
 import type { TabProps } from "./shared";
 import { timerLine } from "./timerLine";
 
@@ -38,9 +39,7 @@ export function LiveTab({
   twitchReady: boolean;
 }) {
   const t = en.admin;
-  const clock = now
-    ? { h: new Date(now).getHours(), m: new Date(now).getMinutes() }
-    : null;
+  const clock = now ? { h: new Date(now).getHours(), m: new Date(now).getMinutes() } : null;
   const countdown = timerLine(form.countdown?.to ?? null, now, t.countdown);
   const brb = timerLine(form.brbUntil, now, t.brb);
 
@@ -76,6 +75,9 @@ export function LiveTab({
             : ""}
         </p>
       </Card>
+
+      <ChannelsCard form={form} update={update} />
+      <CoCard form={form} update={update} />
 
       <Card title={t.today.title}>
         <label className="flex flex-col gap-2">
@@ -282,12 +284,7 @@ function Presets({
     update({
       presets: [
         ...form.presets,
-        {
-          name: clean,
-          topic: form.topic.trim(),
-          game: form.game.trim(),
-          plan: form.nextPlan.trim(),
-        },
+        { name: clean, topic: form.topic.trim(), game: form.game.trim(), plan: form.nextPlan.trim() },
       ],
     });
     setName("");
@@ -307,25 +304,15 @@ function Presets({
                   type="button"
                   aria-pressed={active}
                   onClick={() => {
-                    update({
-                      topic: preset.topic,
-                      game: preset.game,
-                      nextPlan: preset.plan,
-                    });
+                    update({ topic: preset.topic, game: preset.game, nextPlan: preset.plan });
                     onLoad(preset.game);
-                    push(
-                      "ok",
-                      t.loadedTitle,
-                      interpolate(t.loadedText, { name: preset.name }),
-                    );
+                    push("ok", t.loadedTitle, interpolate(t.loadedText, { name: preset.name }));
                   }}
-                  className={`flex min-h-12 items-center gap-2.5 px-4 text-left focus-inset transition-colors duration-200 ${
+                  className={`focus-inset flex min-h-12 items-center gap-2.5 px-4 text-left transition-colors duration-200 ${
                     active ? "bg-tq text-ink" : "bg-ink-3 text-paper hover:bg-bordeaux"
                   }`}
                 >
-                  <span className="label-mono text-[13px] font-extrabold">
-                    {preset.name}
-                  </span>
+                  <span className="label-mono text-[13px] font-extrabold">{preset.name}</span>
                   {preset.game ? (
                     <span className={`text-xs ${active ? "text-ink/70" : "text-muted"}`}>
                       {preset.game}
@@ -336,11 +323,9 @@ function Presets({
                   type="button"
                   aria-label={interpolate(t.remove, { name: preset.name })}
                   onClick={() =>
-                    update({
-                      presets: form.presets.filter((p) => p.name !== preset.name),
-                    })
+                    update({ presets: form.presets.filter((p) => p.name !== preset.name) })
                   }
-                  className="flex w-10 items-center justify-center border-l border-ink bg-ink-3 text-muted focus-inset transition-colors hover:bg-live hover:text-ink"
+                  className="focus-inset flex w-10 items-center justify-center border-l border-ink bg-ink-3 text-muted transition-colors hover:bg-live hover:text-ink"
                 >
                   ✕
                 </button>
@@ -373,11 +358,7 @@ function Presets({
               className={INPUT}
             />
           </label>
-          <button
-            type="submit"
-            disabled={!name.trim() || clash}
-            className={`${CHIP} ${CHIP_ON}`}
-          >
+          <button type="submit" disabled={!name.trim() || clash} className={`${CHIP} ${CHIP_ON}`}>
             {t.save}
           </button>
           <button
@@ -404,11 +385,7 @@ function Presets({
   );
 }
 
-type DiscordInfo = {
-  configured: boolean;
-  lastSentAt: number | null;
-  lockedUntil: number | null;
-};
+type DiscordInfo = { configured: boolean; lastSentAt: number | null; lockedUntil: number | null };
 
 /** Posts the TikTok LIVE ping right away (not part of Save). */
 function DiscordCard({
@@ -482,24 +459,17 @@ function DiscordCard({
 
       {/* What Discord will show */}
       <div className="flex gap-3.5 rounded bg-[#313338] px-4 py-4 text-[15px] leading-normal text-[#DBDEE1]">
-        <span
-          aria-hidden="true"
-          className="size-10 flex-none rounded-full bg-bordeaux-hi"
-        />
+        <span aria-hidden="true" className="size-10 flex-none rounded-full bg-bordeaux-hi" />
         <div className="min-w-0 flex-1">
           <p className="m-0">
             <b className="text-[#F2F3F5]">{t.bot}</b>{" "}
-            <span className="rounded-sm bg-[#5865F2] px-1 text-[11px] text-white">
-              {t.app}
-            </span>{" "}
+            <span className="rounded-sm bg-[#5865F2] px-1 text-[11px] text-white">{t.app}</span>{" "}
             <span className="text-xs text-[#949BA4]">
               {now ? interpolate(t.today, { time: toTimeValue(now) }) : ""}
             </span>
           </p>
           <p className="m-0">
-            <span className="rounded-sm bg-[#5865F2]/30 px-0.5 text-[#C9CDFB]">
-              {t.role}
-            </span>{" "}
+            <span className="rounded-sm bg-[#5865F2]/30 px-0.5 text-[#C9CDFB]">{t.role}</span>{" "}
             {message.content.replace(/^<@&\d+> /, "")}
           </p>
           <div className="mt-2 rounded border-l-4 border-tq bg-[#2B2D31] px-3.5 py-3">
@@ -509,20 +479,14 @@ function DiscordCard({
           </div>
         </div>
       </div>
-      {topicChanged ? (
-        <p className="m-0 text-sm text-bordeaux-hi">{t.savedNote}</p>
-      ) : null}
+      {topicChanged ? <p className="m-0 text-sm text-bordeaux-hi">{t.savedNote}</p> : null}
 
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-2">
           <span id="discord-account" className={LABEL}>
             {t.liveOn}
           </span>
-          <div
-            role="group"
-            aria-labelledby="discord-account"
-            className="flex flex-wrap gap-2"
-          >
+          <div role="group" aria-labelledby="discord-account" className="flex flex-wrap gap-2">
             {(["live", "main"] as const).map((key) => (
               <button
                 key={key}

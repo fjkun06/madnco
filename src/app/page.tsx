@@ -1,5 +1,6 @@
 import { Activities } from "@/components/home/Activities";
 import { CaseFile } from "@/components/home/CaseFile";
+import { CompletedShelf } from "@/components/home/CompletedShelf";
 import { Crew } from "@/components/home/Crew";
 import { DiscordBand } from "@/components/home/DiscordBand";
 import { FindUs } from "@/components/home/FindUs";
@@ -23,6 +24,7 @@ export default function HomePage() {
       <DiscordBand />
       <FindUs />
       <LatestClip />
+      <CompletedShelf />
       <CaseFile />
     </>
   );
