@@ -7,6 +7,7 @@ import type { StreamState } from "@/lib/stream/state";
 import { en } from "@/locales/en";
 import { interpolate } from "@/utils/interpolate";
 import { BUTTON_GHOST, BUTTON_PRIMARY } from "@/utils/ui.classes";
+import { BackToTop } from "./BackToTop";
 import { errorText } from "./errors";
 import { CHIP, CHIP_OFF } from "./fields";
 import {
@@ -182,6 +183,7 @@ export function AdminPanel({
   return (
     <div className="flex flex-col gap-6">
       <ToastStack toasts={toasts} onClose={dismiss} />
+      <BackToTop className="bottom-28 sm:bottom-24" />
 
       {/* Title bar */}
       <div className="flex flex-wrap items-center gap-4">

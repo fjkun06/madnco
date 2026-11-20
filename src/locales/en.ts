@@ -268,6 +268,7 @@ export const en = {
     login: "Log in",
     logout: "Log out",
     remoteLink: "Remote ↗",
+    backToTop: "Back to top",
     errors: {
       "wrong-password": "Wrong password.",
       "too-many": "Too many tries. Wait ten minutes.",
