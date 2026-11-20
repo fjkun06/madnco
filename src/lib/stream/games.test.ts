@@ -222,7 +222,7 @@ describe("shelf", () => {
     const a = { ...newProfile("Old", []), completedAt: NOW - 1000 };
     const b = { ...newProfile("New", ["old"]), completedAt: NOW };
     const c = newProfile("Ongoing", ["old", "new"]);
-    const items = shelf({ list: [a, b, c], current: c.id }, { old: { ...EMPTY_LIVE, part: 7, mins: 600, c1: 30 } });
+    const items = shelf({ list: [a, b, c], current: c.id, known: [] }, { old: { ...EMPTY_LIVE, part: 7, mins: 600, c1: 30 } });
     expect(items.map((i) => i.name)).toEqual(["New", "Old"]);
     expect(items[1]).toMatchObject({ parts: 7, hours: 10 });
     expect(items[1].counters).toEqual([{ label: "Deaths", value: 30, total: null }]);

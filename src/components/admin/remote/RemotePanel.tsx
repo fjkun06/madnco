@@ -17,6 +17,7 @@ import { en } from "@/locales/en";
 import { interpolate } from "@/utils/interpolate";
 import { BackToTop } from "../BackToTop";
 import { errorText } from "../errors";
+import { FounderForm } from "../tabs/FansTab";
 
 const t = en.remote;
 const REFRESH_MS = 10_000;
@@ -219,6 +220,20 @@ export function RemotePanel({
                   ))}
               </select>
             </label>
+          </div>
+
+          <div className={TILE}>
+            <span className={LBL}>{t.shout}</span>
+            <FounderForm
+              busy={busy}
+              alertByDefault
+              showAlertToggle={false}
+              onAdd={async (name, platform) => {
+                const ok = await send("/api/admin/fans", { op: "add", name, platform, alert: true });
+                if (ok) setLast({ text: interpolate(t.shoutDone, { name }) });
+                return ok !== null;
+              }}
+            />
           </div>
 
           <div className={TILE}>

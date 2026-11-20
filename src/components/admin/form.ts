@@ -51,8 +51,8 @@ export type AdminForm = {
 };
 
 /** The tabs of the panel; every field belongs to one. */
-export type AdminTab = "live" | "games" | "schedule" | "screen" | "quest" | "web";
-export const ADMIN_TABS: AdminTab[] = ["live", "games", "schedule", "screen", "quest", "web"];
+export type AdminTab = "live" | "games" | "schedule" | "screen" | "quest" | "fans" | "web";
+export const ADMIN_TABS: AdminTab[] = ["live", "games", "schedule", "screen", "quest", "fans", "web"];
 
 export type FormField = "nextDate" | "nextTime" | "clipUrl" | "guestHost";
 export type FormIssue = { field: FormField; tab: AdminTab; message: string };

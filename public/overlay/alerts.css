@@ -1,0 +1,39 @@
+/*
+ * MadnCo. alerts: follow (Founding 50) and welcome (first-time chatter).
+ * live.js puts one alert at a time into #alert-lane; the page places the lane.
+ */
+.alane{position:absolute;z-index:30;pointer-events:none}
+.alert{display:flex;align-items:stretch;background:#110A0C;color:#F4EFE6;box-shadow:0 20px 50px rgba(0,0,0,.55);position:relative;animation:alertIn .5s cubic-bezier(.22,1,.36,1) both}
+.alert.out{animation:alertOut .4s ease-in both}
+@keyframes alertIn{from{opacity:0;transform:translateY(-24px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes alertOut{to{opacity:0;transform:translateY(-16px)}}
+.alert .badge{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:#E8557A;color:#110A0C;padding:0 22px;min-width:118px}
+.alert .badge b{font:400 46px 'Lilita One',sans-serif;line-height:1}
+.alert .badge span{font:800 11px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase}
+.alert .body{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:16px 22px 18px}
+.alert .k{font:800 13px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:#E8557A}
+.alert .n{font:400 46px 'Lilita One',sans-serif;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alert .s{font:17px Rubik,system-ui,sans-serif;color:#BBAAB1;line-height:1.35}
+.alert .s b{color:#30D5C8;font-weight:700}
+.alert .bar{height:12px;background:#26161C;padding:2px;margin-top:4px}
+.alert .bar i{display:block;height:100%;background:#30D5C8;transition:width .8s}
+.alert .edge{position:absolute;left:0;right:0;bottom:-6px;height:6px;background:repeating-linear-gradient(90deg,#30D5C8 0 22px,#E8557A 22px 44px)}
+.welcome{display:inline-flex;align-items:center;gap:14px;background:#F4EFE6;color:#110A0C;padding:12px 20px;box-shadow:8px 8px 0 #30D5C8;transform:rotate(-1deg);animation:alertIn .5s cubic-bezier(.22,1,.36,1) both}
+.welcome.out{animation:alertOut .4s ease-in both}
+.welcome .k{font:800 12px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:#800020;flex:none}
+.welcome .t{font:400 30px "Lilita One",sans-serif;line-height:1.05;white-space:nowrap}
+/* vertical: bigger */
+.alane.v .alert .n{font-size:52px}
+.alane.v .alert .k{font-size:15px}
+.alane.v .welcome{display:flex;justify-content:center}
+.alane.v .welcome .t{font-size:40px}
+
+/* Ending: founders strip */
+.fstrip{display:flex;flex-direction:column;gap:10px}
+.fstrip .hd{display:flex;justify-content:space-between;align-items:baseline;font:800 13px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:#E8557A}
+.fstrip .hd b{color:#30D5C8}
+.fstrip .win{overflow:hidden;background:#1B1014;padding:14px 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.fstrip .trk{display:inline-flex;gap:34px;white-space:nowrap;padding-left:30px;animation:froll var(--dur,40s) linear infinite}
+.fstrip .trk span{font:400 30px 'Lilita One',sans-serif}
+.fstrip .trk span i{font:800 13px 'JetBrains Mono',monospace;font-style:normal;color:#30D5C8;margin-right:10px;letter-spacing:.08em}
+@keyframes froll{from{transform:translateX(0)}to{transform:translateX(-50%)}}

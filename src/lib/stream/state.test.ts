@@ -197,7 +197,7 @@ describe("publicStatus with game modes", () => {
     {
       ...DEFAULT_STATE,
       game: "FIFA",
-      games: { list: [bo6], current: bo6.id },
+      games: { list: [bo6], current: bo6.id, known: [] },
     },
     NOW,
   );

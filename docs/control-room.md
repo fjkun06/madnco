@@ -26,6 +26,7 @@ OBS overlays read it from `GET /api/stream`.
 | `ADMIN_PASSWORD` | The admin password, at least 8 characters. |
 | `ADMIN_SESSION_SECRET` | Optional, long random string. Changing it signs everyone out. Defaults to the password. |
 | `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET` | From dev.twitch.tv → Your Console → Register Your Application (OAuth redirect `http://localhost`, category "Website Integration"). Without them, "Auto" stays offline. |
+| `TWITCH_EVENTSUB_SECRET` | Optional, 10–100 random characters. Twitch follow alerts (see Founding 50). |
 | `DECK_KEY` | Optional, 24+ random characters. Lets Stream Deck keys change the game counters (`/api/deck`). |
 | `TWITCH_LOGIN` | Optional; defaults to the Twitch handle in `siteConfig` (`madnco8`). |
 
@@ -169,6 +170,40 @@ Answers are plain text (`ok c1=15`, `no game on stream`, `unauthorized`).
   names join it; Courinho is the OG Co). Shows as "CO · name" next to "MAD P1"
   on Gaming (both canvases), "CO · SLOT OPEN" on solo nights.
 - Rebrand: slogan "Madness loves company." on the site, tapes and Ending.
+
+## The Founding 50, follow alerts, welcomes (v6)
+
+The first 50 followers of @madnco8 are **founders**: their name goes on the
+Founders Wall (homepage, shows once there is one), rolls in the Ending
+credits, and plays a follow alert on stream ("New in the fam · Founder #28").
+First-time chatters get a welcome strip. Alerts play one at a time in the
+alert lane (landscape: along the top, beside the cam; vertical: the tape
+slot) on Gaming and Just Chatting.
+
+Control room → **Fans** tab: connections, the wall (add / remove), test
+buttons. The **Remote** has a "New follower · shout out" tile.
+
+| Source | Follow alert | Welcome |
+| --- | --- | --- |
+| Twitch | automatic, with name (EventSub webhook) | automatic, from chat (`first-msg`), landscape scenes |
+| YouTube | Remote shout-out or added after the stream (automatic left out for now) | not yet |
+| TikTok | Remote shout-out or added after the stream (the official API only gives the count) | not available |
+
+Founders are stored in Redis (`madnco:founders`, plus a name set so nobody
+is added twice), alerts in `madnco:alerts` (last 20; overlays only play ones
+from the last 2 minutes, so reopening a scene doesn't replay old ones).
+
+To hear every chat and event while playing (all platforms, only in your
+headphones), use Social Stream Ninja's TTS; keep its audio off the stream.
+
+### Set up Twitch follow alerts
+
+1. Vercel → env: `TWITCH_EVENTSUB_SECRET` = a random string, 10–100
+   characters (`openssl rand -hex 32`). Redeploy.
+2. dev.twitch.tv → Console → your app → OAuth Redirect URLs → add
+   `https://www.madnco.frankjordan.dev/api/admin/twitch/callback`.
+3. /admin → Fans → Twitch → **Connect**, log in as madnco8, allow. Back on
+   the Fans tab it says "waiting for Twitch to confirm", then "follow alerts on".
 
 ## Not verified
 
