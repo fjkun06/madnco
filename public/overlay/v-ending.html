@@ -29,6 +29,7 @@
 
 <style>html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}.sc{transform-origin:0 0}[hidden]{display:none!important}</style>
 <link rel="stylesheet" href="/overlay/play.css">
+<link rel="stylesheet" href="/overlay/guest.css">
 </head><body>
 
 <div class="sc">
@@ -45,7 +46,7 @@
       <span class="disp" style="font-size: 54px; line-height: 1" data-text="next-when"></span>
       <span hidden data-show="next-plan" style="font-size: 26px; font-weight: 700" data-text="next-plan"></span>
     </div>
-    <p data-hide="next" style="margin: 36px 0 0; font-size: 36px; font-weight: 700; line-height: 1.3; text-align: center; max-width: 880px">Thanks for hanging out with the duo of <span style="color: #E8557A">endless madness.</span></p>
+    <p data-hide="next" style="margin: 36px 0 0; font-size: 36px; font-weight: 700; line-height: 1.3; text-align: center; max-width: 880px">Thanks for hanging out. <span style="color: #E8557A">Madness loves company.</span></p>
   </div>
 
   <div style="position: absolute; left: 70px; right: 70px; top: 1100px; border-top: 2px solid #26161C">
@@ -55,9 +56,28 @@
     <div class="ll l4" style="background: #30D5C8; color: #110A0C"><span class="pf" style="color: #110A0C">Discord</span><span class="hd" style="font-size: 36px">discord.gg/sYYdUGR2pp</span><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#110A0C" stroke-width="2.5" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg></div>
   </div>
 
-  <p class="out" aria-hidden="true" style="position: absolute; left: 50px; bottom: 60px; margin: 0; font-size: 170px; line-height: .85">ENDLESS<br><span>MADNESS</span></p>
+  <p class="out" aria-hidden="true" style="position: absolute; left: 50px; bottom: 60px; margin: 0; font-size: 112px; line-height: .85">MADNESS<br><span>LOVES COMPANY</span></p>
   <div class="scan" aria-hidden="true"></div>
   <div style="position:absolute;left:0;right:0;top:960px;display:flex;justify-content:center;z-index:3"><div class="wrapstamp mono cut-s" hidden data-show="play"><span data-text="play-wrap"></span><b data-text="play-name"></b></div></div>
+  <div class="takeover" hidden data-show="guest">
+  <div class="dots"></div><div class="glow" style="left:-300px;top:-200px;width:1600px;height:1600px"></div>
+  <div style="position:absolute;left:80px;right:80px;top:150px;display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center">
+    <img src="/madnco-logo.svg" alt="MadnCo. logo" style="width:260px;height:auto">
+    <span class="mono" style="font-size:22px;color:#E8557A">Game over · for today</span>
+    <div class="disp glitch" style="font-size:240px;line-height:.82">GG.</div>
+    <div class="disp" style="font-size:84px;line-height:.95;color:#30D5C8">NEXT TIME<br>AT HOME?</div>
+    <p style="margin:0;font-size:34px;font-weight:700;line-height:1.35">Thanks for watching us on <span data-text="guest-host"></span>. Help us move out: <span style="color:#E8557A"><span data-text="quest-left">a few</span> more follows</span> on @madnco8 and the next stream is on our own channel.</p>
+  </div>
+  <div style="position:absolute;left:80px;right:80px;top:1240px;display:flex;flex-direction:column;gap:18px">
+    <div class="cut" style="background:#1B1014;padding:18px 20px;display:flex;flex-direction:column;gap:10px">
+      <span class="mono" style="font-size:11px;color:#E8557A">Moving-out progress · @madnco8</span>
+      <span class="disp" style="font-size:30px;line-height:1">Follow @madnco8</span>
+      <div class="tqxp"><span data-bar="quest"></span></div>
+      <div class="mono" style="display:flex;justify-content:space-between;font-size:11px;color:#BBAAB1"><span><span data-text="quest-left">?</span> to go</span><span><b style="color:#30D5C8" data-text="quest-followers">?</b> / <span data-text="quest-goal">50</span></span></div></div>
+    <div class="homebig cut"><div style="flex:1"><div class="mono" style="font-size:13px">Our home</div><div class="disp" style="font-size:46px;line-height:1">@madnco8</div><div class="mono" style="font-size:13px;margin-top:6px">YouTube · Twitch · TikTok</div></div><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></div>
+  </div>
+  <div class="scanl"></div>
+</div>
 </div>
 
 <script>(function(){var W=1080,H=1920;function fit(){var s=document.querySelector('.sc');var k=Math.min(innerWidth/W,innerHeight/H);s.style.transform='scale('+k+')';}addEventListener('resize',fit);fit();})();</script>

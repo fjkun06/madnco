@@ -44,6 +44,18 @@
  * Poll votes come from Twitch chat (!1 … !4, one vote per viewer, last one
  * counts), read anonymously; ?channel= overrides the channel (madnco8).
  *
+ * Home / Guest (control room → Live → Where are we live?), per canvas:
+ * v-*.html pages read the vertical (TikTok) setting, the rest landscape.
+ *   guest / home        set while streaming from a borrowed channel / our own
+ *   guest-host          "@madhauzz"; guest-line  the Starting Soon line
+ *   home-card           guest and the "Our home is @madnco8" card is on
+ *   home-chip           "Home @madnco8" while guest (default text otherwise)
+ *   quest-left          followers still needed for the side quest goal
+ *
+ * Co tonight:
+ *   co / co-name        set while someone sits in the Co seat (their name)
+ *   co-open             solo night: the Co slot is open
+ *
  * Without an answer (offline, local file) every slot keeps its default.
  */
 (function () {
@@ -59,6 +71,7 @@
     story: ["Story", "#E8C26A", "#E8557A", "#110A0C", "Chapter"],
     retro: ["Retro", "#B48CFF", "#30D5C8", "#110A0C", "Retro"],
   };
+  var VERTICAL = /\/v-[^/]*$/.test(location.pathname);
   var CHANNEL = (new URLSearchParams(location.search).get("channel") || "madnco8")
     .toLowerCase()
     .replace(/[^a-z0-9_]/g, "");
@@ -267,13 +280,37 @@
     };
   }
 
+  function crewValues(s, v) {
+    var chs = s.channels || null;
+    var ch = chs ? (VERTICAL ? chs.vertical : chs.landscape) : null;
+    var guest = !!(ch && ch.guest);
+    v.guest = guest ? "1" : "";
+    v.home = guest ? "" : "1";
+    v["guest-host"] = guest ? ch.host : "";
+    v["guest-line"] = guest ? chs.guestLine || "" : "";
+    v["home-card"] = guest && chs.homeCard ? "1" : "";
+    v["home-chip"] = guest ? "Home @madnco8" : "";
+    var co = s.co && s.co.name ? s.co.name : "";
+    v.co = co ? "1" : "";
+    v["co-name"] = co;
+    v["co-open"] = status && !co ? "1" : "";
+    var q = s.quest || null;
+    v["quest-left"] =
+      q && q.followers !== null ? String(Math.max(0, q.goal - q.followers)) : q ? String(q.goal) : "";
+    v._guestLine = guest ? "Guest stream on " + ch.host + ": our home is @madnco8" : "";
+  }
+
   function allValues(now) {
     var s = status || {};
     var v = values(now);
     playValues(s, v);
-    // The game's own ticker lines join the gaming ticker.
-    if (v._playTicker.length) {
-      v._gaming = (v["ticker-gaming"] ? v._items : []).concat(v._playTicker);
+    crewValues(s, v);
+    if (v.guest) v["ticker-label"] = "Guest";
+    // The game's own ticker lines (and the guest line) join the gaming ticker.
+    var extra = v._playTicker.slice();
+    if (v._guestLine) extra.unshift(v._guestLine);
+    if (extra.length) {
+      v._gaming = (v["ticker-gaming"] ? v._items : []).concat(extra);
       v["ticker-gaming"] = "1";
     }
     return v;

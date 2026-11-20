@@ -23,6 +23,7 @@
 
 <style>html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}.sc{transform-origin:0 0}.bgwrap{position:absolute;inset:0;overflow:hidden;background:#110A0C;-webkit-mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000),linear-gradient(#000,#000);mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000),linear-gradient(#000,#000);-webkit-mask-size:100% 100%,960px 540px,1080px 608px;mask-size:100% 100%,960px 540px,1080px 608px;-webkit-mask-position:0 0,60px 170px,0px 760px;mask-position:0 0,60px 170px,0px 760px;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-composite:xor;mask-composite:exclude}[hidden]{display:none!important}</style>
 <link rel="stylesheet" href="/overlay/play.css">
+<link rel="stylesheet" href="/overlay/guest.css">
 </head><body>
 
 <div class="sc">
@@ -32,7 +33,8 @@
     <img src="/madnco-logo.svg" alt="MadnCo. logo" style="width: 170px; height: auto">
     <div style="display: flex; gap: 8px">
       <span class="mono cut-s" style="display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 16px; background: #FF4D4D; color: #110A0C; font-size: 16px"><span class="ld"></span>Live</span>
-      <span class="mono cut-s" style="display: inline-flex; align-items: center; height: 46px; padding: 0 16px; background: #800020; font-size: 15px">@madnco8</span>
+      <span data-hide="guest" class="mono cut-s" style="display: inline-flex; align-items: center; height: 46px; padding: 0 16px; background: #800020; font-size: 15px">@madnco8</span>
+      <span hidden data-show="guest" class="mono cut-s" style="display: inline-flex; align-items: center; height: 46px; padding: 0 16px; background: #F4EFE6; color: #110A0C; font-size: 15px">On&nbsp;<span data-text="guest-host"></span></span>
       <span hidden data-show="game-only" class="mono" style="display:inline-flex;align-items:center;white-space:nowrap;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);height:46px;padding:0 16px;background:#30D5C8;color:#110A0C;font-size:15px">Now&nbsp;·&nbsp;<span data-text="game"></span></span>
     </div>
   </div>
@@ -44,7 +46,11 @@
     <span class="br" style="top: -5px; right: -5px; border-top-width: 7px; border-right-width: 7px"></span>
     <span class="br bb" style="bottom: -5px; left: -5px; border-bottom-width: 7px; border-left-width: 7px"></span>
     <span class="br bb" style="bottom: -5px; right: -5px; border-bottom-width: 7px; border-right-width: 7px"></span>
-    <span class="disp cut-s" style="position: absolute; left: 20px; bottom: 20px; display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 16px; background: #110A0C; font-size: 28px">MAD <span class="mono" style="font-size: 14px; color: var(--b)">P1</span></span>
+    <div style="position: absolute; left: 20px; bottom: 20px; display: flex; gap: 8px">
+      <span class="disp cut-s" style="display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 16px; background: #110A0C; font-size: 28px">MAD <span class="mono" style="font-size: 14px; color: var(--b)">P1</span></span>
+      <span hidden data-show="co" class="disp cut-s cochip" style="height: 46px; font-size: 28px">CO <span class="mono">· <span data-text="co-name"></span></span></span>
+      <span hidden data-show="co-open" class="disp cut-s cochip open" style="height: 46px; font-size: 28px">CO <span class="mono">· Slot open</span></span>
+    </div>
   </div>
 
   <div class="vframe" style="position: absolute; left: 0; top: 760px; width: 1080px; height: 608px; background: transparent; display: flex; align-items: center; justify-content: center; border-top: 5px solid #30D5C8; border-bottom: 5px solid #800020">
@@ -84,13 +90,18 @@
   </div>
   <div class="tape vtape" aria-hidden="true" style="top: 1400px; height: 60px; background: #30D5C8; color: #110A0C; transform: rotate(-2deg)">
     <div class="track" data-ticker="gaming" data-upper>
-      <span style="font-size: 30px">FOLLOW @MADNCO8</span><i style="font-size: 20px">//</i><span style="font-size: 30px">THE DUO OF ENDLESS MADNESS</span><i style="font-size: 20px">//</i><span style="font-size: 30px">FOLLOW @MADNCO8</span><i style="font-size: 20px">//</i><span style="font-size: 30px">THE DUO OF ENDLESS MADNESS</span><i style="font-size: 20px">//</i>
-      <span style="font-size: 30px">FOLLOW @MADNCO8</span><i style="font-size: 20px">//</i><span style="font-size: 30px">THE DUO OF ENDLESS MADNESS</span><i style="font-size: 20px">//</i><span style="font-size: 30px">FOLLOW @MADNCO8</span><i style="font-size: 20px">//</i><span style="font-size: 30px">THE DUO OF ENDLESS MADNESS</span><i style="font-size: 20px">//</i>
+      <span style="font-size: 30px">FOLLOW @MADNCO8</span><i style="font-size: 20px">//</i><span style="font-size: 30px">MADNESS LOVES COMPANY</span><i style="font-size: 20px">//</i><span style="font-size: 30px">FOLLOW @MADNCO8</span><i style="font-size: 20px">//</i><span style="font-size: 30px">MADNESS LOVES COMPANY</span><i style="font-size: 20px">//</i>
+      <span style="font-size: 30px">FOLLOW @MADNCO8</span><i style="font-size: 20px">//</i><span style="font-size: 30px">MADNESS LOVES COMPANY</span><i style="font-size: 20px">//</i><span style="font-size: 30px">FOLLOW @MADNCO8</span><i style="font-size: 20px">//</i><span style="font-size: 30px">MADNESS LOVES COMPANY</span><i style="font-size: 20px">//</i>
     </div>
   </div>
 
   <div style="position: absolute; left: 60px; right: 60px; top: 1510px; bottom: 60px; border: 0; display: flex; align-items: center; justify-content: center; text-align: center">
     
+  </div>
+  <div class="pinned cut" hidden data-show="guest">
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px"><span class="mono" style="font-size: 14px">Pinned · borrowed channel</span>
+      <span class="t disp">Follow @madnco8: <span data-text="quest-left">23</span> more and we go LIVE at home</span></div>
+    <span class="ar cut-s"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
   </div>
 </div>
 

@@ -142,6 +142,34 @@ https://www.madnco.frankjordan.dev/api/deck?key=DECK_KEY&do=c1+
 Answers are plain text (`ok c1=15`, `no game on stream`, `unauthorized`).
 120 presses a minute max. Keep the key private: anyone with the URL can count.
 
+## Remote, Home / Guest, Co tonight (v5)
+
+- **Remote** (`/admin/remote`, button "Remote ↗" in the control room): one
+  page for a laptop, tablet or phone while streaming. Big +/− for the game's
+  counters (or W/D/L and goals), next part, ±1 h, game on stream, BRB "back
+  in 5/10" and clear, ticker on Gaming, FINAL badge, poll open/close, Co
+  tonight, Home/Guest. Every tap is live in ~5 s, no Save. Counters, part and
+  hours have Undo. It refreshes itself every 10 s.
+- Taps go to `POST /api/admin/quick` (one change, applied to the saved state
+  on the server), so they never overwrite other fields. If the control room
+  form was loaded before a Remote tap, its Save is refused (409 "stale"): the
+  panel loads the latest state and asks you to redo the edit.
+- **Where are we live?** (Live tab): Home = @madnco8, Guest = a borrowed
+  channel, set separately for landscape (Twitch + YouTube) and vertical
+  (TikTok). In Guest mode the overlays (`/overlay/guest.css`) show:
+  - Gaming: "Guest on @…" tag under the logo, the "Our home is @madnco8"
+    card instead of the Follow toast (peeks in every 2 min), GUEST ticker label
+    and a guest line in the ticker; vertical: "On @…" chip and a pinned follow
+    card with the followers still needed.
+  - Starting Soon: full "This channel got hijacked" takeover (case file with
+    the side-quest progress). Ending: "Next time at home?".
+  - Website: the Live button links to the guest YouTube channel; the header
+    pill links to the guest TikTok account.
+- **Co tonight** (Live tab): Solo (slot open) or a name from the roster (new
+  names join it; Courinho is the OG Co). Shows as "CO · name" next to "MAD P1"
+  on Gaming (both canvases), "CO · SLOT OPEN" on solo nights.
+- Rebrand: slogan "Madness loves company." on the site, tapes and Ending.
+
 ## Not verified
 
 Written without npm access: the pure modules (`state`, `session`, admin

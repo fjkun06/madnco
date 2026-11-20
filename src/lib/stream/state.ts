@@ -25,6 +25,16 @@ import {
   type Ticker,
 } from "./extras";
 import {
+  DEFAULT_CHANNELS,
+  DEFAULT_CO,
+  publicChannels,
+  sanitizeChannels,
+  sanitizeCo,
+  type Channels,
+  type Co,
+  type PublicChannels,
+} from "./channels";
+import {
   DEFAULT_GAMES,
   currentProfile,
   publicPlay,
@@ -70,6 +80,10 @@ export type StreamState = {
   clip: Clip | null;
   /** Game profiles and which one is on stream (game modes). */
   games: Games;
+  /** Home (@madnco8) or Guest (borrowed channel), per canvas. */
+  channels: Channels;
+  /** Who's in the Co seat tonight, and every past Co. */
+  co: Co;
   /** Admin only, never in the public status. */
   presets: Preset[];
   updatedAt: number;
@@ -93,6 +107,10 @@ export type PublicStatus = {
   play: PublicPlay | null;
   /** Finished series, newest first. */
   shelf: ShelfItem[];
+  /** Home or guest channel per canvas. */
+  channels: PublicChannels;
+  /** Tonight's Co ("" = solo) and the roster of past Cos. */
+  co: Co;
 };
 
 export const TOPIC_MAX = 80;
@@ -115,6 +133,8 @@ export const DEFAULT_STATE: StreamState = {
   quest: DEFAULT_QUEST,
   clip: null,
   games: DEFAULT_GAMES,
+  channels: DEFAULT_CHANNELS,
+  co: DEFAULT_CO,
   presets: [],
   updatedAt: 0,
 };
@@ -155,6 +175,8 @@ export function sanitizeState(input: unknown, now: number): StreamState {
     quest: sanitizeQuest(raw.quest),
     clip: sanitizeClip(raw.clip),
     games: sanitizeGames(raw.games),
+    channels: sanitizeChannels(raw.channels),
+    co: sanitizeCo(raw.co),
     presets: sanitizePresets(raw.presets, { topic: TOPIC_MAX, game: GAME_MAX, plan: PLAN_MAX }),
     updatedAt: isTime(raw.updatedAt) ? raw.updatedAt : now,
   };
@@ -293,6 +315,8 @@ export function publicStatus(
       : null,
     play,
     shelf: shelf(state.games, gameLive),
+    channels: publicChannels(state.channels),
+    co: state.co,
   };
 }
 

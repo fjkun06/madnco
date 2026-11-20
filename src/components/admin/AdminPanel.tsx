@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { StreamState } from "@/lib/stream/state";
@@ -95,7 +96,15 @@ export function AdminPanel({
       });
       const body = (await res.json().catch(() => ({}))) as StreamState & {
         error?: string;
+        state?: StreamState;
       };
+      if (res.status === 409 && body.error === "stale" && body.state) {
+        // Changed from the Remote meanwhile: show the latest, nothing overwritten.
+        setSaved(body.state);
+        load(body.state);
+        push("warn", t.toasts.staleTitle, t.toasts.staleText);
+        return;
+      }
       if (!res.ok) {
         push("error", t.toasts.errorTitle, errorText(body.error));
         if (res.status === 401) router.refresh();
@@ -190,7 +199,13 @@ export function AdminPanel({
           />
           {t.live.modes[form.mode]}
         </span>
-        <button type="button" onClick={logout} className={`${CHIP} ${CHIP_OFF} ml-auto`}>
+        <Link
+          href="/admin/remote"
+          className={`${CHIP} ml-auto inline-flex items-center bg-bordeaux-hi text-ink no-underline hover:bg-paper`}
+        >
+          {t.remoteLink}
+        </Link>
+        <button type="button" onClick={logout} className={`${CHIP} ${CHIP_OFF}`}>
           {t.logout}
         </button>
       </div>

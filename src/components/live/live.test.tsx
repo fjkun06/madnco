@@ -28,6 +28,25 @@ describe("live status on the website", () => {
     expect(link).toHaveTextContent("Live now · Twitch");
   });
 
+  it("points at the borrowed channel in Guest mode", () => {
+    render(<LivePill />);
+    setStatus({
+      live: true,
+      source: "manual",
+      channels: {
+        ...OFFLINE_STATUS.channels,
+        landscape: {
+          guest: true,
+          host: "@madhauzz",
+          url: "https://www.youtube.com/@madhauzz/live",
+        },
+      },
+    });
+    const link = screen.getByRole("link");
+    expect(link).toHaveAttribute("href", "https://www.youtube.com/@madhauzz/live");
+    expect(link).toHaveTextContent("Live now · @madhauzz");
+  });
+
   it("points the hero button at Twitch while live", () => {
     render(<HeroLiveCta className="" />);
     expect(screen.getByRole("link")).toHaveTextContent("Watch the lives");

@@ -9,6 +9,7 @@ import {
   type Quest,
   type TickerScene,
 } from "@/lib/stream/extras";
+import { CANVASES, cleanHandle, type Channels, type Co } from "@/lib/stream/channels";
 import type { Games } from "@/lib/stream/games";
 import {
   DEFAULT_STATE,
@@ -42,6 +43,10 @@ export type AdminForm = {
   clipShow: boolean;
   /** Game profiles and the game on stream. */
   games: Games;
+  /** Home or Guest per canvas. */
+  channels: Channels;
+  /** Tonight's Co and the roster. */
+  co: Co;
   presets: Preset[];
 };
 
@@ -49,7 +54,7 @@ export type AdminForm = {
 export type AdminTab = "live" | "games" | "schedule" | "screen" | "quest" | "web";
 export const ADMIN_TABS: AdminTab[] = ["live", "games", "schedule", "screen", "quest", "web"];
 
-export type FormField = "nextDate" | "nextTime" | "clipUrl";
+export type FormField = "nextDate" | "nextTime" | "clipUrl" | "guestHost";
 export type FormIssue = { field: FormField; tab: AdminTab; message: string };
 
 /** The form for a saved state. */
@@ -73,6 +78,8 @@ export function toForm(state: StreamState): AdminForm {
     clipTag: state.clip?.tag ?? "",
     clipShow: state.clip?.show ?? true,
     games: state.games,
+    channels: state.channels,
+    co: state.co,
     presets: state.presets,
   };
 }
@@ -80,13 +87,15 @@ export function toForm(state: StreamState): AdminForm {
 /**
  * Every field empty, Live status back to Auto. Presets and the game library
  * survive a reset: they are tools, not stream info. Only "which game is on
- * stream" is cleared.
+ * stream" and tonight's Co are cleared; Home/Guest stays as it is.
  */
 export function emptyForm(current: AdminForm): AdminForm {
   return {
     ...toForm(DEFAULT_STATE),
     presets: current.presets,
     games: { ...current.games, current: null },
+    channels: current.channels,
+    co: { ...current.co, name: "" },
   };
 }
 
@@ -129,6 +138,8 @@ export function fromForm(form: AdminForm, saved: StreamState): StreamState {
         }
       : null,
     games: form.games,
+    channels: form.channels,
+    co: form.co,
     presets: form.presets,
     updatedAt: saved.updatedAt,
   };
@@ -160,6 +171,9 @@ export function formIssues(form: AdminForm, saved: StreamState, now: number): Fo
     }
   }
 
+  if (CANVASES.some((canvas) => !cleanHandle(form.channels[canvas].host))) {
+    issues.push({ field: "guestHost", tab: "live", message: t.badHost });
+  }
   if (form.clipUrl.trim() && !parseClipUrl(form.clipUrl)) {
     issues.push({ field: "clipUrl", tab: "web", message: t.badClip });
   }
@@ -196,6 +210,8 @@ export function changedFields(
     ["brbUntil", "live", form.brbUntil, b.brbUntil],
     ["presets", "live", form.presets, b.presets],
     ["games", "games", form.games, b.games],
+    ["channels", "live", form.channels, b.channels],
+    ["co", "live", form.co, b.co],
     ["nextDate", "schedule", form.nextDate, b.nextDate],
     ["nextTime", "schedule", form.nextTime, b.nextTime],
     ["nextPlan", "schedule", form.nextPlan.trim(), b.nextPlan],
