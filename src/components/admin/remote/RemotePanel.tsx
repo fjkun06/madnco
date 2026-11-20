@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { EMPTY_LIVE, MOOD_COLORS, type GameLive, type LiveField } from "@/lib/stream/games";
+import {
+  EMPTY_LIVE,
+  MOOD_COLORS,
+  type GameLive,
+  type LiveField,
+  type ShowField,
+} from "@/lib/stream/games";
 import type { Canvas } from "@/lib/stream/channels";
 import type { QuickOp } from "@/lib/stream/quick";
 import type { StreamState } from "@/lib/stream/state";
@@ -241,6 +247,42 @@ export function RemotePanel({
               ) : null}
             </div>
           </div>
+
+          {current ? (
+            <div className={TILE}>
+              <span className={LBL}>{t.onScreen}</span>
+              <div className="grid grid-cols-3 gap-2">
+                {(
+                  [
+                    "showTitle",
+                    "showPart",
+                    "showGoal",
+                    ...(current.widget === "football" ? ["showRecord", "showGoals"] : []),
+                  ] as ShowField[]
+                ).map((field) => {
+                  const on = current[field];
+                  const what = interpolate(t.shows[field], { unit });
+                  return (
+                    <button
+                      key={field}
+                      type="button"
+                      aria-pressed={on}
+                      disabled={busy}
+                      onClick={() =>
+                        quick(
+                          { op: "show", field, on: !on },
+                          interpolate(on ? t.didShowOff : t.didShowOn, { what }),
+                        )
+                      }
+                      className={`${BTN} min-h-12 ${on ? "bg-tq text-ink" : `${OFF} line-through opacity-70`}`}
+                    >
+                      {what}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
 
           <div className={TILE}>
             <span className={LBL}>{t.co}</span>

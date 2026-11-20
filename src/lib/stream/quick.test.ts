@@ -71,6 +71,18 @@ describe("applyQuick", () => {
     expect(cp.poll.openedAt).toBe(NOW);
   });
 
+  it("switches parts of the game's overlay on and off", () => {
+    expect(parseQuickOp({ op: "show", field: "showGoals", on: false })).toEqual({
+      op: "show",
+      field: "showGoals",
+      on: false,
+    });
+    expect(parseQuickOp({ op: "show", field: "name", on: false })).toBeNull();
+    const next = applyQuick(base, { op: "show", field: "showTitle", on: false }, NOW)!;
+    expect(next.games.list.find((g) => g.id === bo6.id)!.showTitle).toBe(false);
+    expect(applyQuick({ ...base, games: { ...base.games, current: null } }, { op: "show", field: "showTitle", on: false }, NOW)).toBeNull();
+  });
+
   it("picks tonight's Co and flips Home / Guest", () => {
     expect(applyQuick(base, { op: "co", name: "Kevin" }, NOW)!.co).toEqual({
       name: "Kevin",

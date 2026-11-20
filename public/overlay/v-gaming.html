@@ -57,23 +57,23 @@
     
   </div>
 
-  <div class="play" hidden data-show="play" style="position: absolute; left: 24px; top: 782px; transform: scale(.92); transform-origin: 0 0">
-      <div class="row"><div class="gm cut-s"><span class="hzb"></span><div class="k mono">Now playing · <span data-text="mood-name"></span></div><div class="t disp" data-text="play-name"></div></div>
+  <div id="vplay" class="play" hidden data-show="play" style="position: absolute; left: 24px; top: 782px; transform: scale(.92); transform-origin: 0 0">
+      <div class="row"><div class="gm cut-s" hidden data-show="play-title"><span class="hzb"></span><div class="k mono">Now playing · <span data-text="mood-name"></span></div><div class="t disp" data-text="play-name"></div></div>
       <div class="pt cut-s" hidden data-show="play-part"><small class="mono" data-text="play-unit"></small><b data-text="play-part-n"></b></div></div>
       <div class="final mono cut-s" hidden data-show="play-final">Final <span data-text="play-unit"></span> · tonight we finish it</div>
       <div class="goal mono cut-s" hidden data-show="play-goal"><i>Goal</i><span data-text="play-goal"></span></div>
   </div>
-  <div hidden data-show="play" style="position: absolute; right: 24px; top: 782px; transform: scale(.92); transform-origin: 100% 0; display: flex; flex-direction: column; align-items: flex-end">
+  <div id="vstats" hidden data-show="play" style="position: absolute; right: 24px; top: 782px; transform: scale(.92); transform-origin: 100% 0; display: flex; flex-direction: column; align-items: flex-end">
       <div class="box cut-s" hidden data-show="play-counters"><svg class="ic ic-horror" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--a)" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3a7 7 0 0 0-7 7v4l-1.5 6 3-2 2 2 2-2 1.5 2 1.5-2 2 2 2-2 3 2L19 14v-4a7 7 0 0 0-7-7Z"/><circle cx="9" cy="10" r="1.3" fill="var(--a)"/><circle cx="15" cy="10" r="1.3" fill="var(--a)"/></svg><svg class="ic ic-action" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--a)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c-4 0-7 3-7 7 0 2.5 1.3 4 2.5 5v3h9v-3c1.2-1 2.5-2.5 2.5-5 0-4-3-7-7-7Z"/><path d="M9.5 18v3M14.5 18v3"/><circle cx="9.5" cy="11" r="1.4" fill="var(--a)"/><circle cx="14.5" cy="11" r="1.4" fill="var(--a)"/></svg><svg class="ic ic-story" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--a)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2V5Z"/><path d="M4 19a2 2 0 0 1 2-2h12"/></svg>
         <div hidden data-show="play-c1-on"><div class="mono lb" data-text="play-c1-label"></div><b class="n a" data-text="play-c1">0</b></div>
         <div class="sep" hidden data-show="play-c2-on"></div>
         <div hidden data-show="play-c2-on"><div class="mono lb" data-text="play-c2-label"></div><b class="n" data-text="play-c2">0</b></div>
       </div>
       <div class="fb cut-s" hidden data-show="play-football">
-        <div class="c"><span class="mono" style="color:var(--a)">W</span><b data-text="fb-w">0</b></div>
-        <div class="c"><span class="mono" style="color:#BBAAB1">D</span><b data-text="fb-d">0</b></div>
-        <div class="c"><span class="mono" style="color:var(--b)">L</span><b data-text="fb-l">0</b></div>
-        <div class="g"><span class="mono">Goals</span><b data-text="fb-goals">0:0</b></div>
+        <div class="c" hidden data-show="fb-record-on"><span class="mono" style="color:var(--a)">W</span><b data-text="fb-w">0</b></div>
+        <div class="c" hidden data-show="fb-record-on"><span class="mono" style="color:#BBAAB1">D</span><b data-text="fb-d">0</b></div>
+        <div class="c" hidden data-show="fb-record-on"><span class="mono" style="color:var(--b)">L</span><b data-text="fb-l">0</b></div>
+        <div class="g" hidden data-show="fb-goals-on"><span class="mono">Goals</span><b data-text="fb-goals">0:0</b></div>
       </div>
   </div>
   <div hidden data-show="play-poll" style="position: absolute; right: 24px; top: 1000px; transform: scale(.82); transform-origin: 100% 0">
@@ -107,5 +107,19 @@
 
 <script>(function(){var W=1080,H=1920;function fit(){var s=document.querySelector('.sc');var k=Math.min(innerWidth/W,innerHeight/H);s.style.transform='scale('+k+')';}addEventListener('resize',fit);fit();})();</script>
 
+<script>
+// Game title card + stats: top or bottom of the game area, card on the
+// game's preferred side, stats on the other. Called by live.js.
+window.MadnPlacePlay=function(pos){
+ var a=document.getElementById('vplay'),b=document.getElementById('vstats');if(!a||!b)return;
+ var top=pos[0]==='t',left=pos[1]==='l';
+ [a,b].forEach(function(e){e.style.top=e.style.bottom=e.style.left=e.style.right='auto';});
+ a.style[left?'left':'right']='24px';b.style[left?'right':'left']='24px';
+ if(top){a.style.top=b.style.top='782px';}else{a.style.bottom=b.style.bottom='576px';}
+ a.style.transformOrigin=(left?'0':'100%')+(top?' 0':' 100%');
+ b.style.transformOrigin=(left?'100%':'0')+(top?' 0':' 100%');
+ a.style.alignItems=left?'flex-start':'flex-end';b.style.alignItems=left?'flex-end':'flex-start';
+};
+</script>
 <script src="/overlay/live.js" defer></script>
 </body></html>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
+  CARD_POSITIONS,
   COUNTER_LABEL_MAX,
   COUNTER_PRESETS,
   COUNTER_TOTAL_MAX,
@@ -519,10 +520,22 @@ function ProfileEditor({
           placeholder={t.unitPlaceholder}
           onChange={(unit) => set({ unit })}
         />
-        <div className="flex items-end pb-3">
-          <Toggle checked={p.showPart} onChange={(showPart) => set({ showPart })}>
-            {t.showPart}
-          </Toggle>
+        <div className="flex flex-col gap-2">
+          <span className={LABEL}>{t.cardPos}</span>
+          <div role="group" aria-label={t.cardPos} className="grid w-max grid-cols-2 gap-1.5">
+            {CARD_POSITIONS.map((pos) => (
+              <button
+                key={pos}
+                type="button"
+                aria-pressed={p.cardPos === pos}
+                onClick={() => set({ cardPos: pos })}
+                className={`${CHIP_SM} min-w-28 ${p.cardPos === pos ? CHIP_ON : CHIP_OFF}`}
+              >
+                {t.corners[pos]}
+              </button>
+            ))}
+          </div>
+          <span className="text-[13px] leading-snug text-muted">{t.cardPosHint}</span>
         </div>
         <Field
           id="game-goal"
@@ -540,6 +553,29 @@ function ProfileEditor({
           placeholder={t.previouslyPlaceholder}
           onChange={(previously) => set({ previously })}
         />
+      </div>
+
+      <div className="flex flex-col gap-3 border-l-4 border-ink-3 pl-4">
+        <span className={LABEL}>{t.onOverlay}</span>
+        <Toggle checked={p.showTitle} onChange={(showTitle) => set({ showTitle })}>
+          {t.showTitle}
+        </Toggle>
+        <Toggle checked={p.showPart} onChange={(showPart) => set({ showPart })}>
+          {interpolate(t.showPartUnit, { unit: p.unit || "Part" })}
+        </Toggle>
+        <Toggle checked={p.showGoal} onChange={(showGoal) => set({ showGoal })}>
+          {t.showGoal}
+        </Toggle>
+        {p.widget === "football" ? (
+          <>
+            <Toggle checked={p.showRecord} onChange={(showRecord) => set({ showRecord })}>
+              {t.showRecord}
+            </Toggle>
+            <Toggle checked={p.showGoals} onChange={(showGoals) => set({ showGoals })}>
+              {t.showGoals}
+            </Toggle>
+          </>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-2">

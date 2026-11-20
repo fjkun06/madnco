@@ -37,7 +37,9 @@
  *   play-goal, play-prev, play-hours, mood-name, ticker-label   texts
  *   play-part, play-goal, play-prev, play-final, play-completed  show/hide
  *   play-counters, play-c1-on, play-c2-on, play-c1-label, play-c1 ("4 / 16")…
- *   play-football, fb-w, fb-d, fb-l, fb-goals ("14:9")
+ *   play-title (show the name card), play-football, fb-record-on /
+ *   fb-goals-on (show W/D/L, show goals), fb-w, fb-d, fb-l, fb-goals ("14:9");
+ *   window.MadnPlacePlay(corner) is called when the card's corner changes
  *   play-poll, poll-q, poll-o1…4 (show), poll-t1…4 ("!1 Yes · 40%"),
  *     data-bar="poll-1"… bar widths, poll-lead-1… set on the leader
  *   game-only                    the typed game, when no game mode is on
@@ -112,7 +114,7 @@
   }
 
   /* ---------------------------------------------------------- poll votes */
-  var votes = {}, voteKey = null, ws = null, wsRetry = 0;
+  var votes = {}, voteKey = null, ws = null, wsRetry = 0, lastCardPos = null;
 
   function pollVotes(poll) {
     var key = poll ? poll.openedAt + "|" + poll.options.length : null;
@@ -216,7 +218,17 @@
     out["play-c2-label"] = c[1] ? c[1].label : "";
     out["play-c1"] = c[0] ? counterText(c[0]) : "";
     out["play-c2"] = c[1] ? counterText(c[1]) : "";
-    out["play-football"] = p && p.widget === "football" ? "1" : "";
+    var fbOn = p && p.widget === "football";
+    out["fb-record-on"] = fbOn && fb.record !== false ? "1" : "";
+    out["fb-goals-on"] = fbOn && fb.goals !== false ? "1" : "";
+    out["play-football"] = out["fb-record-on"] || out["fb-goals-on"] ? "1" : "";
+    out["play-title"] = p && p.title !== false ? "1" : "";
+    // Each gaming page places the card in its own corner logic (cam, logo).
+    var pos = p && p.cardPos ? p.cardPos : "tl";
+    if (typeof window.MadnPlacePlay === "function" && pos !== lastCardPos) {
+      lastCardPos = pos;
+      window.MadnPlacePlay(pos);
+    }
     out["fb-w"] = String(fb.w || 0);
     out["fb-d"] = String(fb.d || 0);
     out["fb-l"] = String(fb.l || 0);
