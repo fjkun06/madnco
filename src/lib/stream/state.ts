@@ -34,6 +34,7 @@ import {
   type Co,
   type PublicChannels,
 } from "./channels";
+import { EMPTY_FANS, type PublicFans } from "./fans";
 import {
   DEFAULT_GAMES,
   currentProfile,
@@ -111,6 +112,8 @@ export type PublicStatus = {
   channels: PublicChannels;
   /** Tonight's Co ("" = solo) and the roster of past Cos. */
   co: Co;
+  /** The Founding 50 and the alerts to play on stream. */
+  fans: PublicFans;
 };
 
 export const TOPIC_MAX = 80;
@@ -264,6 +267,7 @@ export function publicStatus(
   now: number,
   twitchGame = "",
   gameLive: Record<string, GameLive> = {},
+  fans: PublicFans = EMPTY_FANS,
 ): PublicStatus {
   let live = false;
   let source: PublicStatus["source"] = "none";
@@ -317,6 +321,7 @@ export function publicStatus(
     shelf: shelf(state.games, gameLive),
     channels: publicChannels(state.channels),
     co: state.co,
+    fans,
   };
 }
 

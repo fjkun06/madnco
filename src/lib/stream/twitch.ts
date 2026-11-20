@@ -15,7 +15,7 @@ const STATUS_TTL = 60;
 
 export type TwitchStatus = { live: boolean; game: string };
 
-function credentials() {
+export function twitchCredentials() {
   const id = process.env.TWITCH_CLIENT_ID;
   const secret = process.env.TWITCH_CLIENT_SECRET;
   return id && secret ? { id, secret } : null;
@@ -28,7 +28,7 @@ export function twitchLogin(): string {
     .toLowerCase();
 }
 
-async function appToken(id: string, secret: string): Promise<string> {
+export async function twitchAppToken(id: string, secret: string): Promise<string> {
   const cached = await getJSON<string>(TOKEN_KEY);
   if (cached) return cached;
   const res = await fetch("https://id.twitch.tv/oauth2/token", {
@@ -53,12 +53,12 @@ async function appToken(id: string, secret: string): Promise<string> {
  * credentials, or Twitch/Redis failed). Never throws.
  */
 export async function twitchStatus(): Promise<TwitchStatus | null> {
-  const creds = credentials();
+  const creds = twitchCredentials();
   if (!creds) return null;
   try {
     const cached = await getJSON<TwitchStatus>(STATUS_KEY);
     if (cached) return cached;
-    const token = await appToken(creds.id, creds.secret);
+    const token = await twitchAppToken(creds.id, creds.secret);
     const res = await fetch(
       `https://api.twitch.tv/helix/streams?user_login=${encodeURIComponent(twitchLogin())}`,
       {

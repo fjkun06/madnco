@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { StreamState } from "@/lib/stream/state";
 import { en } from "@/locales/en";
@@ -21,6 +21,7 @@ import {
   type AdminTab,
   type FormField,
 } from "./form";
+import { FansTab } from "./tabs/FansTab";
 import { GamesTab } from "./tabs/GamesTab";
 import { LiveTab, isOtherGame } from "./tabs/LiveTab";
 import { QuestTab } from "./tabs/QuestTab";
@@ -58,7 +59,9 @@ export function AdminPanel({
   const [saved, setSaved] = useState<StreamState>(initial);
   const [form, setForm] = useState<AdminForm>(() => toForm(initial));
   const [otherGame, setOtherGame] = useState(isOtherGame(initial.game));
-  const [tab, setTab] = useState<AdminTab>("live");
+  // Back from a Twitch / YouTube login (?connect=…): open the Fans tab.
+  const connectResult = useSearchParams().get("connect");
+  const [tab, setTab] = useState<AdminTab>(connectResult ? "fans" : "live");
   const [saving, setSaving] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const resetTimer = useRef<number | undefined>(undefined);
@@ -275,6 +278,7 @@ export function AdminPanel({
             />
           ) : null}
           {tab === "games" ? <GamesTab {...props} /> : null}
+          {tab === "fans" ? <FansTab {...props} /> : null}
           {tab === "schedule" ? <ScheduleTab {...props} /> : null}
           {tab === "screen" ? <ScreenTab {...props} /> : null}
           {tab === "quest" ? <QuestTab {...props} /> : null}

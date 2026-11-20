@@ -6,6 +6,7 @@
 
 import { CANVASES, cleanHandle, pickCo, type Canvas } from "./channels";
 import { TICKER_SCENES, type TickerScene } from "./extras";
+import { SHOW_FIELDS, type ShowField } from "./games";
 import type { StreamState } from "./state";
 
 export type QuickOp =
@@ -16,6 +17,8 @@ export type QuickOp =
   | { op: "ticker"; scene: TickerScene; on: boolean }
   | { op: "final"; on: boolean }
   | { op: "poll"; open: boolean }
+  /** Switch a part of the game's overlay on or off (name, part, goal …). */
+  | { op: "show"; field: ShowField; on: boolean }
   /** The game on stream (null = none). */
   | { op: "game"; id: string | null }
   /** Tonight's Co ("" = solo). */
@@ -49,6 +52,10 @@ export function parseQuickOp(input: unknown): QuickOp | null {
       return { op: "final", on };
     case "poll":
       return { op: "poll", open: input.open === true };
+    case "show":
+      return SHOW_FIELDS.includes(input.field as ShowField)
+        ? { op: "show", field: input.field as ShowField, on }
+        : null;
     case "game":
       return input.id === null || (typeof input.id === "string" && /^[a-z0-9-]{1,56}$/.test(input.id))
         ? { op: "game", id: input.id as string | null }
@@ -101,6 +108,8 @@ export function applyQuick(state: StreamState, op: QuickOp, now: number): Stream
       return setCurrent({
         poll: { ...current.poll, open: op.open, openedAt: op.open ? now : current.poll.openedAt },
       });
+    case "show":
+      return current ? setCurrent({ [op.field]: op.on }) : null;
     case "game":
       if (op.id !== null && !games.list.some((g) => g.id === op.id)) return null;
       return { ...state, games: { ...games, current: op.id } };

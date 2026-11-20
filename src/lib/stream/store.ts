@@ -11,6 +11,7 @@ import {
   type SaveError,
   type StreamState,
 } from "./state";
+import { loadPublicFans } from "./fanStore";
 import { completedProfiles } from "./games";
 import { loadGameLive } from "./gameStore";
 import { twitchStatus } from "./twitch";
@@ -57,9 +58,10 @@ export async function loadPublicStatus(): Promise<PublicStatus> {
     ...(state.games.current ? [state.games.current] : []),
     ...completedProfiles(state.games).map((g) => g.id),
   ];
-  const [twitch, live] = await Promise.all([
+  const [twitch, live, fans] = await Promise.all([
     state.mode === "auto" ? twitchStatus() : Promise.resolve(null),
     loadGameLive(ids),
+    loadPublicFans(),
   ]);
-  return publicStatus(state, twitch?.live ?? null, Date.now(), twitch?.game, live);
+  return publicStatus(state, twitch?.live ?? null, Date.now(), twitch?.game, live, fans);
 }

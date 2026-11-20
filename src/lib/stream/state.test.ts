@@ -197,7 +197,7 @@ describe("publicStatus with game modes", () => {
     {
       ...DEFAULT_STATE,
       game: "FIFA",
-      games: { list: [bo6], current: bo6.id },
+      games: { list: [bo6], current: bo6.id, known: [] },
     },
     NOW,
   );
@@ -218,7 +218,7 @@ describe("publicStatus with game modes", () => {
   });
 
   it("keeps the library when an old state is loaded", () => {
-    expect(sanitizeState({ mode: "auto" }, NOW).games.list).toHaveLength(28);
+    expect(sanitizeState({ mode: "auto" }, NOW).games.list).toHaveLength(29);
     expect(OFFLINE_STATUS.play).toBeNull();
   });
 });

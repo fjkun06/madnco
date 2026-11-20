@@ -4,6 +4,7 @@ import { CompletedShelf } from "@/components/home/CompletedShelf";
 import { Crew } from "@/components/home/Crew";
 import { DiscordBand } from "@/components/home/DiscordBand";
 import { FindUs } from "@/components/home/FindUs";
+import { FoundersWall } from "@/components/home/FoundersWall";
 import { Hero } from "@/components/home/Hero";
 import { LatestClip } from "@/components/home/LatestClip";
 import { Tapes } from "@/components/home/Tapes";
@@ -23,6 +24,7 @@ export default function HomePage() {
       <Activities />
       <DiscordBand />
       <FindUs />
+      <FoundersWall />
       <LatestClip />
       <CompletedShelf />
       <CaseFile />

@@ -37,7 +37,9 @@
  *   play-goal, play-prev, play-hours, mood-name, ticker-label   texts
  *   play-part, play-goal, play-prev, play-final, play-completed  show/hide
  *   play-counters, play-c1-on, play-c2-on, play-c1-label, play-c1 ("4 / 16")…
- *   play-football, fb-w, fb-d, fb-l, fb-goals ("14:9")
+ *   play-title (show the name card), play-football, fb-record-on /
+ *   fb-goals-on (show W/D/L, show goals), fb-w, fb-d, fb-l, fb-goals ("14:9");
+ *   window.MadnPlacePlay(corner) is called when the card's corner changes
  *   play-poll, poll-q, poll-o1…4 (show), poll-t1…4 ("!1 Yes · 40%"),
  *     data-bar="poll-1"… bar widths, poll-lead-1… set on the leader
  *   game-only                    the typed game, when no game mode is on
@@ -55,6 +57,13 @@
  * Co tonight:
  *   co / co-name        set while someone sits in the Co seat (their name)
  *   co-open             solo night: the Co slot is open
+ *
+ * Founding 50 and alerts:
+ *   #alert-lane         follow alerts (new founders) and welcome strips play
+ *                       here one at a time; Twitch first-time chatters are
+ *                       welcomed on landscape pages (read from chat)
+ *   [data-founders]     filled with every founder, twice (a looping roll)
+ *   founders-any / founders-count / founders-left
  *
  * Without an answer (offline, local file) every slot keeps its default.
  */
@@ -112,7 +121,7 @@
   }
 
   /* ---------------------------------------------------------- poll votes */
-  var votes = {}, voteKey = null, ws = null, wsRetry = 0;
+  var votes = {}, voteKey = null, ws = null, wsRetry = 0, lastCardPos = null;
 
   function pollVotes(poll) {
     var key = poll ? poll.openedAt + "|" + poll.options.length : null;
@@ -120,9 +129,9 @@
       votes = {};
       voteKey = key;
     }
-    if (poll && !ws && CHANNEL && typeof WebSocket === "function" && wsRetry < Date.now())
+    if ((poll || WANT_WELCOME) && !ws && CHANNEL && typeof WebSocket === "function" && wsRetry < Date.now())
       connectChat();
-    if (!poll && ws) {
+    if (!poll && !WANT_WELCOME && ws) {
       ws.close();
       ws = null;
     }
@@ -144,6 +153,7 @@
       return;
     }
     ws.onopen = function () {
+      ws.send("CAP REQ :twitch.tv/tags");
       ws.send("PASS SCHMOOPIIE");
       ws.send("NICK justinfan" + Math.floor(10000 + Math.random() * 80000));
       ws.send("JOIN #" + CHANNEL);
@@ -156,14 +166,129 @@
           ws.send("PONG :tmi.twitch.tv");
           continue;
         }
-        var m = line.match(/^:([^!]+)![^ ]+ PRIVMSG #[^ ]+ :\s*!([1-4])\b/);
-        if (m) votes[m[1].toLowerCase()] = Number(m[2]) - 1;
+        var m = line.match(/^(?:@(\S+) )?:([^!]+)![^ ]+ PRIVMSG #[^ ]+ :(.*)$/);
+        if (!m) continue;
+        var vote = m[3].match(/^\s*!([1-4])\b/);
+        if (vote) votes[m[2].toLowerCase()] = Number(vote[1]) - 1;
+        // Twitch marks someone's first message in this channel ever.
+        if (WANT_WELCOME && m[1] && /(^|;)first-msg=1(;|$)/.test(m[1])) {
+          var dn = (m[1].match(/(?:^|;)display-name=([^;]*)/) || [])[1] || m[2];
+          enqueue({ id: "tw" + Date.now() + m[2], kind: "welcome", name: "@" + dn, platform: "twitch", n: null });
+        }
       }
     };
     ws.onclose = function () {
       ws = null;
       wsRetry = Date.now() + 15000;
     };
+  }
+
+  /* ---------------------------------------------------------- alerts */
+  var LANE = document.getElementById("alert-lane");
+  // Twitch first-time chatters are welcomed on the landscape scenes only.
+  var WANT_WELCOME = !!LANE && !VERTICAL;
+  var LOADED = Date.now();
+  var seenAlerts = {}, queue = [], playing = false, foundersNow = 0, foundersGoal = 50;
+  var PLATFORM_NAME = { tiktok: "TikTok", youtube: "YouTube", twitch: "Twitch", other: "" };
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text) e.textContent = text;
+    return e;
+  }
+
+  function enqueue(a) {
+    if (!LANE || seenAlerts[a.id]) return;
+    seenAlerts[a.id] = 1;
+    queue.push(a);
+    playNext();
+  }
+
+  function takeAlerts(list) {
+    for (var i = 0; i < list.length; i++) {
+      var a = list[i];
+      // Alerts from before this page opened were already shown elsewhere.
+      if (a.at < LOADED - 15000) seenAlerts[a.id] = 1;
+      else enqueue(a);
+    }
+  }
+
+  function renderAlert(a) {
+    if (a.kind === "welcome") {
+      var w = el("div", "welcome cut-s");
+      w.appendChild(el("span", "k", "First time in chat"));
+      w.appendChild(el("span", "t", "Welcome to the madness, " + a.name + " 👻"));
+      return w;
+    }
+    var box = el("div", "alert cut");
+    var badge = el("div", "badge");
+    badge.appendChild(el("span", "", a.n ? "Founder" : "New"));
+    badge.appendChild(el("b", "", a.n ? "#" + a.n : "+1"));
+    box.appendChild(badge);
+    var body = el("div", "body");
+    var where = PLATFORM_NAME[a.platform] ? " on " + PLATFORM_NAME[a.platform] : "";
+    body.appendChild(el("span", "k", "New in the fam · followed" + where));
+    body.appendChild(el("span", "n", a.name || "Someone just joined"));
+    var s = el("span", "s");
+    var left = Math.max(0, foundersGoal - Math.max(foundersNow, a.n || 0));
+    if (a.n) {
+      s.appendChild(document.createTextNode("Your name goes on the Founders Wall. "));
+      s.appendChild(el("b", "", left + " spots left"));
+    } else if (!a.name) {
+      s.appendChild(document.createTextNode("Comment “founder” to get your name on the wall."));
+    } else {
+      s.appendChild(document.createTextNode("Welcome to the madness."));
+    }
+    body.appendChild(s);
+    var bar = el("div", "bar cut-s");
+    var fill = el("i");
+    fill.style.width = Math.min(100, (Math.max(foundersNow, a.n || 0) / foundersGoal) * 100) + "%";
+    bar.appendChild(fill);
+    body.appendChild(bar);
+    box.appendChild(body);
+    box.appendChild(el("span", "edge"));
+    return box;
+  }
+
+  function playNext() {
+    if (playing || !queue.length) return;
+    playing = true;
+    var a = queue.shift();
+    var node = renderAlert(a);
+    LANE.appendChild(node);
+    var stay = a.kind === "welcome" ? 6000 : 8000;
+    setTimeout(function () {
+      node.classList.add("out");
+      setTimeout(function () {
+        if (node.parentNode) node.parentNode.removeChild(node);
+        playing = false;
+        setTimeout(playNext, 500);
+      }, 400);
+    }, stay);
+  }
+
+  /* Ending: the founders strip */
+  var lastFounders = "";
+  function fillFounders(fans) {
+    var tracks = document.querySelectorAll("[data-founders]");
+    var list = (fans && fans.founders) || [];
+    var key = list.map(function (f) { return f.name; }).join("|");
+    if (key === lastFounders) return;
+    lastFounders = key;
+    for (var t = 0; t < tracks.length; t++) {
+      var trk = tracks[t];
+      while (trk.firstChild) trk.removeChild(trk.firstChild);
+      // Twice, so the roll loops seamlessly.
+      for (var r = 0; r < 2; r++) {
+        for (var i = 0; i < list.length; i++) {
+          var span = el("span", "", list[i].name);
+          span.insertBefore(el("i", "", "#" + (i < 9 ? "0" : "") + (i + 1)), span.firstChild);
+          trk.appendChild(span);
+        }
+      }
+      trk.style.setProperty("--dur", Math.max(20, list.length * 3) + "s");
+    }
   }
 
   function setMood(play) {
@@ -216,7 +341,17 @@
     out["play-c2-label"] = c[1] ? c[1].label : "";
     out["play-c1"] = c[0] ? counterText(c[0]) : "";
     out["play-c2"] = c[1] ? counterText(c[1]) : "";
-    out["play-football"] = p && p.widget === "football" ? "1" : "";
+    var fbOn = p && p.widget === "football";
+    out["fb-record-on"] = fbOn && fb.record !== false ? "1" : "";
+    out["fb-goals-on"] = fbOn && fb.goals !== false ? "1" : "";
+    out["play-football"] = out["fb-record-on"] || out["fb-goals-on"] ? "1" : "";
+    out["play-title"] = p && p.title !== false ? "1" : "";
+    // Each gaming page places the card in its own corner logic (cam, logo).
+    var pos = p && p.cardPos ? p.cardPos : "tl";
+    if (typeof window.MadnPlacePlay === "function" && pos !== lastCardPos) {
+      lastCardPos = pos;
+      window.MadnPlacePlay(pos);
+    }
     out["fb-w"] = String(fb.w || 0);
     out["fb-d"] = String(fb.d || 0);
     out["fb-l"] = String(fb.l || 0);
@@ -280,6 +415,20 @@
     };
   }
 
+  function fanValues(s, v) {
+    var fans = s.fans || null;
+    var n = fans && fans.founders ? fans.founders.length : 0;
+    foundersNow = n;
+    foundersGoal = (fans && fans.goal) || 50;
+    v["founders-any"] = n ? "1" : "";
+    v["founders-count"] = String(n);
+    v["founders-left"] = String(Math.max(0, foundersGoal - n));
+    if (status) {
+      takeAlerts((fans && fans.alerts) || []);
+      fillFounders(fans);
+    }
+  }
+
   function crewValues(s, v) {
     var chs = s.channels || null;
     var ch = chs ? (VERTICAL ? chs.vertical : chs.landscape) : null;
@@ -305,6 +454,7 @@
     var v = values(now);
     playValues(s, v);
     crewValues(s, v);
+    fanValues(s, v);
     if (v.guest) v["ticker-label"] = "Guest";
     // The game's own ticker lines (and the guest line) join the gaming ticker.
     var extra = v._playTicker.slice();

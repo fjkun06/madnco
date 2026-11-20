@@ -24,6 +24,7 @@
 </style>
 
 <style>html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}.sc{transform-origin:0 0}.bgwrap{position:absolute;inset:0;overflow:hidden;background:#110A0C;-webkit-mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000);mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000);-webkit-mask-size:100% 100%,960px 1200px;mask-size:100% 100%,960px 1200px;-webkit-mask-position:0 0,60px 170px;mask-position:0 0,60px 170px;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-composite:xor;mask-composite:exclude}[hidden]{display:none!important}</style>
+<link rel="stylesheet" href="/overlay/alerts.css">
 </head><body>
 
 <div class="sc">
@@ -58,6 +59,7 @@
   <div style="position: absolute; left: 60px; right: 60px; top: 1530px; bottom: 60px; border: 0; display: flex; align-items: center; justify-content: center; text-align: center">
     
   </div>
+  <div id="alert-lane" class="alane v" aria-live="polite" style="left: 40px; right: 40px; top: 1390px"></div>
 </div>
 
 <script>(function(){var W=1080,H=1920;function fit(){var s=document.querySelector('.sc');var k=Math.min(innerWidth/W,innerHeight/H);s.style.transform='scale('+k+')';}addEventListener('resize',fit);fit();})();</script>

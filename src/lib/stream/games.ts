@@ -32,6 +32,14 @@ export type Poll = {
   openedAt: number | null;
 };
 
+/** Corner of the title card on the gaming overlay. */
+export const CARD_POSITIONS = ["tl", "tr", "bl", "br"] as const;
+export type CardPos = (typeof CARD_POSITIONS)[number];
+
+/** Parts of the overlay that can be switched off per game. */
+export const SHOW_FIELDS = ["showTitle", "showPart", "showGoal", "showRecord", "showGoals"] as const;
+export type ShowField = (typeof SHOW_FIELDS)[number];
+
 export type GameProfile = {
   /** Stable key: a slug of the first name. */
   id: string;
@@ -39,9 +47,18 @@ export type GameProfile = {
   mood: Mood;
   /** "Part", "Ep", "Session" … */
   unit: string;
+  /** The game-name card. */
+  showTitle: boolean;
+  /** The part / session chip. */
   showPart: boolean;
   /** One line under the title. */
   goal: string;
+  showGoal: boolean;
+  /** Scoreboard: wins / draws / losses, and goals scored : conceded. */
+  showRecord: boolean;
+  showGoals: boolean;
+  /** Preferred corner; the overlay moves it if the cam or logo is there. */
+  cardPos: CardPos;
   /** "Previously on …" line for Starting Soon. */
   previously: string;
   widget: Widget;
@@ -55,8 +72,12 @@ export type GameProfile = {
   completedAt: number | null;
 };
 
-/** The library plus which game is on stream. */
-export type Games = { list: GameProfile[]; current: string | null };
+/**
+ * The library plus which game is on stream. `known` = default games the
+ * library has already had, so a new default (EA FC 27) gets added once and a
+ * deleted one doesn't come back.
+ */
+export type Games = { list: GameProfile[]; current: string | null; known: string[] };
 
 /** Values that change while streaming (one Redis hash per game). */
 export type GameLive = {
@@ -154,6 +175,7 @@ type Seed = [name: string, mood: Mood, unit: string, goal: string, widget: Widge
 
 /** Every game installed on Frank's PC (19 Nov 2026), with a sensible start. */
 const SEEDS: Seed[] = [
+  ["EA FC 27", "football", "Session", "Road to Division 1", "football", []],
   ["EA FC 26", "football", "Session", "Road to Division 1", "football", []],
   ["EA FC 25", "football", "Session", "Old squad, new grudges", "football", []],
   ["eFootball", "football", "Session", "Mad vs Co, first to 3 wins", "football", []],
@@ -184,14 +206,22 @@ const SEEDS: Seed[] = [
   ["Control Resonant", "story", "Ep", "First playthrough", "counters", ["Deaths", "Bosses beaten"]],
 ];
 
+/** Football games keep the top-left corner free for the in-game scoreboard. */
+export const defaultCardPos = (mood: Mood): CardPos => (mood === "football" ? "bl" : "tl");
+
 export function newProfile(name: string, taken: Iterable<string>, mood: Mood = "action"): GameProfile {
   return {
     id: uniqueId(name, taken),
     name: cleanText(name, GAME_NAME_MAX),
     mood,
     unit: "Part",
+    showTitle: true,
     showPart: true,
     goal: "",
+    showGoal: true,
+    showRecord: true,
+    showGoals: true,
+    cardPos: defaultCardPos(mood),
     previously: "",
     widget: "counters",
     counters: [{ label: "Deaths", total: null }],
@@ -216,7 +246,12 @@ export const DEFAULT_LIBRARY: GameProfile[] = SEEDS.reduce<GameProfile[]>((list,
   return list;
 }, []);
 
-export const DEFAULT_GAMES: Games = { list: DEFAULT_LIBRARY, current: null };
+export const DEFAULT_IDS = DEFAULT_LIBRARY.map((g) => g.id);
+
+/** Defaults added after the first library (v4); older saves get these once. */
+const ADDED_LATER = ["ea-fc-27"];
+
+export const DEFAULT_GAMES: Games = { list: DEFAULT_LIBRARY, current: null, known: DEFAULT_IDS };
 
 // ---------------------------------------------------------------- sanitize
 
@@ -263,8 +298,15 @@ export function sanitizeProfile(input: unknown, taken: Set<string>): GameProfile
     name,
     mood,
     unit: cleanText(input.unit, UNIT_MAX) || "Part",
+    showTitle: input.showTitle !== false,
     showPart: input.showPart !== false,
     goal: cleanText(input.goal, GOAL_LINE_MAX),
+    showGoal: input.showGoal !== false,
+    showRecord: input.showRecord !== false,
+    showGoals: input.showGoals !== false,
+    cardPos: CARD_POSITIONS.includes(input.cardPos as CardPos)
+      ? (input.cardPos as CardPos)
+      : defaultCardPos(mood),
     previously: cleanText(input.previously, PREVIOUSLY_MAX),
     widget,
     counters: sanitizeCounters(input.counters),
@@ -295,8 +337,24 @@ export function sanitizeGames(input: unknown): Games {
     list.push(profile);
     if (list.length === GAMES_MAX) break;
   }
+  // Defaults added since this library was saved join it once; ones the
+  // library already had (even if deleted since) stay as they are. A library
+  // saved before `known` existed had every first-wave default.
+  const known = new Set(
+    Array.isArray(input.known)
+      ? input.known.filter(isId)
+      : DEFAULT_IDS.filter((id) => !ADDED_LATER.includes(id)),
+  );
+  for (const seed of DEFAULT_LIBRARY) {
+    if (known.has(seed.id)) continue;
+    known.add(seed.id);
+    if (!taken.has(seed.id) && list.length < GAMES_MAX) {
+      taken.add(seed.id);
+      list.push(seed);
+    }
+  }
   const current = isId(input.current) && taken.has(input.current) ? input.current : null;
-  return { list, current };
+  return { list, current, known: [...known].filter((id) => DEFAULT_IDS.includes(id)) };
 }
 
 // ---------------------------------------------------------------- live values
@@ -350,7 +408,19 @@ export type PublicPlay = {
   previously: string;
   widget: Widget;
   counters: PublicCounter[];
-  football: { w: number; d: number; l: number; gf: number; ga: number };
+  football: {
+    w: number;
+    d: number;
+    l: number;
+    gf: number;
+    ga: number;
+    /** Show W/D/L, show goals scored : conceded. */
+    record: boolean;
+    goals: boolean;
+  };
+  /** Show the game-name card. */
+  title: boolean;
+  cardPos: CardPos;
   poll: { question: string; options: string[]; openedAt: number } | null;
   ticker: string[];
   finalPart: boolean;
@@ -395,11 +465,21 @@ export function publicPlay(profile: GameProfile, live: GameLive = EMPTY_LIVE): P
     mood: profile.mood,
     unit: profile.unit,
     part: profile.showPart ? live.part : null,
-    goal: profile.goal,
+    goal: profile.showGoal ? profile.goal : "",
     previously: profile.previously,
     widget: profile.widget,
     counters: profile.widget === "counters" ? publicCounters(profile, live) : [],
-    football: { w: live.w, d: live.d, l: live.l, gf: live.gf, ga: live.ga },
+    football: {
+      w: live.w,
+      d: live.d,
+      l: live.l,
+      gf: live.gf,
+      ga: live.ga,
+      record: profile.showRecord,
+      goals: profile.showGoals,
+    },
+    title: profile.showTitle,
+    cardPos: profile.cardPos,
     poll: poll && poll.options.length >= 2 ? poll : null,
     ticker: profile.ticker,
     finalPart: profile.finalPart && !profile.completedAt,

@@ -33,13 +33,14 @@
 <style>html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}.sc{transform-origin:0 0}.follow.fl{animation-name:peekL;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}@keyframes peekL{0%,70%,100%{transform:translateX(-120%)}74%,96%{transform:translateX(0)}}[hidden]{display:none!important}</style>
 <link rel="stylesheet" href="/overlay/play.css">
 <link rel="stylesheet" href="/overlay/guest.css">
+<link rel="stylesheet" href="/overlay/alerts.css">
 </head><body>
 
 <div class="sc">
   
 
   <div id="play" class="play" hidden data-show="play" style="position: absolute; left: 32px; top: 28px">
-      <div class="row"><div class="gm cut-s"><span class="hzb"></span><div class="k mono">Now playing · <span data-text="mood-name"></span></div><div class="t disp" data-text="play-name"></div></div>
+      <div class="row"><div class="gm cut-s" hidden data-show="play-title"><span class="hzb"></span><div class="k mono">Now playing · <span data-text="mood-name"></span></div><div class="t disp" data-text="play-name"></div></div>
       <div class="pt cut-s" hidden data-show="play-part"><small class="mono" data-text="play-unit"></small><b data-text="play-part-n"></b></div></div>
       <div class="final mono cut-s" hidden data-show="play-final">Final <span data-text="play-unit"></span> · tonight we finish it</div>
       <div class="goal mono cut-s" hidden data-show="play-goal"><i>Goal</i><span data-text="play-goal"></span></div>
@@ -50,10 +51,10 @@
         <div hidden data-show="play-c2-on"><div class="mono lb" data-text="play-c2-label"></div><b class="n" data-text="play-c2">0</b></div>
       </div>
       <div class="fb cut-s" hidden data-show="play-football">
-        <div class="c"><span class="mono" style="color:var(--a)">W</span><b data-text="fb-w">0</b></div>
-        <div class="c"><span class="mono" style="color:#BBAAB1">D</span><b data-text="fb-d">0</b></div>
-        <div class="c"><span class="mono" style="color:var(--b)">L</span><b data-text="fb-l">0</b></div>
-        <div class="g"><span class="mono">Goals</span><b data-text="fb-goals">0:0</b></div>
+        <div class="c" hidden data-show="fb-record-on"><span class="mono" style="color:var(--a)">W</span><b data-text="fb-w">0</b></div>
+        <div class="c" hidden data-show="fb-record-on"><span class="mono" style="color:#BBAAB1">D</span><b data-text="fb-d">0</b></div>
+        <div class="c" hidden data-show="fb-record-on"><span class="mono" style="color:var(--b)">L</span><b data-text="fb-l">0</b></div>
+        <div class="g" hidden data-show="fb-goals-on"><span class="mono">Goals</span><b data-text="fb-goals">0:0</b></div>
       </div>
       <div class="poll cut" hidden data-show="play-poll">
         <div class="h mono"><span>Chat decides · type !1 !2</span><span data-text="poll-votes">0 votes</span></div>
@@ -103,6 +104,7 @@
     <span class="mono tlabel" data-text="ticker-label">MadnCo.</span>
     <div class="tclip"><div class="tk" data-ticker="gaming"><span style="font-size: 20px">MadnCo.</span><i style="font-size: 16px">//</i></div></div>
   </div>
+  <div id="alert-lane" class="alane" aria-live="polite" style="left: 660px; top: 28px; width: 760px"></div>
 </div>
 
 <script>(function(){var W=1920,H=1080;function fit(){var s=document.querySelector('.sc');var k=Math.min(innerWidth/W,innerHeight/H);s.style.transform='scale('+k+')';}addEventListener('resize',fit);fit();})();</script>
@@ -116,11 +118,28 @@ function place(el,p,dx,dy){el.style.left=el.style.right=el.style.top=el.style.bo
  if(p[0]==='t')el.style.top=dy+'px';else el.style.bottom=dy+'px';}
 place(c,cam,32,32);
 var g=document.getElementById('gtag'),h=document.getElementById('homecard');
-var pl=document.getElementById('play');if(cam==='tl'){pl.style.top='auto';pl.style.bottom='100px';}
+var pl=document.getElementById('play');
 if(logo!=='off'){if(ok.indexOf(logo)<0)logo='t'+(cam[1]==='l'?'r':'l');
  if(logo===cam)logo=logo[0]+(logo[1]==='l'?'r':'l');place(l,logo,28,22);place(g,logo,30,logo[0]==='t'?118:150);}else{l.style.display='none';place(g,'t'+(cam[1]==='l'?'r':'l'),30,28);}
 var used=[cam,logo];
 if(used.indexOf('br')>=0){if(used.indexOf('bl')<0){f.style.right='auto';f.style.left='0';f.classList.add('fl');h.style.right='auto';h.style.left='0';h.classList.add('fl');}else{f.style.bottom='420px';h.style.bottom='420px';}}
+// Game title card: the game's preferred corner, or the next free one
+// (not where the cam, logo or Follow toast sit). Called by live.js.
+var taken=used.slice();taken.push(used.indexOf('br')>=0&&used.indexOf('bl')<0?'bl':'br');
+window.MadnPlacePlay=function(pref){
+ var v=function(p){return (p[0]==='t'?'b':'t')+p[1];},hz=function(p){return p[0]+(p[1]==='l'?'r':'l');};
+ var order=[pref,v(pref),hz(pref),v(hz(pref))],pos=pref;
+ for(var i=0;i<order.length;i++){if(taken.indexOf(order[i])<0){pos=order[i];break;}}
+ pl.style.left=pl.style.right=pl.style.top=pl.style.bottom='auto';
+ if(pos[1]==='l')pl.style.left='32px';else pl.style.right='32px';
+ if(pos[0]==='t')pl.style.top='28px';else pl.style.bottom='100px';
+ pl.style.alignItems=pos[1]==='l'?'flex-start':'flex-end';
+};
+window.MadnPlacePlay('tl');
+// Alert lane: along the top, beside the cam when the cam is up there.
+var lane=document.getElementById('alert-lane');
+if(cam==='tr'){lane.style.left='auto';lane.style.right='696px';}
+else if(cam==='tl'){lane.style.left='696px';}
 })();</script>
 <script src="/overlay/live.js" defer></script>
 </body></html>

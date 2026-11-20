@@ -1,5 +1,6 @@
 import {
   DEFAULT_GAMES,
+  DEFAULT_IDS,
   DEFAULT_LIBRARY,
   EMPTY_LIVE,
   GAMES_MAX,
@@ -28,9 +29,9 @@ describe("slugify / uniqueId", () => {
 });
 
 describe("default library", () => {
-  it("has all 28 installed games with unique ids", () => {
-    expect(DEFAULT_LIBRARY).toHaveLength(28);
-    expect(new Set(DEFAULT_LIBRARY.map((g) => g.id)).size).toBe(28);
+  it("has all 29 installed games with unique ids", () => {
+    expect(DEFAULT_LIBRARY).toHaveLength(29);
+    expect(new Set(DEFAULT_LIBRARY.map((g) => g.id)).size).toBe(29);
     expect(DEFAULT_GAMES.current).toBeNull();
   });
 
@@ -47,8 +48,39 @@ describe("sanitizeGames", () => {
     expect(sanitizeGames({ list: "x" })).toEqual(DEFAULT_GAMES);
   });
 
-  it("keeps an empty library empty", () => {
-    expect(sanitizeGames({ list: [], current: "x" })).toEqual({ list: [], current: null });
+  it("keeps an emptied library empty", () => {
+    expect(sanitizeGames({ list: [], current: "x", known: DEFAULT_IDS })).toEqual({
+      list: [],
+      current: null,
+      known: DEFAULT_IDS,
+    });
+  });
+
+  it("adds a new default (EA FC 27) once, and never brings back a deleted one", () => {
+    const old = DEFAULT_LIBRARY.filter((g) => g.id !== "ea-fc-27" && g.id !== "resident-evil-7");
+    // Saved before `known` existed: RE7 was deleted, FC 27 didn't exist yet.
+    const games = sanitizeGames({ list: old, current: null });
+    const ids = games.list.map((g) => g.id);
+    expect(ids).toContain("ea-fc-27");
+    expect(ids).not.toContain("resident-evil-7");
+    expect(games.known).toContain("ea-fc-27");
+    // Deleting FC 27 later sticks.
+    const again = sanitizeGames({ ...games, list: games.list.filter((g) => g.id !== "ea-fc-27") });
+    expect(again.list.map((g) => g.id)).not.toContain("ea-fc-27");
+  });
+
+  it("keeps football cards off the scoreboard corner and everything visible by default", () => {
+    const fc = DEFAULT_LIBRARY.find((g) => g.id === "ea-fc-27")!;
+    expect(fc.cardPos).toBe("bl");
+    expect(DEFAULT_LIBRARY.find((g) => g.mood === "action")!.cardPos).toBe("tl");
+    const old = sanitizeGames({ list: [{ name: "EA FC 26", mood: "football" }], known: DEFAULT_IDS });
+    expect(old.list[0]).toMatchObject({
+      cardPos: "bl",
+      showTitle: true,
+      showGoal: true,
+      showRecord: true,
+      showGoals: true,
+    });
   });
 
   it("cleans profiles and drops junk", () => {
@@ -73,6 +105,7 @@ describe("sanitizeGames", () => {
         "junk",
       ],
       current: "bo6",
+      known: DEFAULT_IDS,
     });
     expect(games.list).toHaveLength(2);
     const [first, second] = games.list;
@@ -94,7 +127,7 @@ describe("sanitizeGames", () => {
   });
 
   it("forgets a current game that isn't in the list and caps the list", () => {
-    expect(sanitizeGames({ list: [{ name: "A" }], current: "b" }).current).toBeNull();
+    expect(sanitizeGames({ list: [{ name: "A" }], current: "b", known: DEFAULT_IDS }).current).toBeNull();
     const many = Array.from({ length: 60 }, (_, i) => ({ name: `Game ${i}` }));
     expect(sanitizeGames({ list: many }).list).toHaveLength(GAMES_MAX);
   });
@@ -151,6 +184,17 @@ describe("publicPlay", () => {
     expect(partLabel(play)).toBe("");
   });
 
+  it("passes the show switches and card corner to the overlay", () => {
+    const play = publicPlay(
+      { ...base, goal: "Div 1", showGoal: false, showTitle: false, showRecord: false, cardPos: "br" },
+      live,
+    );
+    expect(play.goal).toBe("");
+    expect(play.title).toBe(false);
+    expect(play.football).toMatchObject({ record: false, goals: true });
+    expect(play.cardPos).toBe("br");
+  });
+
   it("only shows an open poll with two options", () => {
     const poll = { question: "Spare him?", options: ["Yes", "No"], open: true, openedAt: NOW };
     expect(publicPlay({ ...base, widget: "poll", poll }).poll).toEqual({
@@ -178,7 +222,7 @@ describe("shelf", () => {
     const a = { ...newProfile("Old", []), completedAt: NOW - 1000 };
     const b = { ...newProfile("New", ["old"]), completedAt: NOW };
     const c = newProfile("Ongoing", ["old", "new"]);
-    const items = shelf({ list: [a, b, c], current: c.id }, { old: { ...EMPTY_LIVE, part: 7, mins: 600, c1: 30 } });
+    const items = shelf({ list: [a, b, c], current: c.id, known: [] }, { old: { ...EMPTY_LIVE, part: 7, mins: 600, c1: 30 } });
     expect(items.map((i) => i.name)).toEqual(["New", "Old"]);
     expect(items[1]).toMatchObject({ parts: 7, hours: 10 });
     expect(items[1].counters).toEqual([{ label: "Deaths", value: 30, total: null }]);
