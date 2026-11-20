@@ -2,6 +2,7 @@ import {
   COUNTDOWN_GRACE_MS,
   DEFAULT_STATE,
   NEXT_GRACE_MS,
+  OFFLINE_STATUS,
   TOPIC_MAX,
   cleanText,
   formatNextWhen,
@@ -187,5 +188,37 @@ describe("public extras", () => {
     expect(status.quest.done).toBe(true);
     expect(JSON.stringify(status)).not.toContain("Secret");
     expect(pruneState(state, NOW).brb.until).toBeNull();
+  });
+});
+
+describe("publicStatus with game modes", () => {
+  const bo6 = DEFAULT_STATE.games.list.find((g) => g.id === "call-of-duty-black-ops-6")!;
+  const state = sanitizeState(
+    {
+      ...DEFAULT_STATE,
+      game: "FIFA",
+      games: { list: [bo6], current: bo6.id },
+    },
+    NOW,
+  );
+
+  it("shows the current game with its live values", () => {
+    const status = publicStatus(state, true, NOW, "", {
+      [bo6.id]: { part: 2, c1: 5, c2: 1, w: 0, d: 0, l: 0, gf: 0, ga: 0, mins: 90 },
+    });
+    expect(status.game).toBe("Call of Duty: Black Ops 6");
+    expect(status.play).toMatchObject({ id: bo6.id, part: 2, hours: 1.5 });
+    expect(status.shelf).toEqual([]);
+  });
+
+  it("falls back to the typed game when nothing is current", () => {
+    const status = publicStatus({ ...state, games: { ...state.games, current: null } }, true, NOW);
+    expect(status.play).toBeNull();
+    expect(status.game).toBe("FIFA");
+  });
+
+  it("keeps the library when an old state is loaded", () => {
+    expect(sanitizeState({ mode: "auto" }, NOW).games.list).toHaveLength(28);
+    expect(OFFLINE_STATUS.play).toBeNull();
   });
 });

@@ -32,11 +32,12 @@
 /* side quest card + BRB extras (filled by live.js) */
 .qbar{height:20px;background:#26161C;padding:4px}
 .qfill{display:block;height:100%;width:2%;background:repeating-linear-gradient(90deg,#30D5C8 0 18px,#23A99E 18px 23px);transition:width .6s}
-.cdchip{display:inline-flex;align-items:center;gap:16px;padding:0 22px;background:#30D5C8;color:#110A0C}
+.cdchip{display:inline-flex;align-items:center;gap:16px;padding:0 22px;background:var(--a);color:var(--lab)}
 [hidden]{display:none!important}
 </style>
 
 <style>html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}.sc{transform-origin:0 0}[hidden]{display:none!important}</style>
+<link rel="stylesheet" href="/overlay/play.css">
 </head><body>
 
 <div class="sc">
@@ -46,11 +47,11 @@
   <img src="/madnco-logo.svg" alt="MadnCo. logo" style="position: absolute; left: 50%; top: 70px; width: 300px; height: auto; transform: translateX(-50%)">
 
   <div style="position: absolute; left: 0; right: 0; top: 290px; display: flex; flex-direction: column; align-items: center">
-    <svg class="ghost" viewBox="0 0 120 140" width="280" height="327" aria-hidden="true"><path d="M60 6C30 6 12 30 12 60v68l16-12 16 14 16-14 16 14 16-14 16 12V60C108 30 90 6 60 6z" fill="#30D5C8"></path><ellipse cx="44" cy="58" rx="9" ry="13" fill="#110A0C"></ellipse><ellipse cx="76" cy="58" rx="9" ry="13" fill="#110A0C"></ellipse><ellipse cx="60" cy="86" rx="8" ry="10" fill="#110A0C"></ellipse></svg>
+    <svg class="ghost" viewBox="0 0 120 140" width="280" height="327" aria-hidden="true"><path d="M60 6C30 6 12 30 12 60v68l16-12 16 14 16-14 16 14 16-14 16 12V60C108 30 90 6 60 6z" style="fill:var(--a)"></path><ellipse cx="44" cy="58" rx="9" ry="13" fill="#110A0C"></ellipse><ellipse cx="76" cy="58" rx="9" ry="13" fill="#110A0C"></ellipse><ellipse cx="60" cy="86" rx="8" ry="10" fill="#110A0C"></ellipse></svg>
     <div class="shadow" aria-hidden="true" style="width: 260px; height: 26px; border-radius: 50%; background: #000; margin-top: 26px"></div>
     <span class="mono cut-s blink" style="margin-top: 50px; display: inline-flex; align-items: center; gap: 12px; height: 50px; padding: 0 20px; background: #26161C; font-size: 19px"><span style="display: inline-flex; gap: 5px"><span style="width: 6px; height: 20px; background: #F4EFE6"></span><span style="width: 6px; height: 20px; background: #F4EFE6"></span></span>Game paused</span>
     <h1 class="big disp" style="margin: 36px 0 0; font-size: 196px; line-height: .84; text-align: center">BE RIGHT<br>BACK</h1>
-    <p data-hide="brb-any" style="margin: 46px 0 0; font-size: 40px; font-weight: 700; line-height: 1.25; text-align: center">Mad is <span style="color: #30D5C8">ghosting</span> for a sec.<br>Don't you <span style="color: #E8557A">dare</span> leave.</p>
+    <p data-hide="brb-any" style="margin: 46px 0 0; font-size: 40px; font-weight: 700; line-height: 1.25; text-align: center">Mad is <span style="color: var(--a)">ghosting</span> for a sec.<br>Don't you <span style="color: #E8557A">dare</span> leave.</p>
     <div hidden data-show="brb-any" style="margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 24px">
       <span hidden data-show="brb-msg" data-text="brb-msg" style="font-size: 46px; font-weight: 700; color: #30D5C8; text-align: center; max-width: 960px"></span>
       <span class="cdchip cut-s" hidden data-show="brb-timer" style="height: 84px"><span hidden data-show="brb-run" style="display: contents"><span class="mono" style="font-size: 20px">Back in</span><span class="disp" style="font-size: 58px"><span data-text="brb-mm">05</span>:<span data-text="brb-ss">00</span></span></span><span hidden data-show="brb-zero" class="disp" style="font-size: 43px">Any second now…</span></span>

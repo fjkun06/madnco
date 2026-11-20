@@ -9,6 +9,7 @@ import {
   type Quest,
   type TickerScene,
 } from "@/lib/stream/extras";
+import type { Games } from "@/lib/stream/games";
 import {
   DEFAULT_STATE,
   type Countdown,
@@ -39,12 +40,14 @@ export type AdminForm = {
   clipTitle: string;
   clipTag: string;
   clipShow: boolean;
+  /** Game profiles and the game on stream. */
+  games: Games;
   presets: Preset[];
 };
 
 /** The tabs of the panel; every field belongs to one. */
-export type AdminTab = "live" | "schedule" | "screen" | "quest" | "web";
-export const ADMIN_TABS: AdminTab[] = ["live", "schedule", "screen", "quest", "web"];
+export type AdminTab = "live" | "games" | "schedule" | "screen" | "quest" | "web";
+export const ADMIN_TABS: AdminTab[] = ["live", "games", "schedule", "screen", "quest", "web"];
 
 export type FormField = "nextDate" | "nextTime" | "clipUrl";
 export type FormIssue = { field: FormField; tab: AdminTab; message: string };
@@ -69,16 +72,22 @@ export function toForm(state: StreamState): AdminForm {
     clipTitle: state.clip?.title ?? "",
     clipTag: state.clip?.tag ?? "",
     clipShow: state.clip?.show ?? true,
+    games: state.games,
     presets: state.presets,
   };
 }
 
 /**
- * Every field empty, Live status back to Auto. Presets survive a reset:
- * they are tools, not stream info.
+ * Every field empty, Live status back to Auto. Presets and the game library
+ * survive a reset: they are tools, not stream info. Only "which game is on
+ * stream" is cleared.
  */
 export function emptyForm(current: AdminForm): AdminForm {
-  return { ...toForm(DEFAULT_STATE), presets: current.presets };
+  return {
+    ...toForm(DEFAULT_STATE),
+    presets: current.presets,
+    games: { ...current.games, current: null },
+  };
 }
 
 /** @deprecated kept for tests and callers that have no current form. */
@@ -94,7 +103,9 @@ export function fromForm(form: AdminForm, saved: StreamState): StreamState {
   const untouched =
     form.nextDate === savedForm.nextDate && form.nextTime === savedForm.nextTime;
   const at =
-    untouched && saved.next ? saved.next.at : fromDateTime(form.nextDate, form.nextTime);
+    untouched && saved.next
+      ? saved.next.at
+      : fromDateTime(form.nextDate, form.nextTime);
   const clip = parseClipUrl(form.clipUrl);
   return {
     mode: form.mode,
@@ -117,6 +128,7 @@ export function fromForm(form: AdminForm, saved: StreamState): StreamState {
           show: form.clipShow,
         }
       : null,
+    games: form.games,
     presets: form.presets,
     updatedAt: saved.updatedAt,
   };
@@ -128,11 +140,7 @@ export function fromForm(form: AdminForm, saved: StreamState): StreamState {
  * was saved earlier may pass while the stream runs; it is only checked once
  * it changes.
  */
-export function formIssues(
-  form: AdminForm,
-  saved: StreamState,
-  now: number,
-): FormIssue[] {
+export function formIssues(form: AdminForm, saved: StreamState, now: number): FormIssue[] {
   const t = en.admin.issues;
   const issues: FormIssue[] = [];
   const next = (field: FormField, message: string) =>
@@ -187,6 +195,7 @@ export function changedFields(
     ["brbMessage", "live", form.brbMessage.trim(), b.brbMessage],
     ["brbUntil", "live", form.brbUntil, b.brbUntil],
     ["presets", "live", form.presets, b.presets],
+    ["games", "games", form.games, b.games],
     ["nextDate", "schedule", form.nextDate, b.nextDate],
     ["nextTime", "schedule", form.nextTime, b.nextTime],
     ["nextPlan", "schedule", form.nextPlan.trim(), b.nextPlan],
@@ -206,7 +215,9 @@ export function changedFields(
     ["clipTag", "web", form.clipTag.trim(), b.clipTag],
     ["clipShow", "web", form.clipShow, b.clipShow],
   ];
-  return checks.filter(([, , x, y]) => !same(x, y)).map(([key, tab]) => ({ key, tab }));
+  return checks
+    .filter(([, , x, y]) => !same(x, y))
+    .map(([key, tab]) => ({ key, tab }));
 }
 
 /** How many fields differ from the saved state. */

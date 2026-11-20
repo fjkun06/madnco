@@ -26,6 +26,7 @@ OBS overlays read it from `GET /api/stream`.
 | `ADMIN_PASSWORD` | The admin password, at least 8 characters. |
 | `ADMIN_SESSION_SECRET` | Optional, long random string. Changing it signs everyone out. Defaults to the password. |
 | `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET` | From dev.twitch.tv → Your Console → Register Your Application (OAuth redirect `http://localhost`, category "Website Integration"). Without them, "Auto" stays offline. |
+| `DECK_KEY` | Optional, 24+ random characters. Lets Stream Deck keys change the game counters (`/api/deck`). |
 | `TWITCH_LOGIN` | Optional; defaults to the Twitch handle in `siteConfig` (`madnco8`). |
 
 ## OBS browser sources
@@ -93,6 +94,53 @@ links. Pure logic: `src/lib/stream/extras.ts` and `discord.ts` (tested).
   the saved topic/game. Only the Live Ping role can be mentioned
   (`allowed_mentions`). Locked for 10 minutes per send (Redis `SET NX EX`).
   Needs `DISCORD_WEBHOOK_URL` and `DISCORD_LIVE_ROLE_ID` on Vercel.
+
+## Game modes (v4)
+
+The **Games** tab holds one profile per game (28 installed games to start)
+and picks the game that is on stream.
+
+- **Profile** (saved with *Save & push*): name, mood (football · horror ·
+  action · story · retro), part label (Part, Ep, Day…) and whether the part
+  chip shows, goal line, "Previously on…" line, stats box (counters,
+  scoreboard, Chat decides, none), up to 2 counters with an optional total
+  ("4 / 16"), poll, up to 4 extra ticker lines, FINAL badge, Completed.
+- **Live numbers** (part, counters, W/D/L, goals, hours) save instantly in
+  their own Redis hash per game (`madnco:game:<id>`), so the Stream Deck and
+  the admin form never overwrite each other. Reset numbers sets part 1 and
+  everything else to 0.
+- **Overlays**: `gaming` / `v-gaming` show the title card and stats box in the
+  game's mood colours (`/overlay/play.css`); `starting-soon` shows "Up next /
+  Previously", `ending` "Survived Part N" or "Completed", `brb` takes the mood
+  colour. With no game on stream everything looks like v3.
+- **Chat decides**: while the poll is open the gaming overlays read Twitch
+  chat anonymously and count `!1`–`!4` (one vote per viewer, last one counts).
+  Opening the poll again starts a new count. Add `?channel=name` to the
+  overlay URL for another channel.
+- **Website**: "Now playing" uses the current game; finished series appear in
+  the **Completed** section of the homepage.
+
+### Stream Deck counters
+
+Set `DECK_KEY` in Vercel (any random string, 24+ characters, e.g.
+`openssl rand -hex 24`). Then per key: **System → Website**, tick
+**GET request in background**, URL
+
+```
+https://www.madnco.frankjordan.dev/api/deck?key=DECK_KEY&do=c1+
+```
+
+| `do=` | Effect on the game on stream |
+| --- | --- |
+| `c1+` `c1-` | first counter (e.g. Deaths) |
+| `c2+` `c2-` | second counter |
+| `part+` `part-` | next / previous part |
+| `w` `d` `l` | add a win / draw / loss |
+| `gf` `ga` (`gf-` `ga-`) | goal for / against |
+| `hour+` `hour-` | hours played |
+
+Answers are plain text (`ok c1=15`, `no game on stream`, `unauthorized`).
+120 presses a minute max. Keep the key private: anyone with the URL can count.
 
 ## Not verified
 
