@@ -37,6 +37,7 @@
  *   play-goal, play-prev, play-hours, mood-name, ticker-label   texts
  *   play-head (goal, else game name), play-head-k ("Goal"/"Now playing") texts
  *   play-head-on, play-sub-on (game name chip under a goal headline)  show/hide
+ *   play-goal-on, play-goal-k ("Tonight's goal · game · Part 3")  Starting Soon goal
  *   play-part, play-goal, play-prev, play-final, play-completed  show/hide
  *   play-counters, play-c1-on, play-c2-on, play-c1-label, play-c1 ("4 / 16")…
  *   play-title (show the name card), play-football, fb-record-on /
@@ -355,6 +356,9 @@
     out["play-head-k"] = goalHead ? "Goal" : "Now playing";
     out["play-head-on"] = goalHead || out["play-title"] ? "1" : "";
     out["play-sub-on"] = goalHead && out["play-title"] ? "1" : "";
+    // Starting Soon: the goal is the big line under STARTING SOON.
+    out["play-goal-on"] = goalHead ? "1" : "";
+    out["play-goal-k"] = goalHead ? ["Tonight's goal", p.name, part].filter(Boolean).join(" · ") : "";
     var headLen = out["play-head"].length;
     document.documentElement.setAttribute("data-head", headLen > 44 ? "l" : headLen > 24 ? "m" : "s");
     // Each gaming page places the card in its own corner logic (cam, logo).

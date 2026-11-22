@@ -74,7 +74,8 @@
       <span class="mono" style="display: flex; align-items: center; gap: 16px; margin-top: 18px; font-size: 26px; color: #30D5C8"><span style="width: 48px; height: 5px; background: #30D5C8"></span><span data-show="cd-run">Going live in</span><span hidden data-show="cd-zero">Get ready</span><span style="width: 48px; height: 5px; background: #30D5C8"></span></span>
       <div class="cdg" data-show="cd-run" style="margin-top: 22px; font-size: 340px"><b data-text="cd-mm">05</b><span class="colon">:</span><b data-text="cd-ss">00</b></div>
       <div class="cdg" hidden data-show="cd-zero" style="margin-top: 60px; font-size: 190px">ANY SECOND NOW</div>
-      <p hidden data-show="topic" style="margin: 42px 0 0; font-size: 36px; font-weight: 700; display: flex; align-items: center; gap: 16px">Today: <span data-text="topic" style="color: #E8557A"></span><span hidden data-show="game" class="mono cs" style="font-size: 18px; padding: 8px 12px; background: #30D5C8; color: #110A0C" data-text="game"></span></p>
+      <div class="sgoal sm" hidden data-show="play-goal-on"><div class="k mono"><span data-text="play-goal-k"></span><span hidden data-show="topic"> · <span data-text="topic"></span></span></div><div class="g disp" data-text="play-goal"></div></div>
+      <div data-hide="play-goal-on"><p hidden data-show="topic" style="margin: 42px 0 0; font-size: 36px; font-weight: 700; display: flex; align-items: center; gap: 16px">Today: <span data-text="topic" style="color: #E8557A"></span><span hidden data-show="game" class="mono cs" style="font-size: 18px; padding: 8px 12px; background: #30D5C8; color: #110A0C" data-text="game"></span></p></div>
     </div>
     <div style="position: absolute; left: 160px; right: 160px; bottom: 222px; display: flex; flex-direction: column; gap: 10px">
       <div class="cbar cut"><span data-bar="countdown"></span></div>
@@ -86,8 +87,11 @@
     <img class="logo" src="/madnco-logo.svg" alt="MadnCo. logo" style="width: 560px; height: auto; display: block">
     <span class="mono" style="display: flex; align-items: center; gap: 14px; color: #30D5C8; font-size: 20px; margin-top: 18px"><span style="width: 40px; height: 4px; background: #30D5C8"></span>Player 1 has entered the chat</span>
     <h1 class="big disp" style="margin: 22px 0 0; font-size: 168px; line-height: .85; letter-spacing: .01em">STARTING SOON</h1>
+    <div class="sgoal" hidden data-show="play-goal-on"><div class="k mono"><span data-text="play-goal-k"></span><span hidden data-show="topic"> · <span data-text="topic"></span></span></div><div class="g disp" data-text="play-goal"></div></div>
+    <div data-hide="play-goal-on">
     <p hidden data-show="topic" style="margin: 34px 0 0; font-size: 32px; font-weight: 700">Today: <span data-text="topic" style="color: #E8557A"></span> <span hidden data-show="game" class="mono" style="display:inline-flex;align-items:center;white-space:nowrap;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);font-size:16px;padding:6px 10px;background:#30D5C8;color:#110A0C;vertical-align:6px;margin-left:8px" data-text="game"></span></p>
     <p data-hide="topic" style="margin: 34px 0 0; font-size: 32px; font-weight: 700">Grab a drink. The <span style="color: #E8557A">madness</span> is loading.</p>
+    </div>
     <div style="margin-top: 40px; display: flex; flex-direction: column; gap: 12px; align-items: stretch">
       <div class="xp cut"><span data-bar="countdown"></span></div>
       <div class="mono" style="display: flex; justify-content: space-between; font-size: 15px; color: #BBAAB1"><span>Loading madness<span class="blink">_</span></span><span style="color: #30D5C8" data-text="countdown">Stay tuned</span></div>
