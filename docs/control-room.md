@@ -233,6 +233,26 @@ One-time setup:
    environments. Vercel adds `BLOB_STORE_ID` (OIDC; older stores:
    `BLOB_READ_WRITE_TOKEN`). Redeploy.
 
+### Realtime overlays (Ably, v7)
+
+Optional, free (Ably Free: 6M messages/month, 200 connections). After every
+change (Remote, Games tab counters, Save & push, quick ops, Stream Deck, Fans
+tab, Twitch follows) the server publishes the public status to the Ably
+channel `madnco-stream` (`src/lib/stream/realtime.ts`, run with `after()`).
+`/api/stream` adds `realtime: { key, channel }` (the subscribe-only key);
+`live.js` opens Ably's SSE stream with it and redraws on every push
+(~0.5 s). Polling stays as a backup every 30 s (2 s while Ably isn't
+connected). Without the env vars nothing changes.
+
+Setup:
+1. ably.com → sign up (free) → **Create new app** ("madnco").
+2. App → **API Keys**: copy the **Root** key (`appId.keyId:secret`) →
+   Vercel env `ABLY_API_KEY`. Secret: server only.
+3. **Create new API key** "overlays": capability **Subscribe** only,
+   resource restriction: selected channels → `madnco-stream`. Copy it →
+   Vercel env `ABLY_SUBSCRIBE_KEY` (public on purpose: it can only listen).
+4. Redeploy, then refresh the OBS browser sources.
+
 ## Not verified
 
 Written without npm access: the pure modules (`state`, `session`, admin

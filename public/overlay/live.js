@@ -1,7 +1,8 @@
 /*
  * MadnCo. overlays: live slots filled from /api/stream (admin panel).
- * Polls every 2 s while on screen (30 s while OBS hides the source); the
- * countdown ticks every second in between.
+ * Gets changes pushed instantly over Ably when /api/stream names a realtime
+ * key; otherwise (and as a backup every 30 s) polls every 2 s while on
+ * screen. The countdown ticks every second in between.
  *
  *   data-text="topic|game|countdown|next-when|next-plan"  text of the element
  *   data-show="topic|game|next|countdown"  visible only when that value is set
@@ -578,16 +579,58 @@
     track.style.animationDuration = Math.max(18, Math.round(chars / 6)) + "s";
   }
 
+  // Realtime (Ably): /api/stream names a subscribe-only key; with it every
+  // change is pushed here within ~0.5 s. Polling stays on as the backup.
+  var es = null;
+  var rtKey = "";
+  var lastPush = 0;
+  var REALTIME_SSE = "https://main.realtime.ably.net/event-stream?v=1.2&enveloped=false";
+
+  function parsePush(raw) {
+    try {
+      var v = JSON.parse(raw);
+      if (typeof v === "string") v = JSON.parse(v);
+      if (v && v.name === "status" && v.data !== undefined) v = typeof v.data === "string" ? JSON.parse(v.data) : v.data;
+      return v && typeof v === "object" && "live" in v ? v : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function connectRealtime(rt) {
+    if (!rt || !rt.key || !rt.channel || typeof EventSource !== "function") return;
+    if (es && rtKey === rt.key) return;
+    if (es) es.close();
+    rtKey = rt.key;
+    es = new EventSource(
+      REALTIME_SSE + "&channels=" + encodeURIComponent(rt.channel) + "&key=" + encodeURIComponent(rt.key),
+    );
+    es.onmessage = function (event) {
+      var next = parsePush(event.data);
+      if (!next) return;
+      next.realtime = status && status.realtime;
+      lastPush = Date.now();
+      status = next;
+      render();
+    };
+  }
+
+  function realtimeOn() {
+    return !!es && es.readyState === 1;
+  }
+
   function poll() {
     fetch(API, { cache: "no-store" })
       .then(function (r) {
         return r.ok ? r.json() : null;
       })
       .then(function (s) {
-        if (s) {
-          status = s;
-          render();
-        }
+        if (!s) return;
+        connectRealtime(s.realtime);
+        // A push is newer than this (CDN-cached) answer: keep the push.
+        if (realtimeOn() && Date.now() - lastPush < 8000) return;
+        status = s;
+        render();
       })
       .catch(function () {});
   }
@@ -601,7 +644,9 @@
   var onScreen = true;
   var lastPoll = 0;
   function tick() {
-    if (!onScreen && Date.now() - lastPoll < HIDDEN_POLL_MS) return;
+    // Pushes arrive by themselves; polling is only the safety net then.
+    var every = realtimeOn() || !onScreen ? HIDDEN_POLL_MS : POLL_MS;
+    if (Date.now() - lastPoll < every - 250) return;
     lastPoll = Date.now();
     poll();
   }

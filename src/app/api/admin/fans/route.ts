@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth/admin";
 import { loadTwitchConnection, twitchReadyToConnect } from "@/lib/stream/connections";
 import { addFollower, loadFounders, pushAlert, removeFounder } from "@/lib/stream/fanStore";
 import { isPlatform } from "@/lib/stream/fans";
+import { publishStatus } from "@/lib/stream/realtime";
 import { redisConfigured } from "@/lib/stream/redis";
 
 const unauthorized = () => NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -36,6 +37,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "storage-not-configured" }, { status: 503 });
   }
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+  // Push the result to the overlays once this answer is sent (Ably).
+  after(publishStatus);
   try {
     switch (body.op) {
       case "add": {

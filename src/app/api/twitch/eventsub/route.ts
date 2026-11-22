@@ -1,4 +1,6 @@
+import { after } from "next/server";
 import { handleEventSub, validTwitchMessage } from "@/lib/stream/connections";
+import { publishStatus } from "@/lib/stream/realtime";
 import { redisConfigured } from "@/lib/stream/redis";
 
 /**
@@ -28,6 +30,8 @@ export async function POST(request: Request) {
   } catch {
     return new Response("bad json", { status: 400 });
   }
+  // A new follower: show the alert on stream right away.
+  if (h.get("twitch-eventsub-message-type") === "notification") after(publishStatus);
   try {
     const res = await handleEventSub(h.get("twitch-eventsub-message-type"), id!, payload);
     return new Response(res.body || null, {

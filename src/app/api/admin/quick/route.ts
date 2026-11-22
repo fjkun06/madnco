@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth/admin";
 import { applyQuick, parseQuickOp } from "@/lib/stream/quick";
+import { publishStatus } from "@/lib/stream/realtime";
 import { redisConfigured } from "@/lib/stream/redis";
 import { loadState, saveState } from "@/lib/stream/store";
 
@@ -20,6 +21,8 @@ export async function POST(request: Request) {
   }
   const op = parseQuickOp(await request.json().catch(() => null));
   if (!op) return NextResponse.json({ error: "bad-request" }, { status: 400 });
+  // Push the result to the overlays once this answer is sent (Ably).
+  after(publishStatus);
   try {
     const next = applyQuick(await loadState(), op, Date.now());
     if (!next) return NextResponse.json({ error: "not-possible" }, { status: 409 });

@@ -1,7 +1,8 @@
 import { timingSafeEqual } from "node:crypto";
-import { connection } from "next/server";
+import { after, connection } from "next/server";
 import { parseDeckAction } from "@/lib/stream/games";
 import { changeGameLive } from "@/lib/stream/gameStore";
+import { publishStatus } from "@/lib/stream/realtime";
 import { hit, redisConfigured } from "@/lib/stream/redis";
 import { loadState } from "@/lib/stream/store";
 
@@ -41,6 +42,7 @@ export async function GET(request: Request) {
     const id = state.games.current;
     if (!id) return text("no game on stream", 409);
     const live = await changeGameLive(id, action.field, { by: action.by });
+    after(publishStatus);
     return text(`ok ${action.field}=${live[action.field]}`, 200);
   } catch (error) {
     console.error("[deck] failed", error);

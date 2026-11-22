@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import { realtimePublic } from "@/lib/stream/realtime";
 import { loadPublicStatus } from "@/lib/stream/store";
 
 /**
@@ -13,7 +14,8 @@ export async function GET() {
   // Always run at request time, never prerendered at build.
   await connection();
   const status = await loadPublicStatus();
-  return Response.json(status, {
+  // `realtime`: where overlays listen for instant updates (null = poll only).
+  return Response.json({ ...status, realtime: realtimePublic() }, {
     headers: {
       "Cache-Control": "public, max-age=0, s-maxage=3",
       // Overlays may also be opened as local files during testing.
