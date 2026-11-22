@@ -35,6 +35,8 @@
  *   play                         set while a game is on stream
  *   play-name, play-unit, play-part ("Part 3"), play-part-n ("3"),
  *   play-goal, play-prev, play-hours, mood-name, ticker-label   texts
+ *   play-head (goal, else game name), play-head-k ("Goal"/"Now playing") texts
+ *   play-head-on, play-sub-on (game name chip under a goal headline)  show/hide
  *   play-part, play-goal, play-prev, play-final, play-completed  show/hide
  *   play-counters, play-c1-on, play-c2-on, play-c1-label, play-c1 ("4 / 16")…
  *   play-title (show the name card), play-football, fb-record-on /
@@ -346,6 +348,15 @@
     out["fb-goals-on"] = fbOn && fb.goals !== false ? "1" : "";
     out["play-football"] = out["fb-record-on"] || out["fb-goals-on"] ? "1" : "";
     out["play-title"] = p && p.title !== false ? "1" : "";
+    // Headline swap: the goal is the big text, the game name the small chip
+    // under it. No goal (or goal switched off) = game name stays the headline.
+    var goalHead = !!(p && p.goal);
+    out["play-head"] = goalHead ? p.goal : out["play-name"];
+    out["play-head-k"] = goalHead ? "Goal" : "Now playing";
+    out["play-head-on"] = goalHead || out["play-title"] ? "1" : "";
+    out["play-sub-on"] = goalHead && out["play-title"] ? "1" : "";
+    var headLen = out["play-head"].length;
+    document.documentElement.setAttribute("data-head", headLen > 44 ? "l" : headLen > 24 ? "m" : "s");
     // Each gaming page places the card in its own corner logic (cam, logo).
     var pos = p && p.cardPos ? p.cardPos : "tl";
     if (typeof window.MadnPlacePlay === "function" && pos !== lastCardPos) {

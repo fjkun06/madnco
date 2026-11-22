@@ -17,6 +17,10 @@ html[data-mood] .sc{--a:var(--mood-a);--b:var(--mood-b);--lab:var(--mood-lab);--
 .gm{position:relative;background:rgba(17,10,12,.92);padding:12px 20px 14px 18px;border-left:6px solid var(--a)}
 .gm .k{font-size:13px;color:var(--a)}
 .gm .t{font-size:40px;line-height:1;margin-top:6px;white-space:nowrap}
+/* Goal headlines can be long (80 chars): shrink, then wrap to 2 lines. */
+.gm .t{max-width:640px}
+html[data-head="m"] .gm .t{font-size:32px;white-space:normal;line-height:1.05}
+html[data-head="l"] .gm .t{font-size:26px;white-space:normal;line-height:1.08}
 .hzb{display:none;position:absolute;left:0;top:0;bottom:0;width:12px;background:repeating-linear-gradient(-45deg,#FFB23E 0 12px,#110A0C 12px 24px)}
 html[data-mood="action"] .gm{border-left:0;padding-left:30px}
 html[data-mood="action"] .hzb{display:block}
@@ -69,3 +73,4 @@ html[data-mood="retro"] .gm .t{font-size:34px}
 .upnext .p i{font-style:normal;color:var(--b);font-size:12px;margin-right:8px}
 .wrapstamp{display:inline-flex;align-items:center;gap:12px;background:var(--a);color:var(--lab);padding:10px 18px;font-size:15px;transform:rotate(-2deg)}
 .wrapstamp b{font-family:'Lilita One',sans-serif;font-weight:400;font-size:26px;letter-spacing:0;text-transform:none}
+html[data-mood="retro"][data-head="m"] .gm .t{font-size:28px}html[data-mood="retro"][data-head="l"] .gm .t{font-size:22px}
