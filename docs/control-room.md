@@ -205,6 +205,30 @@ headphones), use Social Stream Ninja's TTS; keep its audio off the stream.
 3. /admin → Fans → Twitch → **Connect**, log in as madnco8, allow. Back on
    the Fans tab it says "waiting for Twitch to confirm", then "follow alerts on".
 
+### Share links with game pictures (v7)
+
+Share `https://www.madnco.frankjordan.dev/live/tiktok` (or `/live/twitch`,
+`/live/youtube`, or just `/live` = Twitch / guest YouTube) instead of the
+platform link. The page (`src/app/live/[[...platform]]/route.ts`, logic in
+`src/lib/stream/share.ts`) answers with Open Graph tags — the game's picture,
+"🔴 LIVE: <goal>", part + counters — and forwards people to the live with a
+meta refresh. Crawlers (WhatsApp, Discord, iMessage, X) read the tags; people
+never see the page.
+
+Pictures: Games tab → Share link → **Choose screenshot** (your own gameplay
+shot, e.g. the SHOT key). The browser makes four 1200×630 JPEGs (LIVE on
+TikTok / Twitch / YouTube, and offline), each under ~420 KB because WhatsApp
+drops preview images over ~600 KB. **Upload picture** stores them on Vercel
+Blob (`/api/admin/art`), then **Save & push**. No picture = the site's
+`og-image.png`. The **Copy … link** buttons add `?s=…` so chat apps fetch a
+fresh preview each time.
+
+One-time setup:
+1. `npm install @vercel/blob` (adds it to package.json).
+2. Vercel → project → Storage → Create → **Blob**, access **Public**, connect
+   it to the project (adds `BLOB_READ_WRITE_TOKEN` to all environments).
+   Redeploy.
+
 ## Not verified
 
 Written without npm access: the pure modules (`state`, `session`, admin

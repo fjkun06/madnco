@@ -8,6 +8,7 @@ import {
   COUNTER_TOTAL_MAX,
   COUNTERS_MAX,
   EMPTY_LIVE,
+  defaultCardPos,
   GAME_NAME_MAX,
   GAME_TICKER_ITEM_MAX,
   GAME_TICKER_MAX,
@@ -33,6 +34,7 @@ import { interpolate } from "@/utils/interpolate";
 import { Card, StatusLine } from "../Card";
 import { CHIP, CHIP_OFF, CHIP_ON, CHIP_SM, INPUT, LABEL } from "../fields";
 import { Toggle } from "../Toggle";
+import { ShareArtCard } from "./ShareArt";
 import type { TabProps } from "./shared";
 
 const t = en.admin.games;
@@ -267,18 +269,26 @@ export function GamesTab({ form, update, saved, push }: TabProps) {
       </Card>
 
       {editing ? (
-        <ProfileEditor
-          key={editing.id}
-          profile={editing}
-          set={(patch) => setProfile(editing.id, patch)}
-          onRemove={() => {
-            setGames({
-              list: games.list.filter((g) => g.id !== editing.id),
-              current: games.current === editing.id ? null : games.current,
-            });
-            setSelected(null);
-          }}
-        />
+        <>
+          <ProfileEditor
+            key={editing.id}
+            profile={editing}
+            set={(patch) => setProfile(editing.id, patch)}
+            onRemove={() => {
+              setGames({
+                list: games.list.filter((g) => g.id !== editing.id),
+                current: games.current === editing.id ? null : games.current,
+              });
+              setSelected(null);
+            }}
+          />
+          <ShareArtCard
+            key={`share-${editing.id}`}
+            profile={editing}
+            set={(patch) => setProfile(editing.id, patch)}
+            push={push}
+          />
+        </>
       ) : (
         <Card title={t.profile}>
           <p className="m-0 text-muted">{t.pickOne}</p>
@@ -501,7 +511,11 @@ function ProfileEditor({
                 key={m}
                 type="button"
                 aria-pressed={p.mood === m}
-                onClick={() => set({ mood: m })}
+                onClick={() =>
+                  set(
+                    p.cardPos === defaultCardPos(p.mood) ? { mood: m, cardPos: defaultCardPos(m) } : { mood: m },
+                  )
+                }
                 style={moodStyle(m)}
                 className={`${CHIP} ${
                   p.mood === m ? "bg-(--mood) text-ink" : "bg-ink-3 text-(--mood) hover:bg-ink"
