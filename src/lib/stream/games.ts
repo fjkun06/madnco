@@ -175,6 +175,7 @@ type Seed = [name: string, mood: Mood, unit: string, goal: string, widget: Widge
 
 /** Every game installed on Frank's PC (19 Nov 2026), with a sensible start. */
 const SEEDS: Seed[] = [
+  ["ROB RUN", "action", "Part", "Newbie vs ROB RUN: how many heists before I get busted?", "counters", ["Heists", "Busted"]],
   ["EA FC 27", "football", "Session", "Road to Division 1", "football", []],
   ["EA FC 26", "football", "Session", "Road to Division 1", "football", []],
   ["EA FC 25", "football", "Session", "Old squad, new grudges", "football", []],
@@ -249,7 +250,7 @@ export const DEFAULT_LIBRARY: GameProfile[] = SEEDS.reduce<GameProfile[]>((list,
 export const DEFAULT_IDS = DEFAULT_LIBRARY.map((g) => g.id);
 
 /** Defaults added after the first library (v4); older saves get these once. */
-const ADDED_LATER = ["ea-fc-27"];
+const ADDED_LATER = ["ea-fc-27", "rob-run"];
 
 export const DEFAULT_GAMES: Games = { list: DEFAULT_LIBRARY, current: null, known: DEFAULT_IDS };
 

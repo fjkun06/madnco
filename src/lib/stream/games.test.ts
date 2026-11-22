@@ -29,9 +29,9 @@ describe("slugify / uniqueId", () => {
 });
 
 describe("default library", () => {
-  it("has all 29 installed games with unique ids", () => {
-    expect(DEFAULT_LIBRARY).toHaveLength(29);
-    expect(new Set(DEFAULT_LIBRARY.map((g) => g.id)).size).toBe(29);
+  it("has all 30 installed games with unique ids", () => {
+    expect(DEFAULT_LIBRARY).toHaveLength(30);
+    expect(new Set(DEFAULT_LIBRARY.map((g) => g.id)).size).toBe(30);
     expect(DEFAULT_GAMES.current).toBeNull();
   });
 
@@ -67,6 +67,16 @@ describe("sanitizeGames", () => {
     // Deleting FC 27 later sticks.
     const again = sanitizeGames({ ...games, list: games.list.filter((g) => g.id !== "ea-fc-27") });
     expect(again.list.map((g) => g.id)).not.toContain("ea-fc-27");
+  });
+
+  it("adds ROB RUN once to a library saved with `known` before it existed", () => {
+    const known = DEFAULT_IDS.filter((id) => id !== "rob-run");
+    const games = sanitizeGames({ list: [], current: null, known });
+    const rob = games.list.find((g) => g.id === "rob-run");
+    expect(rob).toMatchObject({ name: "ROB RUN", mood: "action", widget: "counters" });
+    expect(rob!.counters.map((c) => c.label)).toEqual(["Heists", "Busted"]);
+    const again = sanitizeGames({ ...games, list: [] });
+    expect(again.list.map((g) => g.id)).not.toContain("rob-run");
   });
 
   it("keeps football cards off the scoreboard corner and everything visible by default", () => {

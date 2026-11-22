@@ -218,7 +218,7 @@ describe("publicStatus with game modes", () => {
   });
 
   it("keeps the library when an old state is loaded", () => {
-    expect(sanitizeState({ mode: "auto" }, NOW).games.list).toHaveLength(29);
+    expect(sanitizeState({ mode: "auto" }, NOW).games.list).toHaveLength(30);
     expect(OFFLINE_STATUS.play).toBeNull();
   });
 });
