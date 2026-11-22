@@ -1,11 +1,13 @@
 "use client";
 
+import { m } from "framer-motion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { StreamState } from "@/lib/stream/state";
 import { en } from "@/locales/en";
 import { interpolate } from "@/utils/interpolate";
+import { useReduceMotion } from "@/components/ui/reveal/motion";
 import { BUTTON_GHOST, BUTTON_PRIMARY } from "@/utils/ui.classes";
 import { BackToTop } from "./BackToTop";
 import { errorText } from "./errors";
@@ -62,6 +64,26 @@ export function AdminPanel({
   // Back from a Twitch / YouTube login (?connect=…): open the Fans tab.
   const connectResult = useSearchParams().get("connect");
   const [tab, setTab] = useState<AdminTab>(connectResult ? "fans" : "live");
+  const reduceMotion = useReduceMotion();
+  // Marks where the sub navbar sits before it sticks (see openTab).
+  const navAnchor = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+
+  /**
+   * Switch tabs and start the new one at its top: if the page is scrolled
+   * past the sub navbar, jump (no smooth scroll) to where the navbar sticks,
+   * so the new tab's first card sits right under it.
+   */
+  function openTab(key: AdminTab) {
+    const anchor = navAnchor.current;
+    const nav = navRef.current;
+    if (anchor && nav) {
+      const stickTop = parseFloat(getComputedStyle(nav).top) || 0;
+      const target = Math.max(0, anchor.getBoundingClientRect().top + window.scrollY - stickTop);
+      if (window.scrollY > target) window.scrollTo({ top: target, behavior: "instant" });
+    }
+    setTab(key);
+  }
   const [saving, setSaving] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const resetTimer = useRef<number | undefined>(undefined);
@@ -87,7 +109,7 @@ export function AdminPanel({
     const problems = formIssues(form, saved, readNow());
     if (problems.length) {
       const first = problems[0];
-      setTab(first.tab);
+      openTab(first.tab);
       push("error", t.toasts.blockedTitle, `${t.tabs[first.tab]}: ${first.message}.`);
       return;
     }
@@ -216,7 +238,9 @@ export function AdminPanel({
       </div>
 
       {/* Sub navbar: sticks under the site header */}
+      <div ref={navAnchor} aria-hidden="true" />
       <nav
+        ref={navRef}
         aria-label={t.tabs.label}
         className="sticky top-16 z-20 -mx-4 overflow-x-auto bg-ink px-4 sm:top-[72px] sm:mx-0 sm:px-0 md:top-[84px]"
       >
@@ -233,7 +257,7 @@ export function AdminPanel({
                   id={`tab-${key}`}
                   aria-selected={active}
                   aria-controls="admin-tabpanel"
-                  onClick={() => setTab(key)}
+                  onClick={() => openTab(key)}
                   className={`focus-inset relative flex items-center gap-2.5 px-4 py-4 label-mono text-[12px] font-extrabold whitespace-nowrap transition-colors duration-200 sm:px-5 sm:text-[13px] ${
                     active ? "text-paper" : "text-muted hover:text-paper"
                   }`}
@@ -268,7 +292,15 @@ export function AdminPanel({
       ) : null}
 
       <div className="grid grid-cols-1 items-start gap-7 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-        <div id="admin-tabpanel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
+        <m.div
+          key={tab}
+          id="admin-tabpanel"
+          role="tabpanel"
+          aria-labelledby={`tab-${tab}`}
+          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        >
           {tab === "live" ? (
             <LiveTab
               {...props}
@@ -283,7 +315,7 @@ export function AdminPanel({
           {tab === "screen" ? <ScreenTab {...props} /> : null}
           {tab === "quest" ? <QuestTab {...props} /> : null}
           {tab === "web" ? <WebTab {...props} /> : null}
-        </div>
+        </m.div>
         <WhereItShows onToast={push} />
       </div>
 
