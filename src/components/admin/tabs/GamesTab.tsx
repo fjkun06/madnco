@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import {
   CARD_POSITIONS,
   COUNTER_LABEL_MAX,
@@ -24,9 +24,7 @@ import {
   WIDGETS,
   newProfile,
   type CounterDef,
-  type GameLive,
   type GameProfile,
-  type LiveField,
   type Mood,
 } from "@/lib/stream/games";
 import { en } from "@/locales/en";
@@ -35,6 +33,7 @@ import { Card, StatusLine } from "../Card";
 import { CHIP, CHIP_OFF, CHIP_ON, CHIP_SM, INPUT, LABEL } from "../fields";
 import { Toggle } from "../Toggle";
 import { ShareArtCard } from "./ShareArt";
+import { useGameLive } from "../useGameLive";
 import type { TabProps } from "./shared";
 
 const t = en.admin.games;
@@ -87,53 +86,6 @@ function LiveCounter({
       </div>
     </div>
   );
-}
-
-/** Live numbers of one game, loaded from and saved to /api/admin/game. */
-function useGameLive(id: string | null, onError: () => void) {
-  const [values, setValues] = useState<{ id: string; live: GameLive } | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    if (!id) return;
-    let stop = false;
-    fetch(`/api/admin/game?ids=${encodeURIComponent(id)}`, { cache: "no-store" })
-      .then((res) => (res.ok ? (res.json() as Promise<Record<string, GameLive>>) : null))
-      .then((body) => {
-        if (!stop) setValues({ id, live: body?.[id] ?? EMPTY_LIVE });
-      })
-      .catch(() => {
-        if (!stop) setValues({ id, live: EMPTY_LIVE });
-      });
-    return () => {
-      stop = true;
-    };
-  }, [id]);
-
-  async function send(body: Record<string, unknown>) {
-    if (!id || busy) return;
-    setBusy(true);
-    try {
-      const res = await fetch("/api/admin/game", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, ...body }),
-      });
-      if (!res.ok) throw new Error(String(res.status));
-      setValues({ id, live: (await res.json()) as GameLive });
-    } catch {
-      onError();
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return {
-    live: values && values.id === id ? values.live : null,
-    busy,
-    change: (field: LiveField, by: number) => send({ field, by }),
-    reset: () => send({ reset: true }),
-  };
 }
 
 function moodStyle(mood: Mood) {
