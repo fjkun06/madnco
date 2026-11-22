@@ -45,9 +45,12 @@ Untick "Local file" and use the URL; size as listed.
 | Vertical | `…/overlay/v-starting-soon.html`, `v-brb`, `v-ending`, `v-gaming`, `v-just-chatting` | 1080 × 1920 |
 
 Slots in the overlays use `data-text`, `data-show`, `data-hide` and
-`data-bar` attributes; `live.js` documents them. Overlays poll every 5 s;
-`/api/stream` is CDN-cached for 5 s, so many sources still cost about one
-Redis read per 5 s.
+`data-bar` attributes; `live.js` documents them. Overlays poll every 2 s
+while OBS shows them (every 30 s while hidden, via the `obsSourceVisibleChanged`
+event); `/api/stream` is CDN-cached for 3 s (no stale-while-revalidate), so all
+sources together cost at most one run (~5 Redis commands) per 3 s: ~6,000
+commands per streaming hour, ~70 h/month inside Upstash's free 500K. A tap
+shows on stream in ~3–5 s.
 
 ## Admin panel behaviour
 
@@ -149,7 +152,7 @@ Answers are plain text (`ok c1=15`, `no game on stream`, `unauthorized`).
   page for a laptop, tablet or phone while streaming. Big +/− for the game's
   counters (or W/D/L and goals), next part, ±1 h, game on stream, BRB "back
   in 5/10" and clear, ticker on Gaming, FINAL badge, poll open/close, Co
-  tonight, Home/Guest. Every tap is live in ~5 s, no Save. Counters, part and
+  tonight, Home/Guest. Every tap is live in ~3–5 s, no Save. Counters, part and
   hours have Undo. It refreshes itself every 10 s.
 - Taps go to `POST /api/admin/quick` (one change, applied to the saved state
   on the server), so they never overwrite other fields. If the control room
