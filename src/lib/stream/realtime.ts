@@ -16,6 +16,8 @@ export const REALTIME_CHANNEL = "madnco-stream";
 const ABLY_REST = "https://main.realtime.ably.net";
 /** Ably's default message limit is 64 KB; stay under it with room to spare. */
 const MAX_BYTES = 60_000;
+/** Who the server publishes as. */
+const CLIENT_ID = "madnco-server";
 
 /** What /api/stream tells the overlays, or `null` when realtime is off. */
 export function realtimePublic(): { key: string; channel: string } | null {
@@ -41,9 +43,12 @@ export async function publishStatus(): Promise<void> {
       method: "POST",
       headers: {
         Authorization: `Basic ${Buffer.from(key).toString("base64")}`,
+        // Basic auth may claim a client ID (Base64, per Ably's REST spec), so
+        // channels that require identified clients accept it (error 40161).
+        "X-Ably-ClientId": Buffer.from(CLIENT_ID).toString("base64"),
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name: "status", data }),
+      body: JSON.stringify({ name: "status", data, clientId: CLIENT_ID }),
       cache: "no-store",
     });
     // Shows in Vercel → Logs (search "realtime"); polling still covers it.
