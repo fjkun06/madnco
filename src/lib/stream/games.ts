@@ -70,7 +70,36 @@ export type GameProfile = {
   finalPart: boolean;
   /** Set when the series is finished (epoch ms). */
   completedAt: number | null;
+  /** Share-link preview images made from Frank's own screenshot, or `null`. */
+  art: ShareArt | null;
 };
+
+/**
+ * One JPEG per share link: live on TikTok / Twitch / YouTube, and offline.
+ * Made in the browser from a gameplay screenshot, stored on Vercel Blob.
+ */
+export const SHARE_ART_KEYS = ["tiktok", "twitch", "youtube", "off"] as const;
+export type ShareArtKey = (typeof SHARE_ART_KEYS)[number];
+export type ShareArt = Record<ShareArtKey, string>;
+
+const BLOB_URL = /^https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\/[A-Za-z0-9._~/-]{1,200}$/;
+
+/** `true` for a public Vercel Blob URL (the only place share images live). */
+export function isBlobUrl(value: unknown): value is string {
+  return typeof value === "string" && BLOB_URL.test(value);
+}
+
+/** All four images as Blob URLs, or `null`. */
+export function sanitizeArt(input: unknown): ShareArt | null {
+  if (typeof input !== "object" || input === null) return null;
+  const record = input as Record<string, unknown>;
+  const out = {} as ShareArt;
+  for (const key of SHARE_ART_KEYS) {
+    if (!isBlobUrl(record[key])) return null;
+    out[key] = record[key];
+  }
+  return out;
+}
 
 /**
  * The library plus which game is on stream. `known` = default games the
@@ -230,6 +259,7 @@ export function newProfile(name: string, taken: Iterable<string>, mood: Mood = "
     ticker: [],
     finalPart: false,
     completedAt: null,
+    art: null,
   };
 }
 
@@ -320,6 +350,7 @@ export function sanitizeProfile(input: unknown, taken: Set<string>): GameProfile
       : [],
     finalPart: input.finalPart === true,
     completedAt: isTime(input.completedAt) ? input.completedAt : null,
+    art: sanitizeArt(input.art),
   };
 }
 
@@ -427,6 +458,8 @@ export type PublicPlay = {
   finalPart: boolean;
   completed: boolean;
   hours: number;
+  /** Share-link preview images (Blob URLs), or `null`. */
+  art: ShareArt | null;
 };
 
 /** A finished series for the website's shelf. */
@@ -486,6 +519,7 @@ export function publicPlay(profile: GameProfile, live: GameLive = EMPTY_LIVE): P
     finalPart: profile.finalPart && !profile.completedAt,
     completed: profile.completedAt !== null,
     hours: hours(live.mins),
+    art: profile.art,
   };
 }
 
