@@ -3,14 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import {
-  EMPTY_LIVE,
-  LIVE_VALUE_MAX,
-  MOOD_COLORS,
-  type GameLive,
-  type LiveField,
-  type ShowField,
-} from "@/lib/stream/games";
+import { MOOD_COLORS, type LiveField, type ShowField } from "@/lib/stream/games";
 import type { Canvas } from "@/lib/stream/channels";
 import type { QuickOp } from "@/lib/stream/quick";
 import type { StreamState } from "@/lib/stream/state";
@@ -19,6 +12,7 @@ import { interpolate } from "@/utils/interpolate";
 import { BackToTop } from "../BackToTop";
 import { errorText } from "../errors";
 import { FounderForm } from "../tabs/FansTab";
+import { useGameLive } from "../useGameLive";
 
 const t = en.remote;
 const REFRESH_MS = 10_000;
@@ -49,25 +43,23 @@ export function RemotePanel({
 }) {
   const router = useRouter();
   const [state, setState] = useState<StreamState>(initial);
-  const [values, setValues] = useState<{ id: string; live: GameLive } | null>(null);
   const [busy, setBusy] = useState(false);
   const [last, setLast] = useState<Last>(null);
   const [error, setError] = useState("");
   const busyRef = useRef(false);
-  // Counter taps in flight: they update the number at once and are sent one
-  // after another, so quick double taps all count (nothing is dropped).
-  const pending = useRef(0);
-  const queue = useRef<Promise<void>>(Promise.resolve());
 
   const current = state.games.list.find((g) => g.id === state.games.current) ?? null;
-  const live = current && values?.id === current.id ? values.live : null;
   const currentId = current?.id ?? null;
+  // Same counters as the Games tab: a tap saves, then shows the server's number.
+  const counters = useGameLive(currentId, () => setError(errorText()), REFRESH_MS);
+  const live = counters.live;
 
-  // Keep in sync with the control room, the Stream Deck and other devices.
+  // Keep in sync with the control room and other devices (the counters
+  // refresh themselves in useGameLive).
   useEffect(() => {
     let stop = false;
     const refresh = () => {
-      if (busyRef.current || pending.current > 0) return;
+      if (busyRef.current) return;
       fetch("/api/admin/state", { cache: "no-store" })
         .then((res) => {
           if (res.status === 401) router.refresh();
@@ -77,15 +69,6 @@ export function RemotePanel({
           if (next && !stop && !busyRef.current) setState(next);
         })
         .catch(() => undefined);
-      if (currentId) {
-        fetch(`/api/admin/game?ids=${encodeURIComponent(currentId)}`, { cache: "no-store" })
-          .then((res) => (res.ok ? (res.json() as Promise<Record<string, GameLive>>) : null))
-          .then((body) => {
-            if (body && !stop && !busyRef.current && pending.current === 0)
-              setValues({ id: currentId, live: body[currentId] ?? EMPTY_LIVE });
-          })
-          .catch(() => undefined);
-      }
     };
     refresh();
     const timer = setInterval(refresh, REFRESH_MS);
@@ -96,7 +79,7 @@ export function RemotePanel({
       clearInterval(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [currentId, router]);
+  }, [router]);
 
   async function send<T>(url: string, body: unknown): Promise<T | null> {
     if (busyRef.current || !storageReady) return null;
@@ -125,57 +108,14 @@ export function RemotePanel({
     }
   }
 
-  function change(field: LiveField, by: number, label: string, undoable = true) {
-    if (!current || !storageReady) return;
-    const id = current.id;
-    // Show the new number right away; the server's answer confirms it.
-    setValues((prev) => {
-      if (!prev || prev.id !== id) return prev;
-      const min = field === "part" ? 1 : 0;
-      const value = Math.min(LIVE_VALUE_MAX, Math.max(min, prev.live[field] + by));
-      return { id, live: { ...prev.live, [field]: value } };
-    });
+  async function change(field: LiveField, by: number, label: string, undoable = true) {
+    setError("");
+    if (!(await counters.change(field, by))) return;
     const amount = field === "mins" ? by / 60 : by;
     setLast({
       text: `${label} ${amount > 0 ? "+" : ""}${amount}${field === "mins" ? " h" : ""}`,
-      undo: undoable ? () => change(field, -by, label, false) : undefined,
+      undo: undoable ? () => void change(field, -by, label, false) : undefined,
     });
-    setError("");
-    pending.current += 1;
-    queue.current = queue.current.then(async () => {
-      try {
-        const res = await fetch("/api/admin/game", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id, field, by }),
-        });
-        const json = (await res.json().catch(() => ({}))) as GameLive & { error?: string };
-        if (!res.ok) {
-          if (res.status === 401) router.refresh();
-          setError(errorText(json.error));
-          await reloadValues(id);
-          return;
-        }
-        // Only the last answer counts; earlier ones are already out of date.
-        if (pending.current === 1) setValues({ id, live: json });
-      } catch {
-        setError(errorText());
-        await reloadValues(id);
-      } finally {
-        pending.current -= 1;
-      }
-    });
-  }
-
-  /** After a failed tap: show what the server really has. */
-  async function reloadValues(id: string) {
-    try {
-      const res = await fetch(`/api/admin/game?ids=${encodeURIComponent(id)}`, { cache: "no-store" });
-      const body = res.ok ? ((await res.json()) as Record<string, GameLive>) : null;
-      if (body) setValues({ id, live: body[id] ?? EMPTY_LIVE });
-    } catch {
-      // Keep the last numbers; the 10 s refresh will catch up.
-    }
   }
 
   async function quick(op: QuickOp, text: string) {
@@ -231,15 +171,15 @@ export function RemotePanel({
                 </span>
                 {current.showPart ? (
                   <div className="grid grid-cols-[64px_1fr] gap-2">
-                    <button type="button" aria-label={interpolate(t.prevPart, { unit })} disabled={busy || !live || live.part <= 1} onClick={() => change("part", -1, unit)} className={`${BTN} ${OFF}`}>←</button>
-                    <button type="button" disabled={busy || !live} onClick={() => change("part", 1, unit)} className={`${BTN} min-h-16 bg-(--mood) text-ink`}>
+                    <button type="button" aria-label={interpolate(t.prevPart, { unit })} disabled={busy || counters.busy || !live || live.part <= 1} onClick={() => change("part", -1, unit)} className={`${BTN} ${OFF}`}>←</button>
+                    <button type="button" disabled={busy || counters.busy || !live} onClick={() => change("part", 1, unit)} className={`${BTN} min-h-16 bg-(--mood) text-ink`}>
                       {interpolate(t.nextPart, { unit })}
                     </button>
                   </div>
                 ) : null}
                 <div className="grid grid-cols-2 gap-2">
-                  <button type="button" disabled={busy || !live || live.mins < 60} onClick={() => change("mins", -60, t.hoursLabel)} className={`${BTN} ${OFF}`}>−1 h</button>
-                  <button type="button" disabled={busy || !live} onClick={() => change("mins", 60, t.hoursLabel)} className={`${BTN} ${OFF}`}>+1 h</button>
+                  <button type="button" disabled={busy || counters.busy || !live || live.mins < 60} onClick={() => change("mins", -60, t.hoursLabel)} className={`${BTN} ${OFF}`}>−1 h</button>
+                  <button type="button" disabled={busy || counters.busy || !live} onClick={() => change("mins", 60, t.hoursLabel)} className={`${BTN} ${OFF}`}>+1 h</button>
                 </div>
               </>
             ) : null}
@@ -381,7 +321,7 @@ export function RemotePanel({
               {current.counters.map((c, i) => {
                 const field: LiveField = i === 0 ? "c1" : "c2";
                 return (
-                  <Counter key={field} label={c.label} value={live ? live[field] : null} total={c.total} disabled={busy || !live} onChange={(by) => change(field, by, c.label)} />
+                  <Counter key={field} label={c.label} value={live ? live[field] : null} total={c.total} disabled={busy || counters.busy || !live} onChange={(by) => change(field, by, c.label)} />
                 );
               })}
             </div>
@@ -389,7 +329,7 @@ export function RemotePanel({
           {current?.widget === "football" ? (
             <div className="grid flex-1 grid-cols-2 gap-4 lg:grid-cols-3">
               {(["w", "d", "l", "gf", "ga"] as const).map((field) => (
-                <Counter key={field} label={en.admin.games.football[field]} value={live ? live[field] : null} disabled={busy || !live} onChange={(by) => change(field, by, en.admin.games.football[field])} compact />
+                <Counter key={field} label={en.admin.games.football[field]} value={live ? live[field] : null} disabled={busy || counters.busy || !live} onChange={(by) => change(field, by, en.admin.games.football[field])} compact />
               ))}
             </div>
           ) : null}
