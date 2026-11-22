@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth/admin";
+import { publishStatus } from "@/lib/stream/realtime";
 import { redisConfigured } from "@/lib/stream/redis";
 import { loadState, saveState } from "@/lib/stream/store";
 
@@ -26,6 +27,8 @@ export async function PUT(request: Request) {
   if (!redisConfigured()) {
     return NextResponse.json({ error: "storage-not-configured" }, { status: 503 });
   }
+  // Push the result to the overlays once this answer is sent (Ably).
+  after(publishStatus);
   try {
     const body: unknown = await request.json();
     // The Remote may have changed things since this form was loaded: refuse

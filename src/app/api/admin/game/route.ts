@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth/admin";
 import { isLiveField } from "@/lib/stream/games";
 import { changeGameLive, loadGameLive, resetGameLive } from "@/lib/stream/gameStore";
+import { publishStatus } from "@/lib/stream/realtime";
 import { redisConfigured } from "@/lib/stream/redis";
 
 const unauthorized = () => NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -33,6 +34,9 @@ export async function POST(request: Request) {
   }
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
   if (!isId(body.id)) return NextResponse.json({ error: "bad-request" }, { status: 400 });
+  // Push the result to the overlays once this answer is sent (Ably).
+  after(publishStatus);
+
   try {
     if (body.reset === true) return NextResponse.json(await resetGameLive(body.id));
     if (!isLiveField(body.field)) {
