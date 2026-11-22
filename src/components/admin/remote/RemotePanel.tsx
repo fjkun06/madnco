@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   EMPTY_LIVE,
+  LIVE_VALUE_MAX,
   MOOD_COLORS,
   type GameLive,
   type LiveField,
@@ -53,6 +54,10 @@ export function RemotePanel({
   const [last, setLast] = useState<Last>(null);
   const [error, setError] = useState("");
   const busyRef = useRef(false);
+  // Counter taps in flight: they update the number at once and are sent one
+  // after another, so quick double taps all count (nothing is dropped).
+  const pending = useRef(0);
+  const queue = useRef<Promise<void>>(Promise.resolve());
 
   const current = state.games.list.find((g) => g.id === state.games.current) ?? null;
   const live = current && values?.id === current.id ? values.live : null;
@@ -62,7 +67,7 @@ export function RemotePanel({
   useEffect(() => {
     let stop = false;
     const refresh = () => {
-      if (busyRef.current) return;
+      if (busyRef.current || pending.current > 0) return;
       fetch("/api/admin/state", { cache: "no-store" })
         .then((res) => {
           if (res.status === 401) router.refresh();
@@ -76,7 +81,7 @@ export function RemotePanel({
         fetch(`/api/admin/game?ids=${encodeURIComponent(currentId)}`, { cache: "no-store" })
           .then((res) => (res.ok ? (res.json() as Promise<Record<string, GameLive>>) : null))
           .then((body) => {
-            if (body && !stop && !busyRef.current)
+            if (body && !stop && !busyRef.current && pending.current === 0)
               setValues({ id: currentId, live: body[currentId] ?? EMPTY_LIVE });
           })
           .catch(() => undefined);
@@ -120,17 +125,57 @@ export function RemotePanel({
     }
   }
 
-  async function change(field: LiveField, by: number, label: string, undoable = true) {
-    if (!current) return;
+  function change(field: LiveField, by: number, label: string, undoable = true) {
+    if (!current || !storageReady) return;
     const id = current.id;
-    const next = await send<GameLive>("/api/admin/game", { id, field, by });
-    if (!next) return;
-    setValues({ id, live: next });
+    // Show the new number right away; the server's answer confirms it.
+    setValues((prev) => {
+      if (!prev || prev.id !== id) return prev;
+      const min = field === "part" ? 1 : 0;
+      const value = Math.min(LIVE_VALUE_MAX, Math.max(min, prev.live[field] + by));
+      return { id, live: { ...prev.live, [field]: value } };
+    });
     const amount = field === "mins" ? by / 60 : by;
     setLast({
       text: `${label} ${amount > 0 ? "+" : ""}${amount}${field === "mins" ? " h" : ""}`,
-      undo: undoable ? () => void change(field, -by, label, false) : undefined,
+      undo: undoable ? () => change(field, -by, label, false) : undefined,
     });
+    setError("");
+    pending.current += 1;
+    queue.current = queue.current.then(async () => {
+      try {
+        const res = await fetch("/api/admin/game", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, field, by }),
+        });
+        const json = (await res.json().catch(() => ({}))) as GameLive & { error?: string };
+        if (!res.ok) {
+          if (res.status === 401) router.refresh();
+          setError(errorText(json.error));
+          await reloadValues(id);
+          return;
+        }
+        // Only the last answer counts; earlier ones are already out of date.
+        if (pending.current === 1) setValues({ id, live: json });
+      } catch {
+        setError(errorText());
+        await reloadValues(id);
+      } finally {
+        pending.current -= 1;
+      }
+    });
+  }
+
+  /** After a failed tap: show what the server really has. */
+  async function reloadValues(id: string) {
+    try {
+      const res = await fetch(`/api/admin/game?ids=${encodeURIComponent(id)}`, { cache: "no-store" });
+      const body = res.ok ? ((await res.json()) as Record<string, GameLive>) : null;
+      if (body) setValues({ id, live: body[id] ?? EMPTY_LIVE });
+    } catch {
+      // Keep the last numbers; the 10 s refresh will catch up.
+    }
   }
 
   async function quick(op: QuickOp, text: string) {
