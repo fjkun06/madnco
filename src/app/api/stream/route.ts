@@ -3,8 +3,11 @@ import { loadPublicStatus } from "@/lib/stream/store";
 
 /**
  * GET /api/stream — the public stream status for the website and the OBS
- * overlays. The CDN may serve the same answer for 5 seconds, so many
- * overlays polling at once still cost about one Redis read per 5 seconds.
+ * overlays. The CDN serves the same answer for 3 seconds, so all overlays
+ * together cost at most one run (~5 Redis commands) per 3 seconds: about
+ * 6,000 commands per hour of streaming, which keeps ~70 streaming hours a
+ * month inside Upstash's free 500K commands. No stale-while-revalidate, so a
+ * change shows within ~3–5 s (overlays poll every 2 s).
  */
 export async function GET() {
   // Always run at request time, never prerendered at build.
@@ -12,7 +15,7 @@ export async function GET() {
   const status = await loadPublicStatus();
   return Response.json(status, {
     headers: {
-      "Cache-Control": "public, max-age=0, s-maxage=5, stale-while-revalidate=10",
+      "Cache-Control": "public, max-age=0, s-maxage=3",
       // Overlays may also be opened as local files during testing.
       "Access-Control-Allow-Origin": "*",
     },

@@ -1,6 +1,7 @@
 /*
  * MadnCo. overlays: live slots filled from /api/stream (admin panel).
- * Polls every 5 s; the countdown ticks every second in between.
+ * Polls every 2 s while on screen (30 s while OBS hides the source); the
+ * countdown ticks every second in between.
  *
  *   data-text="topic|game|countdown|next-when|next-plan"  text of the element
  *   data-show="topic|game|next|countdown"  visible only when that value is set
@@ -591,7 +592,29 @@
       .catch(function () {});
   }
 
+  // Poll every 2 s while this overlay is on screen. OBS tells browser
+  // sources when they're shown or hidden; hidden ones only check every 30 s,
+  // so the free plans (Vercel: 1M requests/month) are spent on what's visible.
+  // Showing a scene again polls right away.
+  var POLL_MS = 2000;
+  var HIDDEN_POLL_MS = 30000;
+  var onScreen = true;
+  var lastPoll = 0;
+  function tick() {
+    if (!onScreen && Date.now() - lastPoll < HIDDEN_POLL_MS) return;
+    lastPoll = Date.now();
+    poll();
+  }
+  window.addEventListener("obsSourceVisibleChanged", function (event) {
+    onScreen = !(event && event.detail && event.detail.visible === false);
+    if (onScreen && Date.now() - lastPoll > 1000) {
+      lastPoll = Date.now();
+      poll();
+    }
+  });
+
+  lastPoll = Date.now();
   poll();
-  setInterval(poll, 5000);
+  setInterval(tick, POLL_MS);
   setInterval(render, 1000);
 })();
