@@ -33,8 +33,11 @@ export async function publishStatus(): Promise<void> {
   if (!key) return;
   try {
     const data = JSON.stringify(await loadPublicStatus());
-    if (Buffer.byteLength(data) > MAX_BYTES) return;
-    await fetch(`${ABLY_REST}/channels/${REALTIME_CHANNEL}/messages`, {
+    if (Buffer.byteLength(data) > MAX_BYTES) {
+      console.error("[realtime] status too big to push", Buffer.byteLength(data));
+      return;
+    }
+    const res = await fetch(`${ABLY_REST}/channels/${REALTIME_CHANNEL}/messages`, {
       method: "POST",
       headers: {
         Authorization: `Basic ${Buffer.from(key).toString("base64")}`,
@@ -43,7 +46,9 @@ export async function publishStatus(): Promise<void> {
       body: JSON.stringify({ name: "status", data }),
       cache: "no-store",
     });
-  } catch {
-    // Polling is the backup.
+    // Shows in Vercel → Logs (search "realtime"); polling still covers it.
+    if (!res.ok) console.error("[realtime] publish failed", res.status, (await res.text()).slice(0, 300));
+  } catch (error) {
+    console.error("[realtime] publish failed", error);
   }
 }
