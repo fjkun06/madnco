@@ -217,17 +217,18 @@ never see the page.
 
 Pictures: Games tab → Share link → **Choose screenshot** (your own gameplay
 shot, e.g. the SHOT key). The browser makes four 1200×630 JPEGs (LIVE on
-TikTok / Twitch / YouTube, and offline), each under ~420 KB because WhatsApp
-drops preview images over ~600 KB. **Upload picture** stores them on Vercel
+TikTok / Twitch / YouTube, and offline), each under ~240 KB: Meta's limit is 600 KB, but
+WhatsApp only shows the big preview reliably under ~300 KB. **Upload picture** stores them on Vercel
 Blob (`/api/admin/art`), then **Save & push**. No picture = the site's
 `og-image.png`. The **Copy … link** buttons add `?s=…` so chat apps fetch a
 fresh preview each time.
 
 One-time setup:
 1. `npm install @vercel/blob` (adds it to package.json).
-2. Vercel → project → Storage → Create → **Blob**, access **Public**, connect
-   it to the project (adds `BLOB_READ_WRITE_TOKEN` to all environments).
-   Redeploy.
+2. Vercel → project → **Storage** tab → **Create Storage** → **Blob** →
+   **Continue** → access **Public**, connect it to the project in all
+   environments. Vercel adds `BLOB_STORE_ID` (OIDC; older stores:
+   `BLOB_READ_WRITE_TOKEN`). Redeploy.
 
 ## Not verified
 

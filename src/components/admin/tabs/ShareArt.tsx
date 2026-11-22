@@ -12,8 +12,11 @@ const t = en.admin.share;
 
 const W = 1200;
 const H = 630;
-/** WhatsApp drops preview images over ~600 KB; stay well under. */
-const TARGET_BYTES = 420_000;
+/**
+ * Meta says 600 KB, but in practice WhatsApp only shows the big preview for
+ * images under ~300 KB (bigger ones get a small, blurry thumbnail).
+ */
+const TARGET_BYTES = 240_000;
 
 const loadImage = (src: string) =>
   new Promise<HTMLImageElement>((resolve, reject) => {
@@ -163,8 +166,8 @@ export async function makeShareCards(file: File, profile: Pick<GameProfile, "nam
     for (const key of SHARE_ART_KEYS) {
       ctx.clearRect(0, 0, W, H);
       drawCard(ctx, shot, logo, fonts, profile, key);
-      let blob = await toJpeg(canvas, 0.86);
-      for (const q of [0.78, 0.7, 0.6, 0.5]) {
+      let blob = await toJpeg(canvas, 0.82);
+      for (const q of [0.74, 0.66, 0.58, 0.5, 0.42, 0.35]) {
         if (blob.size <= TARGET_BYTES) break;
         blob = await toJpeg(canvas, q);
       }
