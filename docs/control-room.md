@@ -17,6 +17,7 @@ OBS overlays read it from `GET /api/stream`.
 | Admin form model, checks, change count (pure, tested) | `src/components/admin/form.ts`, `time.ts` |
 | Website live bits (client, after hydration) | `src/components/live/*`, `src/lib/stream/useStreamStatus.ts` |
 | OBS overlays (static HTML) + live slots | `public/overlay/*.html`, `public/overlay/live.js` |
+| Stream log (numbers per stream, charts) | `src/lib/stream/streamLog.ts`, `streamLogStore.ts`, `src/app/api/admin/streamlog`, `src/components/admin/tabs/StreamLogTab.tsx`, `streamlog/charts.tsx` |
 
 ## Environment variables (Vercel → Settings → Environment Variables)
 
@@ -252,6 +253,37 @@ Setup:
    resource restriction: selected channels → `madnco-stream`. Copy it →
    Vercel env `ABLY_SUBSCRIBE_KEY` (public on purpose: it can only listen).
 4. Redeploy, then refresh the OBS browser sources.
+
+### Stream log (v7)
+
+Control Room → **Stream log**. One entry per stream, saved in Upstash (hash
+`madnco:streamlog`, one read per page open, one write per save; no extra
+Vercel or Ably cost).
+
+- **Log a stream**: date (past days only), start and end (an end before the
+  start means the stream ran past midnight; the duration is worked out),
+  game (pick from the library or type), part, co, then per platform the
+  numbers from each platform's stream summary: peak, average and unique
+  viewers, comments, new followers, followers now. Leave a box empty when a
+  platform doesn't show that number; empty is not the same as 0. Extras:
+  deaths/counter, clips made, raids in, goal reached/partly/missed, a 1–5
+  "how did it feel", notes. **Fill from the game on stream** copies the
+  current game, part, counter and co.
+- **Edit / delete**: tap a row in "Streams in this period". Delete asks twice.
+- **Browse**: Week (Mon–Sun) / Month / Year, ‹ › to move, Today to jump back.
+- **What the charts show**:
+  - top row: streams, hours, new followers, average viewers (all platforms
+    added up, mean per stream), comments, followers per hour, each with the
+    change against the previous week/month/year (hidden when that one is
+    empty) and the best stream by followers per hour;
+  - new followers per day (week, month) or per month (year), stacked by
+    platform: which platform actually grows the channel;
+  - where viewers come from: unique viewers split by platform;
+  - hours live per day / week / month: are you streaming enough;
+  - average viewers per stream, one line per platform: hover or tap a dot
+    for the game, followers, comments and goal of that stream.
+- Platform colours: Twitch purple, YouTube orange, TikTok green (checked for
+  colour blindness against the panel background).
 
 ## Not verified
 

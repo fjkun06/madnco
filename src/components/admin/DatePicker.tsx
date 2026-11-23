@@ -21,7 +21,9 @@ const DAY =
 
 /**
  * A date field with a month calendar. Days before today are crossed out and
- * can't be picked; shortcuts for today, tomorrow and the weekend.
+ * can't be picked; shortcuts for today, tomorrow and the weekend. With
+ * `past`, it's the other way round (logging what already happened): future
+ * days are crossed out, shortcuts are today and yesterday.
  */
 export function DatePicker({
   id,
@@ -31,6 +33,7 @@ export function DatePicker({
   now,
   sub,
   issue,
+  past: pastMode = false,
 }: {
   id: string;
   label: string;
@@ -40,6 +43,8 @@ export function DatePicker({
   now: number;
   sub?: ReactNode;
   issue?: string;
+  /** Pick days up to today instead of from today. */
+  past?: boolean;
 }) {
   const t = en.admin.picker;
   const w = en.admin.when;
@@ -48,7 +53,9 @@ export function DatePicker({
 
   const today = now ? toDateValue(now) : "";
   const [ty, tm] = today ? today.split("-").map(Number) : [0, 0];
-  const atFirstMonth = view.year < ty || (view.year === ty && view.month <= tm - 1);
+  const atCurrentMonth = view.year < ty || (view.year === ty && view.month <= tm - 1);
+  const atLastMonth = view.year > ty || (view.year === ty && view.month >= tm - 1);
+  const atFirstMonth = !pastMode && atCurrentMonth;
 
   function onField() {
     if (!open || closing) {
@@ -69,14 +76,19 @@ export function DatePicker({
   }
 
   const d = today ? new Date(ty, tm - 1, Number(today.slice(8))) : null;
-  const shortcuts: [string, string][] = d
-    ? [
+  const shortcuts: [string, string][] = !d
+    ? []
+    : pastMode
+      ? [
+          [t.today, today],
+          [t.yesterday, dateValue(d.getFullYear(), d.getMonth(), d.getDate() - 1)],
+        ]
+      : [
         [t.today, today],
         [t.tomorrow, dateValue(d.getFullYear(), d.getMonth(), d.getDate() + 1)],
         [t.sat, nextWeekday(6, now)],
         [t.sun, nextWeekday(0, now)],
-      ]
-    : [];
+      ];
 
   return (
     <div ref={ref} className="relative flex flex-col gap-2">
@@ -130,6 +142,7 @@ export function DatePicker({
               <button
                 type="button"
                 aria-label={t.nextMonth}
+                disabled={pastMode && Boolean(today) && atLastMonth}
                 onClick={() => shift(1)}
                 className={`${CHIP_SM} ${CHIP_OFF} min-w-10 text-base`}
               >
@@ -148,7 +161,8 @@ export function DatePicker({
                 </span>
               ))}
               {monthGrid(view.year, view.month).map((cell) => {
-                const past = Boolean(today) && cell.value < today;
+                const past =
+                  Boolean(today) && (pastMode ? cell.value > today : cell.value < today);
                 const selected = cell.value === value;
                 const isToday = cell.value === today;
                 let tone = "bg-ink-3 text-paper hover:bg-bordeaux";
