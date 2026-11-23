@@ -1,3 +1,5 @@
+import { publicPlay, type GameLive } from "./games";
+import type { StreamState } from "./state";
 import { loadPublicStatus } from "./store";
 
 /**
@@ -25,18 +27,14 @@ export function realtimePublic(): { key: string; channel: string } | null {
   return key && process.env.ABLY_API_KEY ? { key, channel: REALTIME_CHANNEL } : null;
 }
 
-/**
- * Push the current public status to the overlays. Never throws: if Ably is
- * down or not set up, the overlays' backup polling still catches up.
- * Run it with `after()` so the admin's answer isn't delayed.
- */
-export async function publishStatus(): Promise<void> {
+/** POST one message to the channel; logs (never throws) when Ably refuses. */
+async function publish(payload: unknown): Promise<void> {
   const key = process.env.ABLY_API_KEY?.trim();
   if (!key) return;
   try {
-    const data = JSON.stringify(await loadPublicStatus());
+    const data = JSON.stringify(payload);
     if (Buffer.byteLength(data) > MAX_BYTES) {
-      console.error("[realtime] status too big to push", Buffer.byteLength(data));
+      console.error("[realtime] message too big to push", Buffer.byteLength(data));
       return;
     }
     const res = await fetch(`${ABLY_REST}/channels/${REALTIME_CHANNEL}/messages`, {
@@ -56,4 +54,30 @@ export async function publishStatus(): Promise<void> {
   } catch (error) {
     console.error("[realtime] publish failed", error);
   }
+}
+
+/**
+ * Push the whole public status (game switch, BRB, goal, follows…). Reads it
+ * from Redis first. Run it with `after()` so the admin's answer isn't delayed.
+ */
+export async function publishStatus(): Promise<void> {
+  if (!process.env.ABLY_API_KEY) return;
+  try {
+    await publish(await loadPublicStatus());
+  } catch (error) {
+    console.error("[realtime] publish failed", error);
+  }
+}
+
+/**
+ * Fast lane for counters (Remote, Games tab, Stream Deck): the route already
+ * has the new numbers and the saved state, so it pushes just the game card
+ * — no extra Redis reads, one hop less than publishStatus. Overlays swap in
+ * `play` only; everything else stays as it was.
+ */
+export async function publishPlay(state: StreamState, id: string, live: GameLive): Promise<void> {
+  if (!process.env.ABLY_API_KEY || state.games.current !== id) return;
+  const profile = state.games.list.find((g) => g.id === id);
+  if (!profile) return;
+  await publish({ __play: publicPlay(profile, live) });
 }

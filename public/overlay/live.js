@@ -586,12 +586,15 @@
   var lastPush = 0;
   var REALTIME_SSE = "https://main.realtime.ably.net/event-stream?v=1.2&enveloped=false";
 
+  // Two kinds of push: the whole status, or { __play } (fast lane for
+  // counters: only the game card changed).
   function parsePush(raw) {
     try {
       var v = JSON.parse(raw);
       if (typeof v === "string") v = JSON.parse(v);
       if (v && v.name === "status" && v.data !== undefined) v = typeof v.data === "string" ? JSON.parse(v.data) : v.data;
-      return v && typeof v === "object" && "live" in v ? v : null;
+      if (v && typeof v === "object" && ("live" in v || "__play" in v)) return v;
+      return null;
     } catch (e) {
       return null;
     }
@@ -608,9 +611,14 @@
     es.onmessage = function (event) {
       var next = parsePush(event.data);
       if (!next) return;
-      next.realtime = status && status.realtime;
       lastPush = Date.now();
-      status = next;
+      if ("__play" in next) {
+        if (!status) return;
+        status.play = next.__play;
+      } else {
+        next.realtime = status && status.realtime;
+        status = next;
+      }
       render();
     };
   }

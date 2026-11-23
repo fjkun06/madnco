@@ -2,7 +2,8 @@ import { after, NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth/admin";
 import { isLiveField } from "@/lib/stream/games";
 import { changeGameLive, loadGameLive, resetGameLive } from "@/lib/stream/gameStore";
-import { publishStatus } from "@/lib/stream/realtime";
+import { publishPlay } from "@/lib/stream/realtime";
+import { loadState } from "@/lib/stream/store";
 import { redisConfigured } from "@/lib/stream/redis";
 
 const unauthorized = () => NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -34,11 +35,22 @@ export async function POST(request: Request) {
   }
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
   if (!isId(body.id)) return NextResponse.json({ error: "bad-request" }, { status: 400 });
-  // Push the result to the overlays once this answer is sent (Ably).
-  after(publishStatus);
+  const id = body.id;
+  // Read the saved state alongside the change, so the overlay push needs no
+  // extra round trip (Ably fast lane, sent right after this answer).
+  const state = loadState().catch(() => null);
+  const push = (live: Awaited<ReturnType<typeof changeGameLive>>) =>
+    after(async () => {
+      const saved = await state;
+      if (saved) await publishPlay(saved, id, live);
+    });
 
   try {
-    if (body.reset === true) return NextResponse.json(await resetGameLive(body.id));
+    if (body.reset === true) {
+      const live = await resetGameLive(id);
+      push(live);
+      return NextResponse.json(live);
+    }
     if (!isLiveField(body.field)) {
       return NextResponse.json({ error: "bad-request" }, { status: 400 });
     }
@@ -49,10 +61,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "bad-request" }, { status: 400 });
     }
     const live = await changeGameLive(
-      body.id,
+      id,
       body.field,
       by !== null ? { by: Math.max(-600, Math.min(600, by)) } : { value: value! },
     );
+    push(live);
     return NextResponse.json(live, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("[admin] game change failed", error);
