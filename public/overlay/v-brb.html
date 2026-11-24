@@ -38,43 +38,31 @@
 
 <style>html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}.sc{transform-origin:0 0}[hidden]{display:none!important}</style>
 <link rel="stylesheet" href="/overlay/play.css">
+<link rel="stylesheet" href="/overlay/screens.css">
 </head><body>
 
 <div class="sc">
-  <div class="stripes" aria-hidden="true"></div>
-  <div class="glow" aria-hidden="true"></div>
+  <img class="wm v" src="/overlay/logo-mark.png" alt="" aria-hidden="true">
 
-  <img src="/madnco-logo.svg" alt="MadnCo. logo" style="position: absolute; left: 50%; top: 70px; width: 300px; height: auto; transform: translateX(-50%)">
-
-  <div style="position: absolute; left: 0; right: 0; top: 290px; display: flex; flex-direction: column; align-items: center">
-    <svg class="ghost" viewBox="0 0 120 140" width="280" height="327" aria-hidden="true"><path d="M60 6C30 6 12 30 12 60v68l16-12 16 14 16-14 16 14 16-14 16 12V60C108 30 90 6 60 6z" style="fill:var(--a)"></path><ellipse cx="44" cy="58" rx="9" ry="13" fill="#110A0C"></ellipse><ellipse cx="76" cy="58" rx="9" ry="13" fill="#110A0C"></ellipse><ellipse cx="60" cy="86" rx="8" ry="10" fill="#110A0C"></ellipse></svg>
-    <div class="shadow" aria-hidden="true" style="width: 260px; height: 26px; border-radius: 50%; background: #000; margin-top: 26px"></div>
-    <span class="mono cut-s blink" style="margin-top: 50px; display: inline-flex; align-items: center; gap: 12px; height: 50px; padding: 0 20px; background: #26161C; font-size: 19px"><span style="display: inline-flex; gap: 5px"><span style="width: 6px; height: 20px; background: #F4EFE6"></span><span style="width: 6px; height: 20px; background: #F4EFE6"></span></span>Game paused</span>
-    <h1 class="big disp" style="margin: 36px 0 0; font-size: 196px; line-height: .84; text-align: center">BE RIGHT<br>BACK</h1>
-    <p data-hide="brb-any" style="margin: 46px 0 0; font-size: 40px; font-weight: 700; line-height: 1.25; text-align: center">Mad is <span style="color: var(--a)">ghosting</span> for a sec.<br>Don't you <span style="color: #E8557A">dare</span> leave.</p>
-    <div hidden data-show="brb-any" style="margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 24px">
-      <span hidden data-show="brb-msg" data-text="brb-msg" style="font-size: 46px; font-weight: 700; color: #30D5C8; text-align: center; max-width: 960px"></span>
-      <span class="cdchip cut-s" hidden data-show="brb-timer" style="height: 84px"><span hidden data-show="brb-run" style="display: contents"><span class="mono" style="font-size: 20px">Back in</span><span class="disp" style="font-size: 58px"><span data-text="brb-mm">05</span>:<span data-text="brb-ss">00</span></span></span><span hidden data-show="brb-zero" class="disp" style="font-size: 43px">Any second now…</span></span>
+  <div style="position: absolute; left: 0; right: 0; top: 250px; display: flex; flex-direction: column; align-items: center; padding: 0 70px; text-align: center">
+    <img class="flogo" src="/overlay/logo-flat.png" alt="MadnCo. logo" style="width: 240px">
+    <div style="margin-top: 60px"><svg class="ghost" viewBox="0 0 120 140" width="250" height="292" aria-hidden="true"><path d="M60 6C30 6 12 30 12 60v68l16-12 16 14 16-14 16 14 16-14 16 12V60C108 30 90 6 60 6z" style="fill:var(--a)"></path><ellipse cx="44" cy="58" rx="9" ry="13" fill="#110A0C"></ellipse><ellipse cx="76" cy="58" rx="9" ry="13" fill="#110A0C"></ellipse><ellipse cx="60" cy="86" rx="8" ry="10" fill="#110A0C"></ellipse></svg></div>
+    <h1 class="big disp" style="margin: 50px 0 0; font-size: 160px; line-height: .86">BE RIGHT<br>BACK</h1>
+    <p hidden data-show="brb-msg" data-text="brb-msg" style="margin: 44px 0 0; font-size: 46px; font-weight: 700; line-height: 1.25"></p>
+    <p data-hide="brb-msg" style="margin: 44px 0 0; font-size: 44px; font-weight: 700; line-height: 1.25">Mad is <span style="color: var(--a)">ghosting</span> for a sec.<br>Don't you <span style="color: #E8557A">dare</span> leave.</p>
+    <div style="margin-top: 44px; display: flex; flex-direction: column; align-items: center; gap: 22px">
+      <span class="cdchip cut-s" hidden data-show="brb-timer" style="height: 100px; background: var(--a); color: var(--lab)"><span hidden data-show="brb-run" style="display: contents"><span class="mono" style="font-size: 22px">Back in</span><span class="disp" style="font-size: 70px"><span data-text="brb-mm">05</span>:<span data-text="brb-ss">00</span></span></span><span hidden data-show="brb-zero" class="disp" style="font-size: 48px">Any second now…</span></span>
+      <div class="qcard cut-s" hidden data-show="quest-brb" style="width: 620px; padding: 14px 20px 16px; gap: 8px; text-align: left"><div class="hd"><span class="mono" style="font-size: 20px; color: #BBAAB1">Follow @madnco8</span><span class="mono" style="font-size: 20px; color: #BBAAB1"><b style="color: #30D5C8" data-text="quest-followers">?</b> / <span data-text="quest-goal">50</span></span></div><div class="qbar" style="height: 16px"><span class="qfill" data-bar="quest"></span></div></div>
+      <div class="qcard cut-s" data-hide="quest-brb" style="width: 620px; padding: 14px 20px; flex-direction: row; align-items: center; justify-content: space-between"><span class="mono" style="font-size: 20px; color: #BBAAB1">Discord</span><span class="disp" style="font-size: 42px">discord.gg/<span style="color: #30D5C8">sYYdUGR2pp</span></span></div>
     </div>
-    <div class="cut" style="margin-top: 44px; width: 860px; background: #1B1014; padding: 28px; display: flex; flex-direction: column; align-items: center; gap: 14px">
-      <span class="mono" style="font-size: 16px; color: #BBAAB1">Meanwhile · MadnCo. Discord</span>
-      <span class="disp" style="font-size: 50px">discord.gg/<span style="color: #30D5C8">sYYdUGR2pp</span></span>
-    </div>
-    <div style="margin-top: 18px"><div class="cut" hidden data-show="quest-brb" style="width: 860px; background: #1B1014; padding: 22px 24px; display: flex; flex-direction: column; gap: 11px">
-      <span class="mono" style="font-size: 13px; color: #E8557A"><span data-hide="quest-done">Side quest · TikTok</span><span hidden data-show="quest-done" style="color: #30D5C8">✓ Quest complete</span></span>
-      <span class="disp" data-text="quest-title" style="font-size: 36px; line-height: 1">Unlock MadnCo. LIVE</span>
-      <div class="qbar"><span class="qfill" data-bar="quest"></span></div>
-      <div class="mono" style="display: flex; justify-content: space-between; font-size: 13px; color: #BBAAB1"><span>Follow @madnco8</span><span><b style="color: #30D5C8" data-text="quest-followers">?</b> / <span data-text="quest-goal">50</span></span></div>
-    </div></div>
   </div>
 
-  <div class="tape" aria-hidden="true" style="bottom: 110px; height: 68px; background: #800020; color: #F4EFE6; transform: rotate(-3deg)">
+  <div class="tape" aria-hidden="true" style="top: 1560px; height: 76px; background: #30D5C8; color: #110A0C; transform: rotate(-2deg)">
     <div class="track" data-ticker="brb" data-upper>
-      <span style="font-size: 34px">BRB</span><i style="font-size: 22px">//</i><span style="font-size: 34px">DON'T TOUCH THAT DIAL</span><i style="font-size: 22px">//</i><span style="font-size: 34px">BRB</span><i style="font-size: 22px">//</i><span style="font-size: 34px">DON'T TOUCH THAT DIAL</span><i style="font-size: 22px">//</i>
-      <span style="font-size: 34px">BRB</span><i style="font-size: 22px">//</i><span style="font-size: 34px">DON'T TOUCH THAT DIAL</span><i style="font-size: 22px">//</i><span style="font-size: 34px">BRB</span><i style="font-size: 22px">//</i><span style="font-size: 34px">DON'T TOUCH THAT DIAL</span><i style="font-size: 22px">//</i>
+      <span style="font-size: 38px">BRB</span><i style="font-size: 26px">//</i><span style="font-size: 38px">DON'T TOUCH THAT DIAL</span><i style="font-size: 26px">//</i><span style="font-size: 38px">MADNESS LOVES COMPANY</span><i style="font-size: 26px">//</i>
+      <span style="font-size: 38px">BRB</span><i style="font-size: 26px">//</i><span style="font-size: 38px">DON'T TOUCH THAT DIAL</span><i style="font-size: 26px">//</i><span style="font-size: 38px">MADNESS LOVES COMPANY</span><i style="font-size: 26px">//</i>
     </div>
   </div>
-  <div class="scan" aria-hidden="true"></div>
 </div>
 
 <script>(function(){var W=1080,H=1920;function fit(){var s=document.querySelector('.sc');var k=Math.min(innerWidth/W,innerHeight/H);s.style.transform='scale('+k+')';}addEventListener('resize',fit);fit();})();</script>

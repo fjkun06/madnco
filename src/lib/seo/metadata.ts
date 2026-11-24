@@ -7,12 +7,13 @@ export const routes = {
   home: "/",
   impressum: "/impressum",
   privacy: "/privacy",
+  build: "/build",
   admin: "/admin",
   remote: "/admin/remote",
 } as const;
 
 /** Pages meant for search results (the sitemap); the legal pages are noindex. */
-export const indexedRoutes: readonly string[] = [routes.home];
+export const indexedRoutes: readonly string[] = [routes.home, routes.build];
 
 /**
  * Title, description, canonical and share preview for one page. Paths are

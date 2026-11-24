@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { routes } from "@/lib/seo/metadata";
 import { en } from "@/locales/en";
 import { WRAP } from "@/utils/ui.classes";
 import { MobileMenu, type NavLink } from "./MobileMenu";
@@ -8,7 +9,8 @@ import { LivePill } from "@/components/live/LivePill";
 
 /**
  * Top bar: logo, in-page nav, where the lives happen, and a Discord button.
- * Links point at "/#section" so they also work from the legal pages; the
+ * Links point at "/#section" so they also work from other pages (and /build
+ * is its own page); the
  * bar sticks to the top and slides in or out with the scroll direction.
  * The pill turns red while Twitch says @madnco8 is live (or the admin forces
  * it, see /admin); TikTok has no public live status, so it never decides.
@@ -20,6 +22,7 @@ export function Header() {
     { href: "/#what", label: t.what },
     { href: "/#discord", label: t.discord },
     { href: "/#links", label: t.links },
+    { href: routes.build, label: t.build },
   ];
   return (
     <StickyHeader>
@@ -61,7 +64,7 @@ export function Header() {
           <LivePill />
           <Link
             href="/#discord"
-            className="inline-flex min-h-10 items-center bg-tq px-3.5 label-mono text-[11px] font-extrabold whitespace-nowrap text-ink no-underline focus-inset transition-colors duration-300 ease-smooth cut hover:bg-paper sm:min-h-11 sm:px-[18px] sm:text-[13px]"
+            className="inline-flex min-h-10 items-center bg-tq px-3.5 label-mono text-[11px] font-extrabold sm:min-h-11 sm:px-[18px] sm:text-[13px] text-ink no-underline focus-inset transition-colors duration-300 ease-smooth whitespace-nowrap cut hover:bg-paper"
           >
             {t.joinDiscord}
           </Link>

@@ -17,6 +17,7 @@ OBS overlays read it from `GET /api/stream`.
 | Admin form model, checks, change count (pure, tested) | `src/components/admin/form.ts`, `time.ts` |
 | Website live bits (client, after hydration) | `src/components/live/*`, `src/lib/stream/useStreamStatus.ts` |
 | OBS overlays (static HTML) + live slots | `public/overlay/*.html`, `public/overlay/live.js` |
+| Public showcase /build (demo overlay + remote) | `src/app/build`, `src/components/build`, `src/lib/build` |
 | Stream log (numbers per stream, charts) | `src/lib/stream/streamLog.ts`, `streamLogStore.ts`, `src/app/api/admin/streamlog`, `src/components/admin/tabs/StreamLogTab.tsx`, `streamlog/charts.tsx` |
 
 ## Environment variables (Vercel → Settings → Environment Variables)
@@ -284,6 +285,62 @@ Vercel or Ably cost).
     for the game, followers, comments and goal of that stream.
 - Platform colours: Twitch purple, YouTube orange, TikTok green (checked for
   colour blindness against the panel background).
+
+### Overlay cleanup + design #2 (v7)
+
+All overlays use the flat logo (`/overlay/logo-flat.png`, same as the profile
+picture). No LIVE pill, no "MAD P1" / "CO · slot open" / @handle chips.
+
+- **Gaming (both canvases):** one nameplate (`/overlay/plate.css`): top line
+  "short name · Part N · w/ Co" with the counter (skull + number for deaths,
+  label + number otherwise, W·D·L + goals for football) on the right, the goal
+  as the headline under it (no goal = the full game name). Counters pop when
+  they go up. Landscape: the nameplate rides with the cam, above it at the
+  bottom, below it at the top (`?cam=bl|br|tl|tr`, one browser source per
+  Gaming scene, as before), thin frame in the mood colour, small logo in the
+  opposite top corner. Vertical: full width, cam 0,210 1080×608, nameplate
+  strip, game 0,902 1080×608, goal under the game; nothing in TikTok's header
+  (0–210) or comments (1650+).
+- **Clean mode (landscape Gaming):** between pop-ups only the counter (or the
+  football score) shows, docked to the cam. The full nameplate (short name,
+  Part, Co, goal) slides out for 20 s when the scene comes on screen, every
+  20 minutes, and whenever the goal, part or Co changes. Change the timing
+  per browser source: `&every=15` (minutes), `&show=30` (seconds); `&clean=0`
+  keeps the full nameplate up. Polls always stay up.
+- **Starting Soon, BRB, Ending, Just Chatting:** ink background with the giant
+  skull watermark (`/overlay/logo-mark.png`, `/overlay/screens.css`), one
+  tape. Starting Soon: logo, countdown or STARTING SOON, goal + "MW4 · Part 3 ·
+  w/ Co", "Previously" line, small side quest card. BRB: ghost, message,
+  "Back in" timer, side quest bar (or Discord when the side quest is off).
+  Ending: GG / That's a wrap, tonight's game + Co, next stream, @madnco8 +
+  Discord, Founding 50 strip.
+- **Games tab:** "Title card corner" is gone (the nameplate follows the cam);
+  new **Short name (nameplate)** field (16 characters, empty = suggestion).
+  Switches are "On the nameplate": Short name, Part, Goal (+ W/D/L, goals).
+- **Ticker:** off on Gaming by default; the game's own ticker lines only show
+  when Gaming is ticked.
+
+OBS, vertical canvas (V Gaming): cam 1080×608 at x0 y210, game 1080×608 at
+x0 y902. Landscape positions don't change.
+
+### Public showcase: /build (v7)
+
+https://www.madnco.frankjordan.dev/build ("The build" in the header). The
+real overlays in demo mode next to a demo remote; visitors' taps never reach
+the stream, the API or Redis.
+
+- `/build/overlay/<page>` (gaming, starting-soon, brb, ending and the `v-`
+  versions) serves the same HTML as `/overlay/<page>.html`, minus the Google
+  Fonts links, noindex. `live.js` sees that path and, instead of polling or
+  connecting to Ably / Twitch chat, waits for the page's made-up status via
+  `postMessage` (same origin only).
+- The page lends the iframe its own self-hosted fonts (next/font); retro's
+  pixel font ships in `public/overlay/fonts/` (OFL). So the page makes no
+  requests to Google or anyone else, as the privacy page promises.
+- Demo data: `src/lib/build/demoStatus.ts` (one preset per game mode).
+  Change the build log and texts in `en.build`.
+- Starting Soon (landscape): "Up next" and the side quest card now stack in
+  the top-left corner instead of overlapping.
 
 ## Not verified
 

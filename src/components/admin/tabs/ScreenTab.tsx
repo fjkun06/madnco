@@ -100,11 +100,7 @@ export function ScreenTab({ form, update }: TabProps) {
           <span id="ticker-scenes" className={LABEL}>
             {t.showOn}
           </span>
-          <div
-            role="group"
-            aria-labelledby="ticker-scenes"
-            className="flex flex-wrap gap-2"
-          >
+          <div role="group" aria-labelledby="ticker-scenes" className="flex flex-wrap gap-2">
             {TICKER_SCENES.map((scene) => {
               const on = form.tickerScenes.includes(scene);
               return (
@@ -120,6 +116,7 @@ export function ScreenTab({ form, update }: TabProps) {
               );
             })}
           </div>
+          <p className="m-0 text-[13px] leading-snug text-muted">{t.gamingNote}</p>
         </div>
 
         <div className="flex flex-col gap-2">
@@ -129,20 +126,18 @@ export function ScreenTab({ form, update }: TabProps) {
               MadnCo.
             </span>
             <p className="m-0 truncate pl-5 text-lg font-bold text-paper">
-              {filled.length ? (
-                filled.map((item, i) => (
-                  <span key={i}>
-                    {i > 0 ? (
-                      <span aria-hidden="true" className="px-3.5 font-mono text-tq">
-                        {"//"}
-                      </span>
-                    ) : null}
-                    {item}
-                  </span>
-                ))
-              ) : (
-                <span className="font-normal text-muted">{t.empty}</span>
-              )}
+              {filled.length
+                ? filled.map((item, i) => (
+                    <span key={i}>
+                      {i > 0 ? (
+                        <span aria-hidden="true" className="px-3.5 font-mono text-tq">
+                          //
+                        </span>
+                      ) : null}
+                      {item}
+                    </span>
+                  ))
+                : <span className="font-normal text-muted">{t.empty}</span>}
             </p>
           </div>
         </div>
@@ -174,9 +169,7 @@ export function ScreenTab({ form, update }: TabProps) {
             {en.admin.quest.title}
           </span>
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-            <span className="truncate font-display text-[22px] leading-none">
-              {quest.title}
-            </span>
+            <span className="truncate font-display text-[22px] leading-none">{quest.title}</span>
             <span className="block h-4 bg-ink-3 p-[3px]">
               <span
                 className="xp-fill block h-full"

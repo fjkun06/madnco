@@ -60,9 +60,10 @@ export type Ticker = { items: string[]; scenes: TickerScene[] };
 
 export const TICKER_ITEM_MAX = 80;
 export const TICKER_ITEMS_MAX = 8;
+/** Off on Gaming by default: the nameplate keeps the game clean. */
 export const DEFAULT_TICKER: Ticker = {
   items: [],
-  scenes: ["gaming", "chatting", "brb"],
+  scenes: ["chatting", "brb"],
 };
 
 export function sanitizeTicker(input: unknown): Ticker {
@@ -147,8 +148,7 @@ export function questProgress(quest: Pick<Quest, "followers" | "goal">): number 
 
 /** The text to show (done or not), with the fill-ins replaced. */
 export function questText(quest: Quest): string {
-  const left =
-    quest.followers === null ? quest.goal : Math.max(0, quest.goal - quest.followers);
+  const left = quest.followers === null ? quest.goal : Math.max(0, quest.goal - quest.followers);
   const fill: Record<string, string> = {
     handle: siteConfig.handles.tiktok,
     liveHandle: siteConfig.handles.tiktokLive,

@@ -1,0 +1,49 @@
+/*
+ * MadnCo. nameplate: the one card on the Gaming overlays (both canvases).
+ * Top line: short name · Part · w/ Co, counter or scoreboard on the right.
+ * Under it: the goal as the headline (or the game name when there's no goal).
+ * The mood colour (--a, from live.js) draws the edge line and the numbers.
+ */
+.np{background:rgba(17,10,12,.92);display:flex;flex-direction:column;gap:6px;padding:12px 18px 15px}
+.np-top{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:30px}
+.np-meta{display:flex;align-items:center;flex-wrap:wrap;row-gap:4px;min-width:0;font-size:13px;color:#BBAAB1}
+.np-meta b{color:#F4EFE6;font-weight:800}
+.np-meta .mi:not([hidden]) ~ .mi:not([hidden])::before{content:"·";margin:0 .6em;color:#6E5A62}
+/* The Co tag needs no dot: it may wrap to its own line. */
+.np-meta .co{margin-left:.9em}
+.np-meta .co,.np-meta .co *{color:#30D5C8}
+.np-meta .fin{margin-left:10px;background:#E8557A;color:#110A0C;padding:3px 7px;font-size:11px;animation:npfin 1.6s ease-in-out infinite}
+@keyframes npfin{0%,100%{opacity:1}50%{opacity:.55}}
+.np-head{font-family:'Lilita One',Rubik,sans-serif;font-weight:400;font-size:28px;line-height:1.06;color:#F4EFE6}
+html[data-head="m"] .np-head{font-size:25px}
+html[data-head="l"] .np-head{font-size:21px;line-height:1.1}
+
+/* Right side: counters (with a skull for deaths) or the football scoreboard */
+.np-stat{display:flex;align-items:center;gap:14px;flex:none}
+.ct{display:flex;align-items:center;gap:7px}
+.skw{display:flex}
+.ct .sk{width:24px;height:24px;flex:none}
+.ct .sk .b{fill:var(--a)}
+.ct .lb{font-size:11px;color:#BBAAB1}
+.ct b{font-family:'Lilita One',Rubik,sans-serif;font-weight:400;font-size:32px;line-height:1;color:var(--a);display:inline-block}
+.ct small{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:13px;color:#BBAAB1}
+.ct.two b{font-size:24px;color:#F4EFE6}
+.ct.two{padding-left:14px;border-left:2px solid #26161C}
+.fbs{display:flex;align-items:center;gap:12px}
+.fbs .r{display:flex;align-items:baseline;gap:5px}
+.fbs .r span{font-size:12px}
+.fbs .r b{font-family:'Lilita One',Rubik,sans-serif;font-weight:400;font-size:28px;line-height:1}
+.fbs .gl{background:var(--a);color:var(--lab);padding:2px 9px;font-family:'Lilita One',Rubik,sans-serif;font-size:24px;line-height:1.2}
+
+/* A counter going up: a short pop (live.js adds .pop). */
+.pop{animation:nppop .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes nppop{0%{transform:scale(1)}35%{transform:scale(1.35)}100%{transform:scale(1)}}
+
+/* Retro: pixel font on the headline and the numbers */
+html[data-mood="retro"] .np-head,html[data-mood="retro"] .ct b,html[data-mood="retro"] .fbs b,html[data-mood="retro"] .fbs .gl{font-family:'Silkscreen','JetBrains Mono',monospace;letter-spacing:0}
+html[data-mood="retro"] .np-head{font-size:22px}
+
+/* Slide in when the scene starts */
+.np{animation:npin .5s cubic-bezier(.22,1,.36,1) both}
+@keyframes npin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.np,.pop,.np-meta .fin{animation:none}}

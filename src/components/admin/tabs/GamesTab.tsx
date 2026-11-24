@@ -2,13 +2,11 @@
 
 import { useRef, useState, type CSSProperties } from "react";
 import {
-  CARD_POSITIONS,
   COUNTER_LABEL_MAX,
   COUNTER_PRESETS,
   COUNTER_TOTAL_MAX,
   COUNTERS_MAX,
   EMPTY_LIVE,
-  defaultCardPos,
   GAME_NAME_MAX,
   GAME_TICKER_ITEM_MAX,
   GAME_TICKER_MAX,
@@ -20,9 +18,11 @@ import {
   POLL_OPTIONS_MAX,
   POLL_QUESTION_MAX,
   PREVIOUSLY_MAX,
+  SHORT_NAME_MAX,
   UNIT_MAX,
   WIDGETS,
   newProfile,
+  suggestShort,
   type CounterDef,
   type GameProfile,
   type Mood,
@@ -463,11 +463,7 @@ function ProfileEditor({
                 key={m}
                 type="button"
                 aria-pressed={p.mood === m}
-                onClick={() =>
-                  set(
-                    p.cardPos === defaultCardPos(p.mood) ? { mood: m, cardPos: defaultCardPos(m) } : { mood: m },
-                  )
-                }
+                onClick={() => set({ mood: m })}
                 style={moodStyle(m)}
                 className={`${CHIP} ${
                   p.mood === m ? "bg-(--mood) text-ink" : "bg-ink-3 text-(--mood) hover:bg-ink"
@@ -487,21 +483,15 @@ function ProfileEditor({
           onChange={(unit) => set({ unit })}
         />
         <div className="flex flex-col gap-2">
-          <span className={LABEL}>{t.cardPos}</span>
-          <div role="group" aria-label={t.cardPos} className="grid w-max grid-cols-2 gap-1.5">
-            {CARD_POSITIONS.map((pos) => (
-              <button
-                key={pos}
-                type="button"
-                aria-pressed={p.cardPos === pos}
-                onClick={() => set({ cardPos: pos })}
-                className={`${CHIP_SM} min-w-28 ${p.cardPos === pos ? CHIP_ON : CHIP_OFF}`}
-              >
-                {t.corners[pos]}
-              </button>
-            ))}
-          </div>
-          <span className="text-[13px] leading-snug text-muted">{t.cardPosHint}</span>
+          <Field
+            id="game-short"
+            label={t.short}
+            value={p.short}
+            max={SHORT_NAME_MAX}
+            placeholder={suggestShort(p.name)}
+            onChange={(short) => set({ short })}
+          />
+          <span className="text-[13px] leading-snug text-muted">{t.shortHint}</span>
         </div>
         <Field
           id="game-goal"

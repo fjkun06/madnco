@@ -22,7 +22,7 @@
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .big{text-shadow:-7px 0 0 #800020,7px 0 0 #30D5C8;animation:glitch 5s steps(1) infinite}
 @keyframes glitch{0%,88%,100%{text-shadow:-7px 0 0 #800020,7px 0 0 #30D5C8;transform:none}90%{text-shadow:11px 0 0 #800020,-11px 0 0 #30D5C8;transform:translate(5px,-2px) skewX(-6deg)}92%{text-shadow:-14px 0 0 #800020,14px 0 0 #30D5C8;transform:translate(-6px,2px)}94%{text-shadow:-7px 0 0 #800020,7px 0 0 #30D5C8;transform:none}}
-.logo{animation:bob 3s ease-in-out infinite}
+.logo{animation:none}
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-14px) rotate(2deg)}}
 .xp{width:820px;height:32px;background:#26161C;padding:5px;display:flex}
 .xp span{display:block;height:100%;background:repeating-linear-gradient(90deg,#30D5C8 0 16px,#23A99E 16px 20px);animation:load 12s cubic-bezier(.4,0,.2,1) infinite}
@@ -51,69 +51,48 @@
 <style>html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}.sc{transform-origin:0 0}[hidden]{display:none!important}</style>
 <link rel="stylesheet" href="/overlay/play.css">
 <link rel="stylesheet" href="/overlay/guest.css">
+<link rel="stylesheet" href="/overlay/screens.css">
 </head><body>
 
 <div class="sc">
-  <div class="dots" aria-hidden="true"></div>
-  <div class="glow g1" aria-hidden="true"></div>
+  <img class="wm v" src="/overlay/logo-mark.png" alt="" aria-hidden="true">
 
-  <div class="tape" aria-hidden="true" style="top: 120px; height: 56px; background: #800020; color: #F4EFE6; transform: rotate(2deg)">
-    <div class="track" style="animation-direction: reverse; animation-duration: 34s">
-      <span style="font-size: 28px">MADNESS LOVES COMPANY</span><i style="font-size: 20px">//</i><span style="font-size: 28px">JOIN THE FAM</span><i style="font-size: 20px">//</i><span style="font-size: 28px">MADNESS LOVES COMPANY</span><i style="font-size: 20px">//</i><span style="font-size: 28px">JOIN THE FAM</span><i style="font-size: 20px">//</i>
-      <span style="font-size: 28px">MADNESS LOVES COMPANY</span><i style="font-size: 20px">//</i><span style="font-size: 28px">JOIN THE FAM</span><i style="font-size: 20px">//</i><span style="font-size: 28px">MADNESS LOVES COMPANY</span><i style="font-size: 20px">//</i><span style="font-size: 28px">JOIN THE FAM</span><i style="font-size: 20px">//</i>
+  <!-- 0–210 TikTok header, 1650+ TikTok comments: everything sits between. -->
+  <div style="position: absolute; left: 0; right: 0; top: 250px; display: flex; flex-direction: column; align-items: center; padding: 0 70px; text-align: center">
+    <img class="flogo" src="/overlay/logo-flat.png" alt="MadnCo. logo" style="width: 280px">
+
+    <div hidden data-show="countdown" style="display: flex; flex-direction: column; align-items: center">
+      <span class="mono" style="margin-top: 56px; font-size: 30px; color: #30D5C8"><span data-show="cd-run">Going live in</span><span hidden data-show="cd-zero">Get ready</span></span>
+      <div class="cdg" data-show="cd-run" style="margin-top: 16px; font-size: 250px"><b data-text="cd-mm">05</b><span class="colon">:</span><b data-text="cd-ss">00</b></div>
+      <div class="cdg" hidden data-show="cd-zero" style="margin-top: 30px; font-size: 140px; line-height: .9">ANY<br>SECOND<br>NOW</div>
+    </div>
+    <h1 class="big disp" data-hide="countdown" style="margin: 60px 0 0; font-size: 190px; line-height: .84">STARTING<br>SOON</h1>
+
+    <div hidden data-show="play-goal-on" style="margin-top: 50px; display: flex; flex-direction: column; align-items: center; gap: 20px">
+      <div class="sgoal2" data-text="play-goal" style="font-size: 62px"></div>
+      <div class="smeta mono" style="font-size: 26px">
+        <span class="mi" hidden data-show="play-title" data-text="play-short"></span>
+        <span class="mi" hidden data-show="play-part"><span data-text="play-unit"></span> <b data-text="play-part-n"></b></span>
+        <span class="co" hidden data-show="co">w/ <span data-text="co-name"></span></span>
+      </div>
+    </div>
+    <div data-hide="play-goal-on" style="margin-top: 50px">
+      <p hidden data-show="topic" style="margin: 0; font-size: 46px; font-weight: 700; line-height: 1.25">Today:<br><span data-text="topic" style="color: #E8557A"></span></p>
+      <p data-hide="topic" style="margin: 0; font-size: 44px; font-weight: 700; line-height: 1.25">Grab a drink.<br>The <span style="color: #E8557A">madness</span> is loading.</p>
+    </div>
+
+    <div class="qcard cut" hidden data-show="quest-starting" style="margin-top: 56px; width: 640px; padding: 22px 26px 24px; text-align: left">
+      <div class="hd"><span class="disp" data-text="quest-title" style="font-size: 38px; line-height: 1">Unlock MadnCo. LIVE</span><span class="mono" style="font-size: 20px; color: #BBAAB1"><b style="color: #30D5C8" data-text="quest-followers">?</b> / <span data-text="quest-goal">50</span></span></div>
+      <div class="qbar" style="height: 24px"><span class="qfill" data-bar="quest"></span></div>
     </div>
   </div>
 
-  
-  <div hidden data-show="countdown">
-    <div style="position: absolute; left: 0; right: 0; top: 300px; display: flex; flex-direction: column; align-items: center">
-      <img class="logo" src="/madnco-logo.svg" alt="MadnCo. logo" style="width: 460px; height: auto; display: block">
-      <span class="mono" style="display: flex; align-items: center; gap: 16px; margin-top: 40px; font-size: 30px; color: #30D5C8"><span style="width: 48px; height: 5px; background: #30D5C8"></span><span data-show="cd-run">Going live in</span><span hidden data-show="cd-zero">Get ready</span><span style="width: 48px; height: 5px; background: #30D5C8"></span></span>
-      <div class="cdg" data-show="cd-run" style="margin-top: 34px; font-size: 300px"><b data-text="cd-mm">05</b><span class="colon">:</span><b data-text="cd-ss">00</b></div>
-      <div class="cdg" hidden data-show="cd-zero" style="margin-top: 40px; font-size: 150px; text-align: center; line-height: .9">ANY<br>SECOND<br>NOW</div>
-      <div class="sgoal v sm" hidden data-show="play-goal-on"><div class="k mono" data-text="play-goal-k"></div><div class="g disp" data-text="play-goal"></div></div>
-      <div class="cut" style="margin-top: 60px; width: 860px"><div class="cbar"><span data-bar="countdown"></span></div></div>
-      <p hidden data-show="topic" style="margin: 64px 0 0; font-size: 40px; font-weight: 700; text-align: center; line-height: 1.3">Today:<br><span data-text="topic" style="color: #E8557A"></span></p>
-      <div style="margin-top: 20px"><span hidden data-show="game" class="mono cs" style="font-size: 20px; padding: 9px 14px; background: #30D5C8; color: #110A0C" data-text="game"></span></div>
-    </div>
-  </div>
-
-  <div data-hide="countdown" style="position: absolute; left: 0; right: 0; top: 330px; display: flex; flex-direction: column; align-items: center">
-    <img class="logo" src="/madnco-logo.svg" alt="MadnCo. logo" style="width: 720px; height: auto; display: block">
-    <span class="mono" style="display: flex; align-items: center; gap: 14px; color: #30D5C8; font-size: 22px; margin-top: 30px"><span style="width: 40px; height: 4px; background: #30D5C8"></span>Player 1 has entered the chat</span>
-    <h1 class="big disp" style="margin: 34px 0 0; font-size: 200px; line-height: .84; text-align: center">STARTING<br>SOON</h1>
-    <div class="sgoal v" hidden data-show="play-goal-on"><div class="k mono"><span data-text="play-goal-k"></span></div><div class="g disp" data-text="play-goal"></div><div class="tp" hidden data-show="topic">Today: <span data-text="topic"></span></div></div>
-    <div data-hide="play-goal-on">
-    <p hidden data-show="topic" style="margin: 50px 0 0; font-size: 40px; font-weight: 700; text-align: center; line-height: 1.25">Today:<br><span data-text="topic" style="color: #E8557A"></span><br><span hidden data-show="game" class="mono" style="display:inline-flex;align-items:center;white-space:nowrap;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);font-size:18px;padding:7px 12px;background:#30D5C8;color:#110A0C;margin-top:14px" data-text="game"></span></p>
-    <p data-hide="topic" style="margin: 50px 0 0; font-size: 40px; font-weight: 700; text-align: center; line-height: 1.25">Grab a drink.<br>The <span style="color: #E8557A">madness</span> is loading.</p>
-    </div>
-    <div style="margin-top: 56px; display: flex; flex-direction: column; gap: 14px">
-      <div class="xp cut"><span data-bar="countdown"></span></div>
-      <div class="mono" style="display: flex; justify-content: space-between; font-size: 18px; color: #BBAAB1"><span>Loading madness<span class="blink">_</span></span><span style="color: #30D5C8" data-text="countdown">Stay tuned</span></div>
-    </div>
-  </div>
-
-  <div class="tape" aria-hidden="true" style="bottom: 260px; height: 76px; background: #30D5C8; color: #110A0C; transform: rotate(-3deg)">
+  <div class="tape" aria-hidden="true" style="top: 1530px; height: 76px; background: #30D5C8; color: #110A0C; transform: rotate(-2deg)">
     <div class="track" data-ticker="starting" data-upper>
-      <span style="font-size: 38px">FIFA NIGHTS</span><i style="font-size: 26px">//</i><span style="font-size: 38px">RP CHAOS</span><i style="font-size: 26px">//</i><span style="font-size: 38px">OMETV CHAOS</span><i style="font-size: 26px">//</i><span style="font-size: 38px">RAGE QUITS</span><i style="font-size: 26px">//</i>
-      <span style="font-size: 38px">FIFA NIGHTS</span><i style="font-size: 26px">//</i><span style="font-size: 38px">RP CHAOS</span><i style="font-size: 26px">//</i><span style="font-size: 38px">OMETV CHAOS</span><i style="font-size: 26px">//</i><span style="font-size: 38px">RAGE QUITS</span><i style="font-size: 26px">//</i>
+      <span style="font-size: 38px">FOLLOW @MADNCO8</span><i style="font-size: 26px">//</i><span style="font-size: 38px">MADNESS LOVES COMPANY</span><i style="font-size: 26px">//</i><span style="font-size: 38px">N0 EAZY M0DE</span><i style="font-size: 26px">//</i>
+      <span style="font-size: 38px">FOLLOW @MADNCO8</span><i style="font-size: 26px">//</i><span style="font-size: 38px">MADNESS LOVES COMPANY</span><i style="font-size: 26px">//</i><span style="font-size: 38px">N0 EAZY M0DE</span><i style="font-size: 26px">//</i>
     </div>
   </div>
-
-  <div class="mono" style="position: absolute; left: 60px; right: 60px; bottom: 90px; display: flex; flex-direction: column; align-items: center; gap: 16px; font-size: 20px; color: #BBAAB1">
-    <span style="display: flex; align-items: center; gap: 12px"><span class="ld"></span>@madnco8 · TikTok · Twitch · YouTube</span>
-    <span>discord.gg/<span style="color: #30D5C8">sYYdUGR2pp</span></span>
-  </div>
-  <div class="scan" aria-hidden="true"></div>
-  <div style="position: absolute; left: 230px; top: 1250px; z-index: 3">
-    <div class="cut" hidden data-show="quest-starting" style="width: 620px; background: #1B1014; padding: 22px 24px; display: flex; flex-direction: column; gap: 11px">
-      <span class="mono" style="font-size: 13px; color: #E8557A"><span data-hide="quest-done">Side quest · TikTok</span><span hidden data-show="quest-done" style="color: #30D5C8">✓ Quest complete</span></span>
-      <span class="disp" data-text="quest-title" style="font-size: 36px; line-height: 1">Unlock MadnCo. LIVE</span>
-      <div class="qbar"><span class="qfill" data-bar="quest"></span></div>
-      <div class="mono" style="display: flex; justify-content: space-between; font-size: 13px; color: #BBAAB1"><span>Follow @madnco8</span><span><b style="color: #30D5C8" data-text="quest-followers">?</b> / <span data-text="quest-goal">50</span></span></div>
-    </div>
-  </div>
-  <div style="position:absolute;left:60px;right:60px;top:205px;display:flex;justify-content:center;z-index:3;text-align:left"><div class="upnext cut-s" hidden data-show="play"><div class="k mono" data-text="play-up">Up next</div><div class="t disp" data-text="play-name"></div><div class="p" hidden data-show="play-prev"><i class="mono">Previously</i><span data-text="play-prev"></span></div></div></div>
   <div class="takeover" hidden data-show="guest">
   <div class="dots"></div><div class="glow" style="left:-300px;top:0;width:1700px;height:1700px"></div>
   <div class="ttape" aria-hidden="true" style="top:90px;height:57px;background:#800020;color:#F4EFE6;transform:rotate(1.4deg);font-size:30px"><div class="trk"><span>CHANNEL TAKEOVER</span><span style="opacity:.55">//</span><span>MADNCO. ON <span data-text='guest-host'></span></span><span style="opacity:.55">//</span><span>CHANNEL TAKEOVER</span><span style="opacity:.55">//</span><span>MADNCO. ON <span data-text='guest-host'></span></span><span style="opacity:.55">//</span><span>CHANNEL TAKEOVER</span><span style="opacity:.55">//</span><span>MADNCO. ON <span data-text='guest-host'></span></span><span style="opacity:.55">//</span><span>CHANNEL TAKEOVER</span><span style="opacity:.55">//</span><span>MADNCO. ON <span data-text='guest-host'></span></span><span style="opacity:.55">//</span></div></div>

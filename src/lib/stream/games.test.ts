@@ -12,6 +12,7 @@ import {
   sanitizeGames,
   shelf,
   slugify,
+  suggestShort,
   uniqueId,
 } from "./games";
 
@@ -236,5 +237,28 @@ describe("shelf", () => {
     expect(items.map((i) => i.name)).toEqual(["New", "Old"]);
     expect(items[1]).toMatchObject({ parts: 7, hours: 10 });
     expect(items[1].counters).toEqual([{ label: "Deaths", value: 30, total: null }]);
+  });
+});
+
+describe("short names (overlay nameplate)", () => {
+  it("suggests known, short and subtitle names", () => {
+    expect(suggestShort("Call of Duty: Modern Warfare 4")).toBe("MW4");
+    expect(suggestShort("EA FC 27")).toBe("EA FC 27");
+    expect(suggestShort("Some Very Long Game: Rebirth")).toBe("Rebirth");
+    expect(suggestShort("An Extremely Long Game Title Here").length <= 16).toBe(true);
+  });
+
+  it("every default game has one that fits", () => {
+    for (const g of DEFAULT_LIBRARY) {
+      expect(g.short.length > 0 && g.short.length <= 16).toBe(true);
+    }
+  });
+
+  it("keeps a typed short name, falls back when empty, and goes public", () => {
+    const typed = sanitizeGames({ list: [{ id: "mw4", name: "Call of Duty: Modern Warfare 4", short: " Warfare " }], known: DEFAULT_IDS });
+    expect(typed.list[0].short).toBe("Warfare");
+    const empty = sanitizeGames({ list: [{ id: "mw4", name: "Call of Duty: Modern Warfare 4", short: "" }], known: DEFAULT_IDS });
+    expect(empty.list[0].short).toBe("MW4");
+    expect(publicPlay(empty.list[0]).short).toBe("MW4");
   });
 });

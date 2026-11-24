@@ -1,0 +1,26 @@
+/*
+ * MadnCo. full screens (Starting Soon, BRB, Ending, Just Chatting), both
+ * canvases: ink background with the giant skull watermark bleeding off the
+ * right edge, the flat logo, one tape at most.
+ */
+.wm{position:absolute;pointer-events:none;user-select:none}
+.wm.l{right:-300px;top:50%;width:1500px;transform:translateY(-50%) rotate(-8deg)}
+.wm.v{right:-520px;top:44%;width:1500px;transform:translateY(-50%) rotate(-8deg)}
+.flogo{display:block;height:auto}
+
+/* "MW4 · Part 3 · w/ Courinho" under a goal */
+.smeta{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;color:#BBAAB1}
+.smeta b{color:#F4EFE6;font-weight:800}
+.smeta .mi:not([hidden]) ~ .mi:not([hidden])::before{content:"·";margin:0 .6em;color:#6E5A62}
+.smeta .co{margin-left:.9em;color:#30D5C8}
+.sgoal2{font-family:'Lilita One',Rubik,sans-serif;font-weight:400;line-height:1.04;text-align:center;color:#F4EFE6}
+.sprev{color:#BBAAB1;text-align:center;font-weight:500}
+.sprev i{font-style:normal;font-family:'JetBrains Mono',monospace;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#E8557A;margin-right:10px;font-size:.7em}
+
+/* Side quest as one slim card */
+.qcard{background:#1B1014;display:flex;flex-direction:column;gap:10px}
+.qcard .hd{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+.qcard .qbar{height:18px;background:#26161C;padding:4px}
+.qcard .qfill{display:block;height:100%;width:2%;background:repeating-linear-gradient(90deg,#30D5C8 0 18px,#23A99E 18px 23px);transition:width .6s}
+.cut-s{clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.cut{clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}

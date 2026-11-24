@@ -3,11 +3,12 @@ import { siteConfig } from "@/utils/app.constants";
 
 /**
  * /robots.txt — the hub may be crawled, plus the sitemap. The admin panel,
- * the API and the OBS overlays are tools, not pages, so crawlers skip them.
+ * the API and the OBS overlays (and their /build demo copies) are tools, not
+ * pages, so crawlers skip them.
  */
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/api/", "/overlay/"] }],
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/api/", "/overlay/", "/build/overlay/"] }],
     sitemap: `${siteConfig.url}/sitemap.xml`,
   };
 }

@@ -19,7 +19,10 @@ const isJpeg = (bytes: Uint8Array) => bytes[0] === 0xff && bytes[1] === 0xd8 && 
  */
 export async function POST(request: Request) {
   if (!(await isAdmin())) return json({ error: "unauthorized" }, 401);
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return json({ error: "blob-not-configured" }, 503);
+  // Connected stores get BLOB_STORE_ID (OIDC, newer) or BLOB_READ_WRITE_TOKEN (older).
+  if (!process.env.BLOB_STORE_ID && !process.env.BLOB_READ_WRITE_TOKEN) {
+    return json({ error: "blob-not-configured" }, 503);
+  }
   const form = await request.formData().catch(() => null);
   if (!form) return json({ error: "bad-request" }, 400);
   const gameId = form.get("gameId");
