@@ -4,22 +4,43 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Lilita+One&amp;family=Rubik:wght@400;500;700&amp;family=JetBrains+Mono:wght@700;800&amp;family=Silkscreen&amp;display=swap" rel="stylesheet">
 <style>
-
 .sc{position:relative;width:1920px;height:1080px;overflow:hidden;color:#F4EFE6;font-family:Rubik,system-ui,sans-serif}
 .sc *{box-sizing:border-box}
-.game{position:absolute;inset:0;background:linear-gradient(160deg,#3a4250 0%,#262b33 55%,#1c1f25 100%);display:flex;align-items:center;justify-content:center}
 .mono{font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;font-weight:800}
 .disp{font-family:'Lilita One',Rubik,sans-serif;font-weight:400}
 .cut{clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
 .cut-s{clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
-.br{position:absolute;width:44px;height:44px;border:0 solid #30D5C8}
-.ld{width:10px;height:10px;border-radius:50%;background:#110A0C;animation:pulse 1.1s ease-in-out infinite}
-@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.4}}
 .follow{animation:peek 20s ease-in-out infinite}
 @keyframes peek{0%,70%,100%{transform:translateX(120%)}74%,96%{transform:translateX(0)}}
-
-/* ticker strip (filled by live.js); cam and follow badge make room for it */
 [hidden]{display:none!important}
+
+/* Cam + nameplate: one unit in the cam's corner (?cam=bl|br|tl|tr). */
+.unit{position:absolute;width:480px;display:flex;flex-direction:column;gap:0}
+.unit .poll{margin-bottom:10px;width:480px}
+.sc[data-row="t"] .unit{flex-direction:column-reverse}
+.sc[data-row="t"] .unit .poll{margin:10px 0 0}
+.camb{position:relative;width:480px;height:270px;outline:3px solid var(--a);outline-offset:-3px}
+.sc[data-row="b"] .np{border-top:4px solid var(--a)}
+.sc[data-row="t"] .np{border-bottom:4px solid var(--a)}
+/* Clean mode: between pop-ups only the counter shows (the stream title has
+   the rest). Every ?every= minutes (default 20) the full nameplate slides
+   out for ?show= seconds (default 20); also when the scene comes on screen
+   and when the goal, part or Co changes. ?clean=0 keeps it full. */
+.np{transition:max-width .55s cubic-bezier(.22,1,.36,1),opacity .35s ease;max-width:480px}
+.np-meta{transition:opacity .3s ease,max-width .55s cubic-bezier(.22,1,.36,1);max-width:440px;white-space:normal}
+.np-more{display:grid;grid-template-rows:1fr;transition:grid-template-rows .55s cubic-bezier(.22,1,.36,1),opacity .3s ease}
+.np-more>div{overflow:hidden;min-height:0}
+.sc[data-col="l"] .np{align-self:flex-start}
+.sc[data-col="r"] .np{align-self:flex-end}
+.sc.compact .np-meta{opacity:0;max-width:0;overflow:hidden;white-space:nowrap}
+.sc.compact .np-top{gap:0}
+.sc.compact .np-more{grid-template-rows:0fr;opacity:0}
+.sc.compact .np{gap:0}
+.sc.compact.nostat .np{opacity:0}
+@media (prefers-reduced-motion:reduce){.np,.np-meta,.np-more{transition:none}}
+
+
+/* ticker strip (filled by live.js; off by default): the unit makes room */
 .tstrip{position:absolute;left:0;right:0;bottom:0;height:46px;background:rgba(17,10,12,.92);display:flex;align-items:center;overflow:hidden;z-index:2}
 .tlabel{height:100%;display:flex;align-items:center;padding:0 18px;background:#E8557A;color:#110A0C;font-size:14px;flex:none;position:relative;z-index:1}
 .tclip{flex:1;overflow:hidden;white-space:nowrap}
@@ -27,67 +48,68 @@
 .tk span{font-family:Rubik,system-ui,sans-serif;font-weight:700;color:#F4EFE6;padding:0 18px}
 .tk i{font-style:normal;font-family:'JetBrains Mono',monospace;font-weight:800;color:#30D5C8}
 @keyframes tstrip{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.sc:has(#ticker:not([hidden])) #cam,.sc:has(#ticker:not([hidden])) #follow{margin-bottom:52px}
+.sc[data-row="b"]:has(#ticker:not([hidden])) #unit,.sc:has(#ticker:not([hidden])) #follow{margin-bottom:52px}
 </style>
 
 <style>html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}.sc{transform-origin:0 0}.follow.fl{animation-name:peekL;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}@keyframes peekL{0%,70%,100%{transform:translateX(-120%)}74%,96%{transform:translateX(0)}}[hidden]{display:none!important}</style>
 <link rel="stylesheet" href="/overlay/play.css">
+<link rel="stylesheet" href="/overlay/plate.css">
 <link rel="stylesheet" href="/overlay/guest.css">
 <link rel="stylesheet" href="/overlay/alerts.css">
 </head><body>
 
-<div class="sc">
-  
+<div class="sc" data-row="b">
 
-  <div id="play" class="play" hidden data-show="play" style="position: absolute; left: 32px; top: 28px">
-      <div class="row"><div class="gm cut-s" hidden data-show="play-head-on"><span class="hzb"></span><div class="k mono"><span data-text="play-head-k">Now playing</span> · <span data-text="mood-name"></span></div><div class="t disp" data-text="play-head"></div></div>
-      <div class="pt cut-s" hidden data-show="play-part"><small class="mono" data-text="play-unit"></small><b data-text="play-part-n"></b></div></div>
-      <div class="final mono cut-s" hidden data-show="play-final">Final <span data-text="play-unit"></span> · tonight we finish it</div>
-      <div class="goal mono cut-s" hidden data-show="play-sub-on"><i>Playing</i><span data-text="play-name"></span></div>
-    <div class="stats">
-      <div class="box cut-s" hidden data-show="play-counters"><svg class="ic ic-horror" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--a)" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3a7 7 0 0 0-7 7v4l-1.5 6 3-2 2 2 2-2 1.5 2 1.5-2 2 2 2-2 3 2L19 14v-4a7 7 0 0 0-7-7Z"/><circle cx="9" cy="10" r="1.3" fill="var(--a)"/><circle cx="15" cy="10" r="1.3" fill="var(--a)"/></svg><svg class="ic ic-action" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--a)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c-4 0-7 3-7 7 0 2.5 1.3 4 2.5 5v3h9v-3c1.2-1 2.5-2.5 2.5-5 0-4-3-7-7-7Z"/><path d="M9.5 18v3M14.5 18v3"/><circle cx="9.5" cy="11" r="1.4" fill="var(--a)"/><circle cx="14.5" cy="11" r="1.4" fill="var(--a)"/></svg><svg class="ic ic-story" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--a)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2V5Z"/><path d="M4 19a2 2 0 0 1 2-2h12"/></svg>
-        <div hidden data-show="play-c1-on"><div class="mono lb" data-text="play-c1-label"></div><b class="n a" data-text="play-c1">0</b></div>
-        <div class="sep" hidden data-show="play-c2-on"></div>
-        <div hidden data-show="play-c2-on"><div class="mono lb" data-text="play-c2-label"></div><b class="n" data-text="play-c2">0</b></div>
+  <div id="unit" class="unit" style="left: 32px; bottom: 32px">
+    <div class="poll cut" hidden data-show="play-poll">
+      <div class="h mono"><span>Chat decides · type !1 !2</span><span data-text="poll-votes">0 votes</span></div>
+      <div class="q disp" data-text="poll-q"></div>
+      <div class="opts">
+        <div class="o" hidden data-show="poll-o1" data-lead="1"><div class="f" data-bar="poll-1"></div><span class="mono" data-text="poll-t1"></span></div>
+        <div class="o" hidden data-show="poll-o2" data-lead="2"><div class="f" data-bar="poll-2"></div><span class="mono" data-text="poll-t2"></span></div>
+        <div class="o" hidden data-show="poll-o3" data-lead="3"><div class="f" data-bar="poll-3"></div><span class="mono" data-text="poll-t3"></span></div>
+        <div class="o" hidden data-show="poll-o4" data-lead="4"><div class="f" data-bar="poll-4"></div><span class="mono" data-text="poll-t4"></span></div>
       </div>
-      <div class="fb cut-s" hidden data-show="play-football">
-        <div class="c" hidden data-show="fb-record-on"><span class="mono" style="color:var(--a)">W</span><b data-text="fb-w">0</b></div>
-        <div class="c" hidden data-show="fb-record-on"><span class="mono" style="color:#BBAAB1">D</span><b data-text="fb-d">0</b></div>
-        <div class="c" hidden data-show="fb-record-on"><span class="mono" style="color:var(--b)">L</span><b data-text="fb-l">0</b></div>
-        <div class="g" hidden data-show="fb-goals-on"><span class="mono">Goals</span><b data-text="fb-goals">0:0</b></div>
-      </div>
-      <div class="poll cut" hidden data-show="play-poll">
-        <div class="h mono"><span>Chat decides · type !1 !2</span><span data-text="poll-votes">0 votes</span></div>
-        <div class="q disp" data-text="poll-q"></div>
-        <div class="opts">
-          <div class="o" hidden data-show="poll-o1" data-lead="1"><div class="f" data-bar="poll-1"></div><span class="mono" data-text="poll-t1"></span></div>
-          <div class="o" hidden data-show="poll-o2" data-lead="2"><div class="f" data-bar="poll-2"></div><span class="mono" data-text="poll-t2"></span></div>
-          <div class="o" hidden data-show="poll-o3" data-lead="3"><div class="f" data-bar="poll-3"></div><span class="mono" data-text="poll-t3"></span></div>
-          <div class="o" hidden data-show="poll-o4" data-lead="4"><div class="f" data-bar="poll-4"></div><span class="mono" data-text="poll-t4"></span></div>
+    </div>
+
+    <div class="np" hidden data-show="play">
+      <div class="np-top">
+        <div class="np-meta mono">
+          <span class="mi" hidden data-show="play-sub-on" data-text="play-short"></span>
+          <span class="mi" hidden data-show="play-part"><span data-text="play-unit"></span> <b data-text="play-part-n"></b></span>
+          <span class="co" hidden data-show="co">w/ <span data-text="co-name"></span></span>
+          <span class="fin" hidden data-show="play-final">Final</span>
+        </div>
+        <div class="np-stat">
+          <div class="ct" hidden data-show="play-c1-on">
+            <span class="skw" hidden data-show="play-c1-skull"><svg class="sk" viewBox="0 0 24 24" aria-hidden="true"><path class="b" d="M12 2C7 2 3.5 5.6 3.5 10.2c0 2.6 1.1 4.4 2.7 5.6V19c0 .8.6 1.4 1.4 1.4h1.1v-2h1.5v2h3.6v-2h1.5v2h1.1c.8 0 1.4-.6 1.4-1.4v-3.2c1.6-1.2 2.7-3 2.7-5.6C20.5 5.6 17 2 12 2z"/><circle cx="8.8" cy="10.6" r="2.3" fill="#110A0C"/><circle cx="15.2" cy="10.6" r="2.3" fill="#110A0C"/><path d="M12 13.2l-1.3 2.2h2.6z" fill="#110A0C"/></svg></span>
+            <span class="lb mono" hidden data-show="play-c1-named" data-text="play-c1-label"></span>
+            <b data-text="play-c1-n" data-pop>0</b><small data-text="play-c1-of"></small>
+          </div>
+          <div class="ct two" hidden data-show="play-c2-on">
+            <span class="lb mono" data-text="play-c2-label"></span>
+            <b data-text="play-c2-n" data-pop>0</b><small data-text="play-c2-of"></small>
+          </div>
+          <div class="fbs" hidden data-show="play-football">
+            <span class="r" hidden data-show="fb-record-on"><span class="mono" style="color: var(--a)">W</span><b data-text="fb-w" data-pop>0</b></span>
+            <span class="r" hidden data-show="fb-record-on"><span class="mono" style="color: #BBAAB1">D</span><b data-text="fb-d" data-pop>0</b></span>
+            <span class="r" hidden data-show="fb-record-on"><span class="mono" style="color: var(--b)">L</span><b data-text="fb-l" data-pop>0</b></span>
+            <span class="gl" hidden data-show="fb-goals-on" data-text="fb-goals">0:0</span>
+          </div>
         </div>
       </div>
+      <div class="np-more"><div><div class="np-head" hidden data-show="play-head-on" data-text="play-head"></div></div></div>
     </div>
+
+    <div class="np" hidden data-show="game-only">
+      <div class="np-top"><div class="np-meta mono"><span class="mi">Now playing</span><span class="co" hidden data-show="co">w/ <span data-text="co-name"></span></span></div></div>
+      <div class="np-more"><div><div class="np-head" data-text="game"></div></div></div>
+    </div>
+
+    <div id="cam" class="camb"><span class="camfx"></span><span class="rec mono">● REC</span></div>
   </div>
 
-  <div id="cam" style="position: absolute; left: 32px; bottom: 32px; width: 480px; display: flex; flex-direction: column">
-    <div style="position: relative; width: 480px; height: 270px; background: transparent; display: flex; align-items: center; justify-content: center">
-      <span class="camfx"></span><span class="rec mono">● REC</span>
-      <span class="br" style="top: -4px; left: -4px; border-top-width: 6px; border-left-width: 6px"></span>
-      <span class="br" style="top: -4px; right: -4px; border-top-width: 6px; border-right-width: 6px"></span>
-      <span class="br bb" style="bottom: -4px; left: -4px; border-bottom-width: 6px; border-left-width: 6px"></span>
-      <span class="br bb" style="bottom: -4px; right: -4px; border-bottom-width: 6px; border-right-width: 6px"></span>
-    </div>
-    <div style="display: flex; margin-top: 10px; gap: 8px">
-      <span class="mono cut-s" style="display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 14px; background: #FF4D4D; color: #110A0C; font-size: 14px"><span class="ld"></span>Live</span>
-      <span class="disp cut-s" style="display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 16px; background: #110A0C; font-size: 24px">MAD <span class="mono" style="font-size: 13px; color: var(--b)">P1</span></span>
-      <span hidden data-show="co" class="disp cut-s cochip">CO <span class="mono">· <span data-text="co-name"></span></span></span>
-      <span hidden data-show="co-open" class="disp cut-s cochip open">CO <span class="mono">· Slot open</span></span>
-      <span class="mono cut-s" style="display: inline-flex; align-items: center; height: 40px; padding: 0 14px; background: #800020; font-size: 13px" data-text="home-chip">@madnco8</span>
-      <span hidden data-show="game-only" class="mono" style="display:inline-flex;align-items:center;white-space:nowrap;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);height:40px;padding:0 14px;background:#30D5C8;color:#110A0C;font-size:13px">Now&nbsp;·&nbsp;<span data-text="game"></span></span>
-    </div>
-  </div>
-
-  <img id="logo" src="/madnco-logo.svg" alt="MadnCo. logo" style="position: absolute; right: 28px; top: 22px; width: 170px; height: auto; opacity: .92">
+  <img id="logo" src="/overlay/logo-flat.png" alt="MadnCo. logo" style="position: absolute; right: 28px; top: 22px; width: 110px; height: auto; opacity: .6">
 
   <div id="follow" data-hide="guest" class="follow mono cut" style="position: absolute; right: 0; bottom: 40px; display: flex; align-items: center; gap: 14px; height: 60px; padding: 0 26px 0 22px; background: #30D5C8; color: #110A0C; font-size: 17px">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
@@ -104,62 +126,66 @@
     <span class="mono tlabel" data-text="ticker-label">MadnCo.</span>
     <div class="tclip"><div class="tk" data-ticker="gaming"><span style="font-size: 20px">MadnCo.</span><i style="font-size: 16px">//</i></div></div>
   </div>
-  <div id="alert-lane" class="alane" aria-live="polite" style="left: 660px; top: 28px; width: 760px"></div>
+  <div id="alert-lane" class="alane" aria-live="polite" style="left: 580px; top: 28px; width: 760px"></div>
 </div>
 
 <script>(function(){var W=1920,H=1080;function fit(){var s=document.querySelector('.sc');var k=Math.min(innerWidth/W,innerHeight/H);s.style.transform='scale('+k+')';}addEventListener('resize',fit);fit();})();</script>
 <script>(function(){
+// ?cam=bl|br|tl|tr (one browser source per OBS Gaming scene). The
+// nameplate rides with the cam: above it at the bottom, below it at the top.
 var q=new URLSearchParams(location.search),ok=['bl','br','tl','tr'];
 var cam=(q.get('cam')||'bl').toLowerCase(),logo=(q.get('logo')||'').toLowerCase();
 if(ok.indexOf(cam)<0)cam='bl';
-var c=document.getElementById('cam'),l=document.getElementById('logo'),f=document.getElementById('follow');
+var sc=document.querySelector('.sc');sc.setAttribute('data-row',cam[0]);
+var u=document.getElementById('unit'),l=document.getElementById('logo'),f=document.getElementById('follow');
 function place(el,p,dx,dy){el.style.left=el.style.right=el.style.top=el.style.bottom='auto';
  if(p[1]==='l')el.style.left=dx+'px';else el.style.right=dx+'px';
  if(p[0]==='t')el.style.top=dy+'px';else el.style.bottom=dy+'px';}
-place(c,cam,32,32);
+place(u,cam,32,32);
 var g=document.getElementById('gtag'),h=document.getElementById('homecard');
-var pl=document.getElementById('play');
+// Logo: the top corner across from the cam.
 if(logo!=='off'){if(ok.indexOf(logo)<0)logo='t'+(cam[1]==='l'?'r':'l');
- if(logo===cam)logo=logo[0]+(logo[1]==='l'?'r':'l');place(l,logo,28,22);place(g,logo,30,logo[0]==='t'?118:150);}else{l.style.display='none';place(g,'t'+(cam[1]==='l'?'r':'l'),30,28);}
+ if(logo===cam)logo=logo[0]+(logo[1]==='l'?'r':'l');place(l,logo,28,22);place(g,logo,30,logo[0]==='t'?92:150);}else{l.style.display='none';place(g,'t'+(cam[1]==='l'?'r':'l'),30,28);}
 var used=[cam,logo];
-if(used.indexOf('br')>=0){if(used.indexOf('bl')<0){f.style.right='auto';f.style.left='0';f.classList.add('fl');h.style.right='auto';h.style.left='0';h.classList.add('fl');}else{f.style.bottom='420px';h.style.bottom='420px';}}
-// Game title card: always in the game's chosen row (top or bottom), so a
-// bottom-left football card never jumps up onto the in-game scoreboard.
-// Order: chosen corner, then the other side of the same row, then the
-// chosen corner again, stacked past whatever sits there (cam, logo,
-// Follow toast). Called by live.js.
-var follow=used.indexOf('br')>=0&&used.indexOf('bl')<0?'bl':'br';
-var taken=used.slice();taken.push(follow);
-var H=1080,GAP=16,lastPref="tl";
-function inCorner(p){var out=[];
- if(cam===p)out.push(c);
- if(logo!=='off'&&logo===p){out.push(l);out.push(g);}
- if(follow===p){out.push(f);out.push(h);}
- return out.filter(function(e){return e&&e.offsetParent!==null;});}
-window.MadnPlacePlay=function(pref){
- if(ok.indexOf(pref)<0)pref='tl';lastPref=pref;
- var hz=function(p){return p[0]+(p[1]==='l'?'r':'l');};
- var pos=pref,shift=0;
- if(taken.indexOf(pref)>=0){
-  if(taken.indexOf(hz(pref))<0)pos=hz(pref);
-  else inCorner(pref).forEach(function(e){
-   var d=pref[0]==='t'?e.offsetTop+e.offsetHeight:H-e.offsetTop;
-   if(d>shift)shift=d;});
- }
- pl.style.left=pl.style.right=pl.style.top=pl.style.bottom='auto';
- if(pos[1]==='l')pl.style.left='32px';else pl.style.right='32px';
- if(pos[0]==='t')pl.style.top=(shift?shift+GAP:28)+'px';
- else pl.style.bottom=(shift?shift+GAP:100)+'px';
- pl.style.alignItems=pos[1]==='l'?'flex-start':'flex-end';
-};
-// The ticker lifts the cam and Follow toast: re-stack when it shows/hides.
-var tk=document.getElementById('ticker');
-if(tk&&window.MutationObserver)new MutationObserver(function(){window.MadnPlacePlay(lastPref);}).observe(tk,{attributes:true,attributeFilter:['hidden']});
-window.MadnPlacePlay('tl');
-// Alert lane: along the top, beside the cam when the cam is up there.
+if(used.indexOf('br')>=0){if(used.indexOf('bl')<0){f.style.right='auto';f.style.left='0';f.classList.add('fl');h.style.right='auto';h.style.left='0';h.classList.add('fl');}else{f.style.bottom='460px';h.style.bottom='460px';}}
+// Alert lane: along the top, clear of a top cam.
 var lane=document.getElementById('alert-lane');
-if(cam==='tr'){lane.style.left='auto';lane.style.right='696px';}
-else if(cam==='tl'){lane.style.left='696px';}
+if(cam==='tr'){lane.style.left='auto';lane.style.right='560px';}
+else if(cam==='tl'){lane.style.left='560px';}
+else{lane.style.left='580px';}
+})();</script>
+<script>(function(){
+// Clean mode (see the CSS note above).
+var q=new URLSearchParams(location.search);
+if(q.get('clean')==='0')return;
+var sc=document.querySelector('.sc');
+var every=Math.max(1,Number(q.get('every'))||20)*60000,show=Math.max(5,Number(q.get('show'))||20)*1000;
+sc.setAttribute('data-col',((q.get('cam')||'bl')[1]==='r')?'r':'l');
+var timer=null;
+function plates(){return Array.prototype.filter.call(document.querySelectorAll('#unit .np'),function(n){return !n.hidden;});}
+function squeeze(){
+ var any=false;
+ plates().forEach(function(n){var st=n.querySelector('.np-stat');var w=st?st.offsetWidth:0;
+  if(w){any=true;n.style.maxWidth=(w+36)+'px';}});
+ sc.classList.toggle('nostat',!any);
+ sc.classList.add('compact');
+}
+function full(){
+ clearTimeout(timer);
+ sc.classList.remove('compact');
+ plates().forEach(function(n){n.style.maxWidth='';});
+ timer=setTimeout(squeeze,show);
+}
+window.MadnFull=full;
+full();
+setInterval(full,every);
+addEventListener('obsSourceVisibleChanged',function(e){if(!(e&&e.detail&&e.detail.visible===false))full();});
+// New goal, part or Co: show the full plate once.
+if(window.MutationObserver){var mo=new MutationObserver(function(){if(sc.classList.contains('compact'))full();});
+ ['play-head','play-part-n','co-name','game'].forEach(function(k){Array.prototype.forEach.call(document.querySelectorAll('#unit [data-text="'+k+'"]'),function(el){mo.observe(el,{childList:true,characterData:true,subtree:true});});});}
+// Counters and scores change width: re-fit the compact plate.
+if(window.MutationObserver){var mo2=new MutationObserver(function(){if(sc.classList.contains('compact'))squeeze();});
+ Array.prototype.forEach.call(document.querySelectorAll('#unit .np-stat'),function(el){mo2.observe(el,{childList:true,characterData:true,subtree:true,attributes:true,attributeFilter:['hidden']});});}
 })();</script>
 <script src="/overlay/live.js" defer></script>
 </body></html>

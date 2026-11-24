@@ -29,6 +29,7 @@ import { LiveTab, isOtherGame } from "./tabs/LiveTab";
 import { QuestTab } from "./tabs/QuestTab";
 import { ScheduleTab } from "./tabs/ScheduleTab";
 import { ScreenTab } from "./tabs/ScreenTab";
+import { StreamLogTab } from "./tabs/StreamLogTab";
 import type { TabProps } from "./tabs/shared";
 import { WebTab } from "./tabs/WebTab";
 import { ToastStack, useToasts } from "./Toasts";
@@ -291,7 +292,12 @@ export function AdminPanel({
         </p>
       ) : null}
 
-      <div className="grid grid-cols-1 items-start gap-7 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+      {/* The stream log gets the full width (charts); the other tabs share it with "Where it shows". */}
+      <div
+        className={`grid grid-cols-1 items-start gap-7 ${
+          tab === "log" ? "" : "lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]"
+        }`}
+      >
         <m.div
           key={tab}
           id="admin-tabpanel"
@@ -314,9 +320,10 @@ export function AdminPanel({
           {tab === "schedule" ? <ScheduleTab {...props} /> : null}
           {tab === "screen" ? <ScreenTab {...props} /> : null}
           {tab === "quest" ? <QuestTab {...props} /> : null}
+          {tab === "log" ? <StreamLogTab {...props} /> : null}
           {tab === "web" ? <WebTab {...props} /> : null}
         </m.div>
-        <WhereItShows onToast={push} />
+        {tab === "log" ? null : <WhereItShows onToast={push} />}
       </div>
 
       {/* Action bar: sticks to the bottom of the screen, full width */}

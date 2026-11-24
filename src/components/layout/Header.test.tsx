@@ -17,8 +17,13 @@ describe("Header", () => {
     render(<Header />);
     for (const link of screen.getAllByRole("link")) {
       const href = link.getAttribute("href") ?? "";
-      if (href.startsWith("http")) continue;
+      if (href.startsWith("http") || href === "/build") continue;
       expect(href.startsWith("/#")).toBe(true);
     }
+  });
+
+  it("links the build showcase page", () => {
+    render(<Header />);
+    expect(screen.getByRole("link", { name: "The build" })).toHaveAttribute("href", "/build");
   });
 });

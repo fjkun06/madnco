@@ -71,6 +71,9 @@
  *   founders-any / founders-count / founders-left
  *
  * Without an answer (offline, local file) every slot keeps its default.
+ *
+ * Demo (/build/overlay/<page>, the public showcase): nothing is fetched; the
+ * parent page posts { madncoDemo: status } and the overlay draws that.
  */
 (function () {
   "use strict";
@@ -86,6 +89,9 @@
     retro: ["Retro", "#B48CFF", "#30D5C8", "#110A0C", "Retro"],
   };
   var VERTICAL = /\/v-[^/]*$/.test(location.pathname);
+  // Demo copy on the public /build page: no API, no chat, no realtime; the
+  // page hands us a made-up status over postMessage (same origin only).
+  var DEMO = location.pathname.indexOf("/build/overlay/") === 0;
   var CHANNEL = (new URLSearchParams(location.search).get("channel") || "madnco8")
     .toLowerCase()
     .replace(/[^a-z0-9_]/g, "");
@@ -134,7 +140,7 @@
       votes = {};
       voteKey = key;
     }
-    if ((poll || WANT_WELCOME) && !ws && CHANNEL && typeof WebSocket === "function" && wsRetry < Date.now())
+    if ((poll || WANT_WELCOME) && !DEMO && !ws && CHANNEL && typeof WebSocket === "function" && wsRetry < Date.now())
       connectChat();
     if (!poll && !WANT_WELCOME && ws) {
       ws.close();
@@ -191,7 +197,7 @@
   /* ---------------------------------------------------------- alerts */
   var LANE = document.getElementById("alert-lane");
   // Twitch first-time chatters are welcomed on the landscape scenes only.
-  var WANT_WELCOME = !!LANE && !VERTICAL;
+  var WANT_WELCOME = !!LANE && !VERTICAL && !DEMO;
   var LOADED = Date.now();
   var seenAlerts = {}, queue = [], playing = false, foundersNow = 0, foundersGoal = 50;
   var PLATFORM_NAME = { tiktok: "TikTok", youtube: "YouTube", twitch: "Twitch", other: "" };
@@ -346,6 +352,14 @@
     out["play-c2-label"] = c[1] ? c[1].label : "";
     out["play-c1"] = c[0] ? counterText(c[0]) : "";
     out["play-c2"] = c[1] ? counterText(c[1]) : "";
+    // Nameplate: number and "/total" apart; deaths get a skull, others a label.
+    out["play-short"] = p ? p.short || p.name : "";
+    out["play-c1-n"] = c[0] ? String(c[0].value) : "";
+    out["play-c1-of"] = c[0] && c[0].total ? "/" + c[0].total : "";
+    out["play-c1-skull"] = c[0] && /death|died|dead/i.test(c[0].label) ? "1" : "";
+    out["play-c1-named"] = c[0] && !out["play-c1-skull"] ? "1" : "";
+    out["play-c2-n"] = c[1] ? String(c[1].value) : "";
+    out["play-c2-of"] = c[1] && c[1].total ? "/" + c[1].total : "";
     var fbOn = p && p.widget === "football";
     out["fb-record-on"] = fbOn && fb.record !== false ? "1" : "";
     out["fb-goals-on"] = fbOn && fb.goals !== false ? "1" : "";
@@ -474,7 +488,8 @@
     fanValues(s, v);
     if (v.guest) v["ticker-label"] = "Guest";
     // The game's own ticker lines (and the guest line) join the gaming ticker.
-    var extra = v._playTicker.slice();
+    // Game lines only when the ticker is on for Gaming; the guest line always.
+    var extra = v["ticker-gaming"] ? v._playTicker.slice() : [];
     if (v._guestLine) extra.unshift(v._guestLine);
     if (extra.length) {
       v._gaming = (v["ticker-gaming"] ? v._items : []).concat(extra);
@@ -495,7 +510,15 @@
       key = el.getAttribute("data-text");
       if (!el.hasAttribute("data-fallback"))
         el.setAttribute("data-fallback", el.textContent);
-      el.textContent = v[key] || el.getAttribute("data-fallback");
+      var txt = v[key] || el.getAttribute("data-fallback");
+      // Counters going up pop once (not on the first draw).
+      if (el.hasAttribute("data-pop") && el._shown !== undefined && txt !== el._shown && parseFloat(txt) > parseFloat(el._shown)) {
+        el.classList.remove("pop");
+        void el.offsetWidth;
+        el.classList.add("pop");
+      }
+      if (v[key]) el._shown = txt;
+      if (el.textContent !== txt) el.textContent = txt;
     }
     var shows = document.querySelectorAll("[data-show]");
     for (i = 0; i < shows.length; i++)
@@ -666,8 +689,17 @@
     }
   });
 
-  lastPoll = Date.now();
-  poll();
-  setInterval(tick, POLL_MS);
+  if (DEMO) {
+    window.addEventListener("message", function (event) {
+      if (event.origin !== location.origin || !event.data || typeof event.data.madncoDemo !== "object") return;
+      status = event.data.madncoDemo;
+      render();
+    });
+    if (window.parent !== window) window.parent.postMessage({ madncoDemoReady: true }, location.origin);
+  } else {
+    lastPoll = Date.now();
+    poll();
+    setInterval(tick, POLL_MS);
+  }
   setInterval(render, 1000);
 })();

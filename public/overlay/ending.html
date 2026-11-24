@@ -25,44 +25,46 @@
 .ll svg{color:#30D5C8}
 .l1{animation:slide 1s .1s cubic-bezier(.22,1,.36,1) both}.l2{animation:slide 1s .2s cubic-bezier(.22,1,.36,1) both}.l3{animation:slide 1s .3s cubic-bezier(.22,1,.36,1) both}.l4{animation:slide 1s .4s cubic-bezier(.22,1,.36,1) both}
 @keyframes slide{from{opacity:0;transform:translateX(80px)}to{opacity:1;transform:none}}
-.logo{animation:bob 3s ease-in-out infinite}
+.logo{animation:none}
 @keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
 </style>
 
 <style>html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}.sc{transform-origin:0 0}[hidden]{display:none!important}</style>
 <link rel="stylesheet" href="/overlay/play.css">
+<link rel="stylesheet" href="/overlay/screens.css">
 <link rel="stylesheet" href="/overlay/guest.css">
 <link rel="stylesheet" href="/overlay/alerts.css">
 </head><body>
 
 <div class="sc">
-  <div class="dots" aria-hidden="true"></div>
-  <div class="glow g1" aria-hidden="true"></div>
+  <img class="wm l" src="/overlay/logo-mark.png" alt="" aria-hidden="true">
 
-  <div style="position: absolute; left: 110px; top: 120px; width: 820px; display: flex; flex-direction: column">
-    <img class="logo" src="/madnco-logo.svg" alt="MadnCo. logo" style="width: 400px; height: auto; margin-left: -20px">
-    <span class="mono" style="display: flex; align-items: center; gap: 14px; color: #E8557A; font-size: 20px; margin-top: 28px"><span style="width: 40px; height: 4px; background: #E8557A"></span>Game over · for today</span>
-    <h1 class="big disp" style="margin: 20px 0 0; font-size: 200px; line-height: .82">GG.</h1>
-    <h2 class="disp" style="margin: 14px 0 0; font-size: 92px; line-height: .9; color: #30D5C8">THAT'S A WRAP</h2>
-    <p style="margin: 34px 0 0; font-size: 30px; font-weight: 700; line-height: 1.3; max-width: 720px">Thanks for hanging out. <span style="color: #E8557A">Madness loves company.</span> Follow so you catch the next one.</p>
-  </div>
-
-  <div style="position: absolute; right: 110px; top: 190px; width: 760px; border-top: 2px solid #26161C">
-    <div class="ll l1"><span class="pf">TikTok</span><span class="hd">@madnco8</span><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg></div>
-    <div class="ll l2"><span class="pf">Twitch</span><span class="hd">@madnco8</span><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg></div>
-    <div class="ll l3"><span class="pf">YouTube</span><span class="hd">@madnco8</span><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg></div>
-    <div class="ll l4" style="background: #30D5C8; color: #110A0C"><span class="pf" style="color: #110A0C">Discord</span><span class="hd" style="font-size: 38px">discord.gg/sYYdUGR2pp</span><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#110A0C" stroke-width="2.5" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg></div>
-    <div hidden data-show="next" class="cut" style="margin-top: 34px; background: #800020; padding: 24px 28px; display: flex; flex-direction: column; gap: 6px">
-      <span class="mono" style="font-size: 14px; color: #30D5C8">Next stream</span>
-      <span class="disp" style="font-size: 50px; line-height: 1" data-text="next-when"></span>
-      <span hidden data-show="next-plan" style="font-size: 22px; font-weight: 700" data-text="next-plan"></span>
+  <div style="position: absolute; left: 120px; top: 120px; width: 860px; display: flex; flex-direction: column; align-items: flex-start">
+    <img class="flogo" src="/overlay/logo-flat.png" alt="MadnCo. logo" style="width: 220px">
+    <h1 class="big disp" style="margin: 40px 0 0; font-size: 200px; line-height: .84">GG.</h1>
+    <h2 class="disp" style="margin: 12px 0 0; font-size: 84px; line-height: .95; color: #30D5C8">THAT'S A WRAP</h2>
+    <div class="smeta mono" hidden data-show="play" style="justify-content: flex-start; margin-top: 18px; font-size: 18px">
+      <span class="mi" hidden data-show="play-title" data-text="play-short"></span>
+      <span class="mi" hidden data-show="play-part"><span data-text="play-unit"></span> <b data-text="play-part-n"></b></span>
+      <span class="co" hidden data-show="co">w/ <span data-text="co-name"></span></span>
     </div>
-    <p data-hide="next" class="mono" style="margin: 26px 0 0; font-size: 15px; color: #BBAAB1">madnco.frankjordan.dev</p>
+    <div hidden data-show="next" class="cut" style="margin-top: 40px; background: #800020; padding: 20px 28px 22px; display: flex; flex-direction: column; gap: 6px">
+      <span class="mono" style="font-size: 15px; color: #E8557A">Next stream</span>
+      <span class="disp" style="font-size: 52px; line-height: 1" data-text="next-when"></span>
+      <span hidden data-show="next-plan" class="mono" style="font-size: 17px; color: #F4EFE6" data-text="next-plan"></span>
+    </div>
   </div>
 
-  <p class="out" aria-hidden="true" style="position: absolute; left: 90px; bottom: -40px; margin: 0; font-size: 112px; line-height: .85">MADNESS <span>LOVES COMPANY</span></p>
-  <div class="scan" aria-hidden="true"></div>
-  <div style="position:absolute;left:110px;top:800px;z-index:3"><div class="wrapstamp mono cut-s" hidden data-show="play"><span data-text="play-wrap"></span><b data-text="play-name"></b></div></div>
+  <div style="position: absolute; left: 1100px; top: 330px; width: 700px">
+    <div class="disp" style="font-size: 100px; line-height: 1">@madnco8</div>
+    <div class="mono" style="font-size: 20px; color: #BBAAB1; margin-top: 12px">TikTok · Twitch · YouTube</div>
+    <div class="cut-s" style="margin-top: 40px; display: flex; align-items: center; justify-content: space-between; padding: 20px 26px; background: #30D5C8; color: #110A0C"><span class="mono" style="font-size: 15px">Discord</span><span class="disp" style="font-size: 40px">discord.gg/sYYdUGR2pp</span></div>
+  </div>
+
+  <div hidden data-show="founders-any" style="position: absolute; left: 0px; right: 0px; bottom: 0px; height: 110px; background: #1B1014; display: flex; align-items: center; gap: 30px; padding: 0 0 0 40px">
+    <span class="mono" style="flex: none; font-size: 16px; color: #E8557A">Founding 50 · <b style="color: #F4EFE6" data-text="founders-count">0</b>/50</span>
+    <div class="fstrip" style="flex: 1; min-width: 0"><div class="win" style="background: transparent; padding: 0"><div class="trk" data-founders></div></div></div>
+  </div>
   <div class="takeover" hidden data-show="guest">
   <div class="dots"></div><div class="glow" style="left:-300px;top:-300px;width:1300px;height:1300px"></div>
   <div style="position:absolute;left:110px;top:150px;width:820px;display:flex;flex-direction:column;gap:18px">
@@ -83,10 +85,6 @@
   </div>
   <div class="scanl"></div>
 </div>
-  <div class="fstrip" hidden data-show="founders-any" style="position: absolute; right: 110px; top: 700px; width: 760px">
-    <div class="hd"><span>Founders · the Founding 50</span><span><b data-text="founders-count">0</b> / 50</span></div>
-    <div class="win cut-s"><div class="trk" data-founders></div></div>
-  </div>
 </div>
 
 <script>(function(){var W=1920,H=1080;function fit(){var s=document.querySelector('.sc');var k=Math.min(innerWidth/W,innerHeight/H);s.style.transform='scale('+k+')';}addEventListener('resize',fit);fit();})();</script>

@@ -6,7 +6,7 @@ describe("sitemap", () => {
   // The legal pages are noindex, so listing them would send mixed signals.
   it("lists only the indexable pages on the www domain", () => {
     const urls = sitemap().map((entry) => entry.url);
-    expect(urls).toEqual([siteConfig.url]);
+    expect(urls).toEqual([siteConfig.url, `${siteConfig.url}/build`]);
   });
 });
 
@@ -15,7 +15,7 @@ describe("robots", () => {
     const result = robots();
     expect(result.sitemap).toBe(`${siteConfig.url}/sitemap.xml`);
     expect(result.rules).toEqual([
-      { userAgent: "*", allow: "/", disallow: ["/admin", "/api/", "/overlay/"] },
+      { userAgent: "*", allow: "/", disallow: ["/admin", "/api/", "/overlay/", "/build/overlay/"] },
     ]);
   });
 });

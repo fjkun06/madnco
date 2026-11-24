@@ -44,6 +44,8 @@ export type GameProfile = {
   /** Stable key: a slug of the first name. */
   id: string;
   name: string;
+  /** On the overlay nameplate ("MW4"); falls back to a suggestion. */
+  short: string;
   mood: Mood;
   /** "Part", "Ep", "Session" … */
   unit: string;
@@ -196,6 +198,44 @@ export function uniqueId(name: string, taken: Iterable<string>): string {
 const isId = (value: unknown): value is string =>
   typeof value === "string" && /^[a-z0-9-]{1,56}$/.test(value);
 
+/** Longest short name on the overlay nameplate. */
+export const SHORT_NAME_MAX = 16;
+
+/** Hand-picked short names for the installed games. */
+const KNOWN_SHORT: Record<string, string> = {
+  "Call of Duty: Black Ops 6": "BO6",
+  "Call of Duty: Black Ops Cold War": "Cold War",
+  "Call of Duty: Black Ops III": "BO3",
+  "Call of Duty: Modern Warfare 4": "MW4",
+  "Call of Duty: Modern Warfare II": "MW2",
+  "Call of Duty: Modern Warfare III": "MW3",
+  "Call of Duty: Vanguard": "Vanguard",
+  "Battlefield 1": "BF1",
+  "Battlefield 4": "BF4",
+  "Battlefield V": "BFV",
+  "Resident Evil 7": "RE7",
+  "Resident Evil Village": "RE Village",
+  "S.T.A.L.K.E.R. 2": "Stalker 2",
+  "Red Dead Redemption 2": "RDR2",
+  "Cyberpunk 2077": "Cyberpunk",
+  "God of War Ragnarök": "Ragnarök",
+  "Final Fantasy XVI": "FF16",
+  "Clair Obscur: Expedition 33": "Expedition 33",
+  "Dragon Ball Sparking! ZERO": "Sparking Zero",
+  "Forza Horizon 5": "Forza 5",
+  "Gears of War: E-Day": "Gears E-Day",
+};
+
+/** A short name for the nameplate: known games, else the name or its subtitle. */
+export function suggestShort(name: string): string {
+  const clean = name.trim();
+  if (KNOWN_SHORT[clean]) return KNOWN_SHORT[clean];
+  if (clean.length <= SHORT_NAME_MAX) return clean;
+  const after = clean.split(":").pop()!.trim();
+  if (after && after.length <= SHORT_NAME_MAX) return after;
+  return clean.slice(0, SHORT_NAME_MAX).trim();
+}
+
 const EMPTY_POLL: Poll = { question: "", options: ["", ""], open: false, openedAt: null };
 
 // ---------------------------------------------------------------- defaults
@@ -243,6 +283,7 @@ export function newProfile(name: string, taken: Iterable<string>, mood: Mood = "
   return {
     id: uniqueId(name, taken),
     name: cleanText(name, GAME_NAME_MAX),
+    short: suggestShort(cleanText(name, GAME_NAME_MAX)),
     mood,
     unit: "Part",
     showTitle: true,
@@ -327,6 +368,7 @@ export function sanitizeProfile(input: unknown, taken: Set<string>): GameProfile
   return {
     id,
     name,
+    short: cleanText(input.short, SHORT_NAME_MAX) || suggestShort(name),
     mood,
     unit: cleanText(input.unit, UNIT_MAX) || "Part",
     showTitle: input.showTitle !== false,
@@ -433,6 +475,8 @@ export type PublicCounter = { label: string; value: number; total: number | null
 export type PublicPlay = {
   id: string;
   name: string;
+  /** Short name for the nameplate. */
+  short: string;
   mood: Mood;
   unit: string;
   part: number | null;
@@ -496,6 +540,7 @@ export function publicPlay(profile: GameProfile, live: GameLive = EMPTY_LIVE): P
   return {
     id: profile.id,
     name: profile.name,
+    short: profile.short || suggestShort(profile.name),
     mood: profile.mood,
     unit: profile.unit,
     part: profile.showPart ? live.part : null,

@@ -21,66 +21,70 @@
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 </style>
 
-<style>html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}.sc{transform-origin:0 0}.bgwrap{position:absolute;inset:0;overflow:hidden;background:#110A0C;-webkit-mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000),linear-gradient(#000,#000);mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000),linear-gradient(#000,#000);-webkit-mask-size:100% 100%,960px 540px,1080px 608px;mask-size:100% 100%,960px 540px,1080px 608px;-webkit-mask-position:0 0,60px 170px,0px 760px;mask-position:0 0,60px 170px,0px 760px;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-composite:xor;mask-composite:exclude}[hidden]{display:none!important}
-/* FIFA/FC: the game name card would cover the in-game scoreboard on mobile, so football hides it here (W/D/L + goals stay). */
-html[data-mood="football"] #vplay{display:none!important}</style>
+<style>html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden}.sc{transform-origin:0 0}.bgwrap{position:absolute;inset:0;overflow:hidden;background:#110A0C;-webkit-mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000),linear-gradient(#000,#000);mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000),linear-gradient(#000,#000);-webkit-mask-size:100% 100%,1080px 608px,1080px 608px;mask-size:100% 100%,1080px 608px,1080px 608px;-webkit-mask-position:0 0,0px 210px,0px 902px;mask-position:0 0,0px 210px,0px 902px;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-composite:xor;mask-composite:exclude}[hidden]{display:none!important}
+</style>
 <link rel="stylesheet" href="/overlay/play.css">
+<link rel="stylesheet" href="/overlay/plate.css">
 <link rel="stylesheet" href="/overlay/guest.css">
 <link rel="stylesheet" href="/overlay/alerts.css">
+<style>
+/* Vertical nameplate: a full-width strip between cam and game, the goal under the game. */
+.vstrip{position:absolute;left:0;right:0;top:818px;height:84px;background:#1B1014;border-top:4px solid var(--a);flex-direction:row;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 40px;animation:none}
+.vstrip .np-meta{font-size:22px;flex-wrap:nowrap;white-space:nowrap;overflow:hidden}
+.vstrip .ct b{font-size:56px}.vstrip .ct small{font-size:22px}.vstrip .ct .sk{width:42px;height:42px}.vstrip .ct .lb{font-size:16px}
+.vstrip .ct.two b{font-size:40px}
+.vstrip .fbs .r b{font-size:46px}.vstrip .fbs .r span{font-size:18px}.vstrip .fbs .gl{font-size:40px}
+.vgoal{position:absolute;left:40px;right:40px;top:1530px;border-left:6px solid var(--a);padding:4px 0 4px 22px}
+.vgoal .np-head{font-size:46px;line-height:1.05}
+html[data-head="m"] .vgoal .np-head{font-size:42px}
+html[data-head="l"] .vgoal .np-head{font-size:34px}
+.vcam{position:absolute;left:0;top:210px;width:1080px;height:608px}
+.vlogo{position:absolute;right:22px;top:18px;width:130px;height:auto;opacity:.75}
+</style>
 </head><body>
 
 <div class="sc">
-  <div class="bgwrap" aria-hidden="true"><div class="dots" aria-hidden="true"></div></div>
+  <div class="bgwrap" aria-hidden="true"></div>
 
-  <div style="position: absolute; left: 60px; right: 60px; top: 40px; height: 90px; display: flex; align-items: center; justify-content: space-between">
-    <img src="/madnco-logo.svg" alt="MadnCo. logo" style="width: 170px; height: auto">
-    <div style="display: flex; gap: 8px">
-      <span class="mono cut-s" style="display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 16px; background: #FF4D4D; color: #110A0C; font-size: 16px"><span class="ld"></span>Live</span>
-      <span data-hide="guest" class="mono cut-s" style="display: inline-flex; align-items: center; height: 46px; padding: 0 16px; background: #800020; font-size: 15px">@madnco8</span>
-      <span hidden data-show="guest" class="mono cut-s" style="display: inline-flex; align-items: center; height: 46px; padding: 0 16px; background: #F4EFE6; color: #110A0C; font-size: 15px">On&nbsp;<span data-text="guest-host"></span></span>
-      <span hidden data-show="game-only" class="mono" style="display:inline-flex;align-items:center;white-space:nowrap;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);height:46px;padding:0 16px;background:#30D5C8;color:#110A0C;font-size:15px">Now&nbsp;·&nbsp;<span data-text="game"></span></span>
+  <!-- 0–210: TikTok's header covers this. Cam full width under it. -->
+  <div class="vcam"><span class="camfx"></span><span class="rec mono">● REC</span>
+    <img class="vlogo" src="/overlay/logo-flat.png" alt="MadnCo. logo"></div>
+
+  <div class="vstrip np" hidden data-show="play">
+    <div class="np-meta mono">
+      <span class="mi" hidden data-show="play-title" data-text="play-short"></span>
+      <span class="mi" hidden data-show="play-part"><span data-text="play-unit"></span> <b data-text="play-part-n"></b></span>
+      <span class="co" hidden data-show="co">w/ <span data-text="co-name"></span></span>
+      <span class="fin" hidden data-show="play-final">Final</span>
+    </div>
+    <div class="np-stat">
+      <div class="ct" hidden data-show="play-c1-on">
+        <span class="skw" hidden data-show="play-c1-skull"><svg class="sk" viewBox="0 0 24 24" aria-hidden="true"><path class="b" d="M12 2C7 2 3.5 5.6 3.5 10.2c0 2.6 1.1 4.4 2.7 5.6V19c0 .8.6 1.4 1.4 1.4h1.1v-2h1.5v2h3.6v-2h1.5v2h1.1c.8 0 1.4-.6 1.4-1.4v-3.2c1.6-1.2 2.7-3 2.7-5.6C20.5 5.6 17 2 12 2z"/><circle cx="8.8" cy="10.6" r="2.3" fill="#110A0C"/><circle cx="15.2" cy="10.6" r="2.3" fill="#110A0C"/><path d="M12 13.2l-1.3 2.2h2.6z" fill="#110A0C"/></svg></span>
+        <span class="lb mono" hidden data-show="play-c1-named" data-text="play-c1-label"></span>
+        <b data-text="play-c1-n" data-pop>0</b><small data-text="play-c1-of"></small>
+      </div>
+      <div class="ct two" hidden data-show="play-c2-on">
+        <span class="lb mono" data-text="play-c2-label"></span>
+        <b data-text="play-c2-n" data-pop>0</b><small data-text="play-c2-of"></small>
+      </div>
+      <div class="fbs" hidden data-show="play-football">
+        <span class="r" hidden data-show="fb-record-on"><span class="mono" style="color: var(--a)">W</span><b data-text="fb-w" data-pop>0</b></span>
+        <span class="r" hidden data-show="fb-record-on"><span class="mono" style="color: #BBAAB1">D</span><b data-text="fb-d" data-pop>0</b></span>
+        <span class="r" hidden data-show="fb-record-on"><span class="mono" style="color: var(--b)">L</span><b data-text="fb-l" data-pop>0</b></span>
+        <span class="gl" hidden data-show="fb-goals-on" data-text="fb-goals">0:0</span>
+      </div>
     </div>
   </div>
-
-  <div style="position: absolute; left: 60px; top: 170px; width: 960px; height: 540px; background: transparent; display: flex; align-items: center; justify-content: center">
-    <span class="camfx"></span><span class="rec mono">● REC</span>
-    
-    <span class="br" style="top: -5px; left: -5px; border-top-width: 7px; border-left-width: 7px"></span>
-    <span class="br" style="top: -5px; right: -5px; border-top-width: 7px; border-right-width: 7px"></span>
-    <span class="br bb" style="bottom: -5px; left: -5px; border-bottom-width: 7px; border-left-width: 7px"></span>
-    <span class="br bb" style="bottom: -5px; right: -5px; border-bottom-width: 7px; border-right-width: 7px"></span>
-    <div style="position: absolute; left: 20px; bottom: 20px; display: flex; gap: 8px">
-      <span class="disp cut-s" style="display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 16px; background: #110A0C; font-size: 28px">MAD <span class="mono" style="font-size: 14px; color: var(--b)">P1</span></span>
-      <span hidden data-show="co" class="disp cut-s cochip" style="height: 46px; font-size: 28px">CO <span class="mono">· <span data-text="co-name"></span></span></span>
-      <span hidden data-show="co-open" class="disp cut-s cochip open" style="height: 46px; font-size: 28px">CO <span class="mono">· Slot open</span></span>
-    </div>
+  <div class="vstrip np" hidden data-show="game-only">
+    <div class="np-meta mono"><span class="mi">Now playing</span><span class="mi" style="color: #F4EFE6" data-text="game"></span><span class="co" hidden data-show="co">w/ <span data-text="co-name"></span></span></div>
   </div>
 
-  <div class="vframe" style="position: absolute; left: 0; top: 760px; width: 1080px; height: 608px; background: transparent; display: flex; align-items: center; justify-content: center; border-top: 5px solid #30D5C8; border-bottom: 5px solid #800020">
-    
-  </div>
+  <!-- 902–1510: the game, full width. -->
 
-  <div id="vplay" class="play" hidden data-show="play" style="position: absolute; left: 24px; top: 782px; transform: scale(.92); transform-origin: 0 0">
-      <div class="row"><div class="gm cut-s" hidden data-show="play-head-on"><span class="hzb"></span><div class="k mono"><span data-text="play-head-k">Now playing</span> · <span data-text="mood-name"></span></div><div class="t disp" data-text="play-head"></div></div>
-      <div class="pt cut-s" hidden data-show="play-part"><small class="mono" data-text="play-unit"></small><b data-text="play-part-n"></b></div></div>
-      <div class="final mono cut-s" hidden data-show="play-final">Final <span data-text="play-unit"></span> · tonight we finish it</div>
-      <div class="goal mono cut-s" hidden data-show="play-sub-on"><i>Playing</i><span data-text="play-name"></span></div>
-  </div>
-  <div id="vstats" hidden data-show="play" style="position: absolute; right: 24px; top: 782px; transform: scale(.92); transform-origin: 100% 0; display: flex; flex-direction: column; align-items: flex-end">
-      <div class="box cut-s" hidden data-show="play-counters"><svg class="ic ic-horror" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--a)" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3a7 7 0 0 0-7 7v4l-1.5 6 3-2 2 2 2-2 1.5 2 1.5-2 2 2 2-2 3 2L19 14v-4a7 7 0 0 0-7-7Z"/><circle cx="9" cy="10" r="1.3" fill="var(--a)"/><circle cx="15" cy="10" r="1.3" fill="var(--a)"/></svg><svg class="ic ic-action" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--a)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c-4 0-7 3-7 7 0 2.5 1.3 4 2.5 5v3h9v-3c1.2-1 2.5-2.5 2.5-5 0-4-3-7-7-7Z"/><path d="M9.5 18v3M14.5 18v3"/><circle cx="9.5" cy="11" r="1.4" fill="var(--a)"/><circle cx="14.5" cy="11" r="1.4" fill="var(--a)"/></svg><svg class="ic ic-story" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--a)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2V5Z"/><path d="M4 19a2 2 0 0 1 2-2h12"/></svg>
-        <div hidden data-show="play-c1-on"><div class="mono lb" data-text="play-c1-label"></div><b class="n a" data-text="play-c1">0</b></div>
-        <div class="sep" hidden data-show="play-c2-on"></div>
-        <div hidden data-show="play-c2-on"><div class="mono lb" data-text="play-c2-label"></div><b class="n" data-text="play-c2">0</b></div>
-      </div>
-      <div class="fb cut-s" hidden data-show="play-football">
-        <div class="c" hidden data-show="fb-record-on"><span class="mono" style="color:var(--a)">W</span><b data-text="fb-w">0</b></div>
-        <div class="c" hidden data-show="fb-record-on"><span class="mono" style="color:#BBAAB1">D</span><b data-text="fb-d">0</b></div>
-        <div class="c" hidden data-show="fb-record-on"><span class="mono" style="color:var(--b)">L</span><b data-text="fb-l">0</b></div>
-        <div class="g" hidden data-show="fb-goals-on"><span class="mono">Goals</span><b data-text="fb-goals">0:0</b></div>
-      </div>
-  </div>
-  <div hidden data-show="play-poll" style="position: absolute; right: 24px; top: 1000px; transform: scale(.82); transform-origin: 100% 0">
-      <div class="poll cut" >
+  <div class="vgoal" hidden data-show="play-goal-on"><div class="np-head" data-text="play-goal"></div></div>
+
+  <div hidden data-show="play-poll" style="position: absolute; right: 24px; top: 924px; transform: scale(.82); transform-origin: 100% 0">
+      <div class="poll cut">
         <div class="h mono"><span>Chat decides · type !1 !2</span><span data-text="poll-votes">0 votes</span></div>
         <div class="q disp" data-text="poll-q"></div>
         <div class="opts">
@@ -91,39 +95,22 @@ html[data-mood="football"] #vplay{display:none!important}</style>
         </div>
       </div>
   </div>
-  <div class="tape vtape" aria-hidden="true" style="top: 1400px; height: 60px; background: #30D5C8; color: #110A0C; transform: rotate(-2deg)">
+
+  <!-- Ticker (off by default on Gaming): just under the goal. -->
+  <div class="tape vtape" hidden data-show="ticker-gaming" aria-hidden="true" style="top: 1636px; height: 56px; background: #30D5C8; color: #110A0C; transform: rotate(-1.5deg)">
     <div class="track" data-ticker="gaming" data-upper>
-      <span style="font-size: 30px">FOLLOW @MADNCO8</span><i style="font-size: 20px">//</i><span style="font-size: 30px">MADNESS LOVES COMPANY</span><i style="font-size: 20px">//</i><span style="font-size: 30px">FOLLOW @MADNCO8</span><i style="font-size: 20px">//</i><span style="font-size: 30px">MADNESS LOVES COMPANY</span><i style="font-size: 20px">//</i>
-      <span style="font-size: 30px">FOLLOW @MADNCO8</span><i style="font-size: 20px">//</i><span style="font-size: 30px">MADNESS LOVES COMPANY</span><i style="font-size: 20px">//</i><span style="font-size: 30px">FOLLOW @MADNCO8</span><i style="font-size: 20px">//</i><span style="font-size: 30px">MADNESS LOVES COMPANY</span><i style="font-size: 20px">//</i>
+      <span style="font-size: 28px">FOLLOW @MADNCO8</span><i style="font-size: 20px">//</i><span style="font-size: 28px">MADNESS LOVES COMPANY</span><i style="font-size: 20px">//</i>
     </div>
   </div>
 
-  <div style="position: absolute; left: 60px; right: 60px; top: 1510px; bottom: 60px; border: 0; display: flex; align-items: center; justify-content: center; text-align: center">
-    
-  </div>
-  <div class="pinned cut" hidden data-show="guest">
+  <div class="pinned cut" hidden data-show="guest" style="top: 1720px">
     <div style="flex: 1; display: flex; flex-direction: column; gap: 8px"><span class="mono" style="font-size: 14px">Pinned · borrowed channel</span>
       <span class="t disp">Follow @madnco8: <span data-text="quest-left">23</span> more and we go LIVE at home</span></div>
     <span class="ar cut-s"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
   </div>
-  <div id="alert-lane" class="alane v" aria-live="polite" style="left: 40px; right: 40px; top: 1380px"></div>
+  <div id="alert-lane" class="alane v" aria-live="polite" style="left: 40px; right: 40px; top: 1520px"></div>
 </div>
 
 <script>(function(){var W=1080,H=1920;function fit(){var s=document.querySelector('.sc');var k=Math.min(innerWidth/W,innerHeight/H);s.style.transform='scale('+k+')';}addEventListener('resize',fit);fit();})();</script>
-
-<script>
-// Game title card + stats: top or bottom of the game area, card on the
-// game's preferred side, stats on the other. Called by live.js.
-window.MadnPlacePlay=function(pos){
- var a=document.getElementById('vplay'),b=document.getElementById('vstats');if(!a||!b)return;
- var top=pos[0]==='t',left=pos[1]==='l';
- [a,b].forEach(function(e){e.style.top=e.style.bottom=e.style.left=e.style.right='auto';});
- a.style[left?'left':'right']='24px';b.style[left?'right':'left']='24px';
- if(top){a.style.top=b.style.top='782px';}else{a.style.bottom=b.style.bottom='576px';}
- a.style.transformOrigin=(left?'0':'100%')+(top?' 0':' 100%');
- b.style.transformOrigin=(left?'100%':'0')+(top?' 0':' 100%');
- a.style.alignItems=left?'flex-start':'flex-end';b.style.alignItems=left?'flex-end':'flex-start';
-};
-</script>
 <script src="/overlay/live.js" defer></script>
 </body></html>
